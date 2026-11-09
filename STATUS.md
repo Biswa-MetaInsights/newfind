@@ -1,6 +1,18 @@
 # NewFind — Current State
 
-Owner: **Biswajith Gopinathan (Biswa-MetaInsights)**. Reviewed 2026-11-07.
+Owner: **Biswajith Gopinathan (Biswa-MetaInsights)**. Reviewed 2026-11-10.
+
+## Google activation — verified 2026-11-10 (Europe/Berlin)
+
+Owner: **Biswajith Gopinathan (Biswa-MetaInsights)**. This update supersedes older Google-disabled and frontend-promotion-blocked notes below; those entries describe earlier rollout states.
+
+The owner privately configured Google Web OAuth credentials using the guarded host script; an environment rollback copy was created. Compose validation passed and only NewFind auth was recreated with no dependencies or rebuild; the owner supplied healthy-container evidence. The public auth capabilities then returned Google enabled and Facebook disabled.
+
+Vercel production deployment `62hQTU5VXNFhjW1j4zzHSHyeM7eJ` rebuilt reviewed commit `445e88ae4b463b54b116b4b17966bdf700ab30cb` and became Ready at `https://newfind-khaki.vercel.app`. Previous production deployment `G2Pg85bZdqdgAczGZ16ybyNfYF1Z` remains the frontend rollback candidate. No TalktoFile or production networking changes were performed during this activation.
+
+Verified in the public browser: enabled Google button; Google account chooser; owner-approved device verification and basic name/profile/email consent; fresh authorization callback to the signed-in NewFind dashboard; persisted session after browser reload; private profile loaded and displayed **Google connected**. The initial callback expired during the extended verification and correctly rejected stale state; a fresh attempt succeeded. No credentials or authorization codes are included in this report.
+
+Remaining OAuth evidence: separate fresh-account signup, explicit linking of an existing password account, logout/returning-login cycle, cancellation, and real-device/mobile callback testing. Automated social-auth and credential-configuration suite passed 26 tests before activation; those isolated tests do not replace the remaining live journeys. Facebook remains disabled.
 
 ## Deployment state
 
