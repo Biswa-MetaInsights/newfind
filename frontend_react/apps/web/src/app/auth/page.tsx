@@ -9,6 +9,7 @@ import type { AuthTokens } from "@eventmind/types";
 import { isAxiosError } from "@eventmind/api";
 import { BrandLogo } from "@/components/brand";
 import { SocialSignIn } from "@/components/SocialSignIn";
+import { GUTTERS } from "@/lib/layout";
 
 export default function AuthPage() {
   const router = useRouter();
@@ -74,14 +75,27 @@ export default function AuthPage() {
   }
 
   return (
-    <div className="flex min-h-[100dvh]" style={{ backgroundColor: "var(--brand-bg)" }}>
+    <div className="flex min-h-[100dvh] flex-col" style={{ backgroundColor: "var(--brand-bg)" }}>
+      <header className="shrink-0 border-b border-[var(--brand-nav-border)] bg-[var(--brand-bg)]">
+        <nav aria-label="Home navigation" className={`flex min-h-[72px] flex-wrap items-center justify-between gap-x-4 gap-y-1 py-2 ${GUTTERS}`}>
+          <Link href="/" aria-label="NewFind — home" className="inline-flex shrink-0 items-center rounded-lg focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--brand-green)]">
+            <BrandLogo markSize={55} gap={16} style={{ color: "var(--brand-logo)" }} />
+          </Link>
+          <Link href="/" className="nf-control inline-flex min-h-11 items-center rounded-lg text-[var(--brand-text)] hover:underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--brand-green)]">
+            Back to home
+          </Link>
+        </nav>
+      </header>
+      <div className="flex flex-1">
       {/* Left panel — hidden on small screens. A fixed green fill in BOTH themes
           (like the footer), so everything on it takes --brand-on-green rather
           than the themed text tokens. */}
       <div className="hidden lg:flex lg:flex-1 items-center justify-center p-16"
         style={{ backgroundColor: "var(--brand-green)", color: "var(--brand-on-green)" }}>
         <div className="max-w-md">
-          <BrandLogo markSize={70} gap={14} className="mb-10" />
+          <Link href="/" aria-label="NewFind — home" className="inline-block rounded-lg focus-visible:outline-2 focus-visible:outline-offset-4">
+            <BrandLogo markSize={70} gap={14} className="mb-10" />
+          </Link>
           <h1 className="text-[42px] font-extrabold leading-tight mb-6">
             Unlock Your Next<br />Great Experience.
           </h1>
@@ -190,6 +204,7 @@ export default function AuthPage() {
 
           <SocialSignIn disabled={isLoading} />
         </div>
+      </div>
       </div>
     </div>
   );
