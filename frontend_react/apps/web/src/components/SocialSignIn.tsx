@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { apiClient, isAxiosError } from "@eventmind/api";
 
@@ -14,6 +14,10 @@ const providers = [
 export function SocialSignIn({ mode = "signin", disabled = false }: { mode?: "signin" | "link"; disabled?: boolean }) {
   const [busy, setBusy] = useState<Provider | null>(null);
   const [error, setError] = useState("");
+  const errorRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (error) errorRef.current?.focus();
+  }, [error]);
   const capabilities = useQuery({
     queryKey: ["auth-capabilities"],
     queryFn: () => apiClient.get<Capabilities>("/auth/capabilities").then(r => r.data),
@@ -36,13 +40,20 @@ export function SocialSignIn({ mode = "signin", disabled = false }: { mode?: "si
       if (target.protocol !== "https:" || target.hostname !== provider.host) throw new Error("Invalid provider destination");
       window.location.assign(target.href);
     } catch (cause) {
-      setError(isAxiosError(cause) && typeof cause.response?.data?.detail === "string"
-        ? cause.response.data.detail : "Sign-in could not start. Please try again.");
+      const detail = isAxiosError(cause) ? cause.response?.data?.detail : undefined;
+      setError(detail === "Start social sign-in from NewFind"
+        ? `${provider.name} sign-in is temporarily unavailable on this website. Please sign in with email and password while we resolve it.`
+        : typeof detail === "string" ? detail : `${provider.name} sign-in could not start. Please try again or use email and password.`);
       setBusy(null);
     }
   }
 
   return <div className="space-y-4">
+    {error && <div ref={errorRef} role="alert" tabIndex={-1}
+      className="nf-meta rounded-lg border-2 border-red-500 p-4 text-[var(--brand-text)] focus:outline-2 focus:outline-offset-2 focus:outline-red-500">
+      <p className="font-semibold mb-1">Sign-in could not start</p>
+      <p>{error}</p>
+    </div>}
     {providers.map(provider => {
       const linked = mode === "link" && connected.data?.includes(provider.id);
       const available = capabilities.data?.[provider.id] === true;
@@ -58,6 +69,5 @@ export function SocialSignIn({ mode = "signin", disabled = false }: { mode?: "si
     })}
     {capabilities.isError && <p role="alert" className="nf-meta">Sign-in options could not be loaded. Refresh the page to try again.</p>}
     {mode === "link" && connected.isError && <p role="alert" className="nf-meta">Connected accounts could not be loaded. Please sign in again.</p>}
-    {error && <p role="alert" className="nf-meta">{error}</p>}
   </div>;
 }
