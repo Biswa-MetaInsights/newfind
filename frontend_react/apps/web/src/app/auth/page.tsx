@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { authApi } from "@eventmind/api";
@@ -87,12 +88,14 @@ export default function AuthPage() {
         </nav>
       </header>
       <div className="flex flex-1">
-      {/* Left panel — hidden on small screens. A fixed green fill in BOTH themes
-          (like the footer), so everything on it takes --brand-on-green rather
-          than the themed text tokens. */}
-      <div className="hidden lg:flex lg:flex-1 items-center justify-center p-16"
+      {/* Homepage photography with a consistent green overlay in both themes. */}
+      <div className="relative hidden overflow-hidden lg:flex lg:flex-1 items-center justify-center p-16"
         style={{ backgroundColor: "var(--brand-green)", color: "var(--brand-on-green)" }}>
-        <div className="max-w-md">
+        <Image src="/hero/hero-3.png" alt="" fill
+          sizes="(min-width: 1024px) 50vw, 0px" className="object-cover" />
+        <div aria-hidden="true" className="absolute inset-0"
+          style={{ background: "linear-gradient(180deg, color-mix(in srgb, var(--brand-green) 55%, transparent), color-mix(in srgb, var(--brand-green) 88%, transparent))" }} />
+        <div className="relative z-10 max-w-md">
           <Link href="/" aria-label="NewFind — home" className="inline-block rounded-lg focus-visible:outline-2 focus-visible:outline-offset-4">
             <BrandLogo markSize={70} gap={14} className="mb-10" />
           </Link>

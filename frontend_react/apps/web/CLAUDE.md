@@ -57,7 +57,7 @@ Usage: `style={{ color: "var(--brand-text)" }}`, or the `BRAND` string map from 
 Tailwind arbitrary values (`text-[var(--brand-hint)]`). **Alpha tints need
 `color-mix(in srgb, var(--brand-green) N%, transparent)`** — a CSS var can't take a hex-alpha suffix.
 
-**Intentionally not themed:** `Footer.tsx`, `/auth`'s left panel (green fill in both themes, so its
+**Intentionally not themed:** `Footer.tsx`, `/auth`'s left panel (homepage photography with a fixed green overlay in both themes, so its
 logo/heading/blurb all take `--brand-on-green`), the `HeroCarousel` letterbox, and semantic accents
 (badge colours, star gold, error red, status green/amber, Google/Facebook brand colours).
 

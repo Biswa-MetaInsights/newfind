@@ -4,7 +4,7 @@ Owner: **Biswajith Gopinathan (Biswa-MetaInsights)**. Reviewed 2026-11-10.
 
 ## Custom domain and authentication navigation — 2026-11-10
 
-The custom domain `https://www.newfind.events` serves the production app; the apex redirects to it and HTTPS is active. The authentication page now has a responsive NewFind home header and Back to home link, and its desktop-panel logo also links home. Google login on the custom domain is blocked by the backend's exact-origin check: `APP_PUBLIC_URL` still points to the Vercel hostname. The backend origin and Google OAuth authorized origin/callback require coordinated migration; existing credentials remain enabled. Do not claim custom-domain Google login verified until a fresh callback and persisted session pass.
+The custom domain `https://www.newfind.events` serves the production app; the apex redirects to it and HTTPS is active. The authentication page has a responsive NewFind home header and Back to home link, and its desktop-panel logo also links home. The header and focused social-auth error panel were deployed and verified on the custom domain. The desktop sign-in/sign-up panel uses the homepage food-market photo with a fixed green overlay; the form remains on its themed plain surface. Google login on the custom domain is blocked by the backend's exact-origin check: `APP_PUBLIC_URL` still points to the Vercel hostname. The backend origin and Google OAuth authorized origin/callback require coordinated migration; existing credentials remain enabled. Do not claim custom-domain Google login verified until a fresh callback and persisted session pass.
 
 ## Google activation — verified 2026-11-10 (Europe/Berlin)
 
