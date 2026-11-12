@@ -16,7 +16,7 @@ Desktop browser verification confirms the original hero/font, sign-in header/pho
 
 The owner selected Google and reached consent and the live NewFind callback. That email already has a password account, so explicit linking is required. Password sign-in then returned `Incorrect username or password`. Password recovery and subsequent Dashboard → Profile linking require the owner's input. This is not evidence of a completed Google session.
 
-Automatic approval review rejected the separate production-data QA run because it would create persistent live accounts, tickets and messages. It must not be rerun without explicit permission for those records. Browser device emulation is blocked by the organisation's DevTools policy; mobile and authenticated browser journeys remain unverified. Detailed evidence is in `Eventmind_files/GAUTHAM_FRONTEND_INTEGRATION_QA.md`.
+Automatic approval review rejected the separate production-data QA run because it would create persistent live accounts, tickets and messages. It must not be rerun without explicit permission for those records. Device emulation is blocked by the organisation's DevTools policy. Normal browser zoom provides a narrow CSS viewport for geometry checks: at 454 px the event-heading location panel started at x=-104 px. A viewport-bounded scrollable picker with a mobile Close button is prepared; deployment validation and authenticated browser journeys remain pending. Detailed evidence is in `Eventmind_files/GAUTHAM_FRONTEND_INTEGRATION_QA.md`.
 
 ## Backend and operations
 

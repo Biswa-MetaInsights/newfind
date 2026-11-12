@@ -47,7 +47,12 @@ export function CityPicker({ variant = "pill", label }: { variant?: "pill" | "ic
       </button>
       {open && (
         <div id={popupId} role="region" aria-label="Choose search location"
-          className="absolute right-0 top-full mt-2 p-4 w-[320px] max-w-[calc(100vw-32px)] max-h-[70dvh] overflow-y-auto overscroll-contain rounded-lg shadow-xl z-[90] border border-[var(--brand-border)] bg-[var(--brand-surface)]">
+          className="fixed inset-x-4 top-4 p-4 max-h-[calc(100dvh-32px)] overflow-y-auto overscroll-contain rounded-lg shadow-xl z-[90] border border-[var(--brand-border)] bg-[var(--brand-surface)] lg:absolute lg:inset-x-auto lg:right-0 lg:top-full lg:mt-2 lg:w-[320px] lg:max-h-[70dvh]">
+          <div className="flex items-center justify-between gap-3 mb-3 lg:hidden">
+            <h2 className="text-[18px] font-bold">Choose location</h2>
+            <button type="button" className="min-h-11 px-3 rounded-lg border border-[var(--brand-control-border)]"
+              onClick={() => { setOpen(false); trigger.current?.focus(); }}>Close</button>
+          </div>
           <LocationSelector value={city} onChange={next => { setCity(next); setOpen(false); trigger.current?.focus(); }} />
         </div>
       )}
