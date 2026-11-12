@@ -28,7 +28,7 @@ Retain the restored PR 9 hero, Roboto font, brand stylesheet and component geome
 - Production deployment `7Udocu8Lk5njFevNjpcYJNSVfc4h` is Ready and assigned to `www.newfind.events`; application source `726a79f80e0d311047af5069bf874b6d97229831`.
 - Browser: original two-column hero, Roboto font, sign-in photo/header/home navigation, Help route, and API-backed Leuven selection verified. Desktop scroll width did not exceed the viewport.
 - Google: button opens Google, owner selected an account, consent returned to NewFind; existing password-account collision correctly requires explicit linking. Password entered by the owner was rejected. Recovery/linking and persisted signed-in browser checks remain blocked on owner input.
-- Device emulation: blocked by the organisation's DevTools policy; no mobile-test claim.
+- Device emulation is blocked by policy. Normal browser zoom reproduced a location panel beginning at x=-104 px. Hotfix `6bb9ac3` is live in production deployment `6qR5LyCLegpA7XaZjQAWKhAhEeMd`; its bounded scrollable panel passed at 340, 454, 545, 681, 779 and 909 CSS px from the heading and mobile menu. Live 340 px panel bounds: left/top 16, right 321, bottom 218, viewport 340×234. Home/auth/discovery and expanded discovery location have no horizontal overflow at 340 px. This does not replace real-device touch/keyboard or signed-in organiser QA.
 - Production-data QA: automatic approval review rejected creating persistent live test accounts/tickets/messages. No successful live mutation journey is claimed; explicit permission is required before retrying.
 - Follow-up test-harness fix uses ESM imports; the booking-client test and lint were rerun successfully. No deployed application behavior changed.
 
