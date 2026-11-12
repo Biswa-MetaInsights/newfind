@@ -41,7 +41,7 @@ def test_frontend_booking_is_persistent_idempotent_and_owner_scoped(core):
 
     def frontend(action='book', credential=token, quantity=2):
         command = [os.environ.get('CODEX_PRIMARY_RUNTIME_NODE') or shutil.which('node'),
-                   str(ROOT / 'frontend_react/apps/web/scripts/booking-contract.cjs')]
+                   str(ROOT / 'frontend_react/apps/web/scripts/booking-contract.mjs')]
         result = subprocess.run(command, input=json.dumps({'origin': str(client.base_url), 'token': credential,
                                 'eventId': event_id, 'requestId': request_id, 'quantity': quantity,
                                 'action': action}), text=True, capture_output=True, timeout=30)

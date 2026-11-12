@@ -25,7 +25,12 @@ Retain the restored PR 9 hero, Roboto font, brand stylesheet and component geome
 - Frontend TypeScript: passed.
 - Production build: passed, including recovery, provider callback and Help/About routes.
 - ESLint: no errors; existing unused-symbol warnings remain.
-- Browser and production-domain evidence: pending candidate deployment.
+- Production deployment `7Udocu8Lk5njFevNjpcYJNSVfc4h` is Ready and assigned to `www.newfind.events`; application source `726a79f80e0d311047af5069bf874b6d97229831`.
+- Browser: original two-column hero, Roboto font, sign-in photo/header/home navigation, Help route, and API-backed Leuven selection verified. Desktop scroll width did not exceed the viewport.
+- Google: button opens Google, owner selected an account, consent returned to NewFind; existing password-account collision correctly requires explicit linking. Password entered by the owner was rejected. Recovery/linking and persisted signed-in browser checks remain blocked on owner input.
+- Device emulation: blocked by the organisation's DevTools policy; no mobile-test claim.
+- Production-data QA: automatic approval review rejected creating persistent live test accounts/tickets/messages. No successful live mutation journey is claimed; explicit permission is required before retrying.
+- Follow-up test-harness fix uses ESM imports; the booking-client test and lint were rerun successfully. No deployed application behavior changed.
 
 SQLite service tests do not establish PostgreSQL concurrency behavior or real-device UI correctness. Prior release PostgreSQL tests remain separate historical evidence.
 
