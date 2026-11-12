@@ -66,6 +66,7 @@
 // ─────────────────────────────────────────────────────────────────────────────
 
 import Link from 'next/link'
+import { isDummyMode } from '@/lib/data-source'
 import { BRAND } from '@/lib/theme'
 import { GUTTERS } from '@/lib/layout'
 import { Wordmark } from './brand'
@@ -181,7 +182,7 @@ function BodyLink({
  *  numeric drop here — that is what sat it low the first time.
  *
  *  The `-translate-y` on top of it is the nudge from the x-height centre up to
- *  the CAP-height centre — Roboto's x-height is ~0.53em and its cap height
+ *  the CAP-height centre — the previous font's x-height is ~0.53em and its cap height
  *  ~0.71em, so their midpoints differ by ~0.09em, and that is the whole constant.
  *  A disc this much taller than the text reads low when centred on lowercase.
  *  It is a transform, NOT a vertical-align offset, so it stays independent of
@@ -217,8 +218,8 @@ const FEATURES: Record<Audience, Feature[]> = {
       // Spec: TODO.md §16. (The assistant card below is a DIFFERENT feature and
       // stays.)
       id: 'chat',
-      title: 'Talk to the organiser before you go',
-      body: 'Every event has its own room. Ask the organiser, meet the people going, even before it starts. Say goodbye to endless emails.',
+      title: isDummyMode ? 'Talk to the organiser before you go' : 'Find your next event',
+      body: isDummyMode ? 'Every event has its own room. Ask the organiser, meet the people going, even before it starts. Say goodbye to endless emails.' : 'Explore upcoming events, read the details, and find something you want to join.',
     },
     // ⚠️ PARKED, NOT DELETED (Gautham, 2026-08-19) — "Everything in one feed" is
     // commented out so Participants runs two cards + the CTA tile. Uncomment to
@@ -233,7 +234,7 @@ const FEATURES: Record<Audience, Feature[]> = {
     // },
     {
       id: 'assistant',
-      title: 'An AI assistant that knows the event inside out',
+      title: isDummyMode ? 'An AI assistant that knows the event inside out' : 'Your tickets, saved',
       // ⚠️ THE GLYPH IS THE NOUN — it is not decoration beside a description of
       // the button, it IS the word (Gautham, 2026-08-20: "the emoji/symbol alone
       // is enough"). An earlier draft read "just tap the terracotta button" and
@@ -243,8 +244,7 @@ const FEATURES: Record<Audience, Feature[]> = {
       // its place. **Do not delete it without putting words back.**
       body: (
         <>
-          Ask it what to bring, where to go, what to expect, and more — just tap the{' '}
-          <AssistantLauncherGlyph /> on any event to start chatting.
+          {isDummyMode ? <>Ask it what to bring, where to go, what to expect, and more — just tap the{' '}<AssistantLauncherGlyph /> on any event to start chatting.</> : 'Book a free event and find your confirmed ticket in My Dashboard whenever you sign in.'}
         </>
       ),
     },
@@ -257,14 +257,14 @@ const FEATURES: Record<Audience, Feature[]> = {
   organisers: [
     {
       id: 'stats',
-      title: 'Everything an organiser wants, in one place',
+      title: 'Your events in one place',
       body: (
         <>
-          See all your event info and stats in the{' '}
+          Find your events in the{' '}
           <BodyLink href="/organizer/events" audience="organisers">
             organiser console
           </BodyLink>{' '}
-          — one at a time, or all together.
+          — open an event to view or update its details.
         </>
       ),
     },
@@ -280,8 +280,8 @@ const FEATURES: Record<Audience, Feature[]> = {
       // total as an itemised line. TODO.md §13 carries the spec — keep the two
       // in step, because this card is the promise and §13 is the work.
       id: 'pricing',
-      title: 'Free to list. Small fee for paid events.',
-      body: 'Free events cost nothing to participants and organisers. Participants pay a mere 2% convenience fee on paid events.',
+      title: 'Free events. Free tickets.',
+      body: 'Publish a free event and let participants reserve their places. Paid checkout is not available yet.',
     },
   ],
 }
@@ -331,8 +331,8 @@ const TILE =
   'bg-[var(--brand-surface)] border-[var(--brand-control-border)]'
 
 /** ⚠️ THE TYPE SCALE IS THE EVENT CARD'S, not this band's own (Gautham,
- *  2026-08-19): a tile title is `text-[20px] font-bold` and its body
- *  `text-[18px]`, the same pair `EventCardItem` uses for an event title and its
+ *  2026-08-19): a tile title uses `text-[20px] font-bold leading-snug` and its body
+ *  uses `text-[18px] leading-relaxed`, the same pair `EventCardItem` uses for an event title and its
  *  date/venue line — the two sit on the same page and were visibly out of step
  *  at 18/16. **If `EventsCarousel`'s card sizes move, move these with them**;
  *  they are a deliberate match, not a coincidence. The `SeeAllTile` in that file

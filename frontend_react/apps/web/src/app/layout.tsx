@@ -28,6 +28,7 @@ const appFont = Roboto({
 // The replacement title is Gautham's wording, not a placeholder: online/offline
 // is the FORMAT axis, which is what the MVP is actually about.
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://www.newfind.events"),
   title: "NewFind: find new online and offline events",
   description:
     "AI-powered platform to discover events and experiences near you.",

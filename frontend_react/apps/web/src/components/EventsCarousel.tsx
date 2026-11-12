@@ -104,8 +104,8 @@ export const CARD_GRID = 'grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5'
 const IMAGE_SIZES =
   '(max-width: 639px) calc(100vw - 32px), (max-width: 1279px) calc(50vw - 34px), calc(25vw - 39px)'
 
-const FILTER_TABS = ['All', 'Recommended', 'This Week', 'Free', 'Music', 'Food']
-const ONLINE_FILTER_TABS = ['All', 'Recommended', 'Free', 'This Week', 'Selling Fast']
+const FILTER_TABS = ['All', 'This Week', 'Free', 'Music', 'Food']
+const ONLINE_FILTER_TABS = ['All', 'Free', 'This Week', 'Selling Fast']
 
 // ─── Filter tabs ───────────────────────────────────────────────────────────────
 
@@ -668,8 +668,8 @@ function SeeAllTile({ events, href }: { events: CarouselEvent[]; href: string })
         ))}
       </div>
 
-      {/* Label — font sizes intentionally match event title (text-[20px] font-bold)
-          and date/venue line (text-[18px]) so they stay in sync when those change.
+      {/* Label — uses the same card-title role as event cards
+          and date/venue line (text-[15px]) so they stay in sync when those change.
           ⚠️ FeatureBand's tiles copy the same 20/18 pair for the same reason (they
           sit on this page too) — move those with these. */}
       <div className="flex flex-col items-center gap-1 text-center">

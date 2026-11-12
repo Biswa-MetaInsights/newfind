@@ -9,6 +9,10 @@
 
 ---
 
+## 2026-11-12
+
+- Prepared core API integration behind Gautham’s restored frontend, with persistent booking verification and provider import support.
+
 ## 2026-11-07
 - **Biswajith Gopinathan** — deploy auth/gateway social backend with protected backup/restore and rollback images; verify health, preserved Gmail configuration and unchanged TalktoFile starts; provider activation and frontend promotion remain pending.
 - **Biswajith Gopinathan** — prepare browser-bound Google/Facebook authorization-code sign-in, signed Google identity verification and explicit account linking with isolated security tests; Google provider activation and live OAuth QA remain pending.
