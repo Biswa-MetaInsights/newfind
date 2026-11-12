@@ -3,6 +3,8 @@
 import { use, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
+import { useRegistrationState } from "@/lib/use-registration-state";
+import { registrationState } from "@/lib/registration-state";
 import { bookFreeEvent } from "@/lib/bookings";
 import { isExternalEvent } from "@/lib/external-events";
 import { eventsSource } from "@/lib/data-source";
@@ -44,6 +46,8 @@ export default function CheckoutPage({
     enabled: hasHydrated && isAuthenticated,
   });
 
+  const registration = useRegistrationState(event);
+
   if (!hasHydrated || !isAuthenticated) return null;
 
   if (isError) {
@@ -61,6 +65,14 @@ export default function CheckoutPage({
           style={{ borderColor: `${GREEN} transparent transparent transparent` }} />
       </div>
     );
+  }
+
+  if (!registration.available) {
+    return <div className="min-h-screen bg-[var(--brand-bg)] text-[var(--brand-text)]"><Navbar />
+      <main className={`py-12 ${GUTTERS}`}><h1 className="text-[28px] font-bold">{registration.label}</h1>
+        <p className="mt-4 text-[18px]">This event is not accepting new bookings.</p>
+        <button onClick={() => router.push(`/event/${id}`)} className="mt-6 px-5 py-3 rounded-lg bg-[var(--brand-green)] text-[var(--brand-on-green)]">View event details</button>
+      </main></div>;
   }
 
   if (isExternalEvent(event)) {
@@ -83,6 +95,7 @@ export default function CheckoutPage({
   const money = (amount: number) => formatPrice(amount, event.currency, { decimals: true, freeLabel: null });
 
   async function handlePay() {
+    if (!registrationState(event!, Date.now()).available) { setError("Registration is no longer open for this event."); return; }
     setError(null);
     setIsProcessing(true);
     try {

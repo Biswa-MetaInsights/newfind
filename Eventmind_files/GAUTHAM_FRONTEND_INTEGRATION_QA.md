@@ -34,6 +34,10 @@ Retain the restored PR 9 hero, Roboto font, brand stylesheet and component geome
 
 SQLite service tests do not establish PostgreSQL concurrency behavior or real-device UI correctness. Prior release PostgreSQL tests remain separate historical evidence.
 
+## Booking-date correction
+
+The reported November 9 QA listing is dated 2030-11-09T08:30:00Z, not November 2026. The year is now explicit in cards/details. Shared registration-state checks gate event-card and sticky controls and direct checkout, including already-started, ended, completed, cancelled, closed, invalid-date and sold-out cases. An open page rechecks at start/end boundaries. Twelve Node regression cases passed; TypeScript and focused lint passed. Deployment verification is pending.
+
 ## External and deferred work
 
 - Ticketmaster/OpenAgenda/publiq imports need usable host credentials/permissions and a verified import run. No keys are included in source and no importer is scheduled by this frontend change.

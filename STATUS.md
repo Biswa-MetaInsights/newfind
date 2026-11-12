@@ -10,6 +10,8 @@ The frontend reconnects the existing API proxy, social callbacks, recovery, pers
 
 ## Verification and blockers
 
+A booking-date correction is prepared: the reported QA event actually starts on 2030-11-09, but the old display omitted the year. Event cards/details now show the year. Shared registration checks close native bookings at the start, label ended/completed events, and keep the card/sticky/checkout controls consistent. Twelve regression cases passed, including exact start/end instants and time-zone offsets; live validation is pending.
+
 56 isolated automated tests passed; one optional restic test was skipped. The actual TypeScript booking client passed retry/restart/account-isolation checks against isolated running services. Production build and TypeScript passed. ESLint has no errors and four existing warnings. A follow-up commit converts the test harness to ESM; it does not change the deployed application.
 
 Desktop browser verification confirms the original hero/font, sign-in header/photo/home link, live Help page, API-backed Leuven search and an enabled Google button. Production `/api/auth/capabilities` returns Google/recovery/verification enabled and Facebook disabled.

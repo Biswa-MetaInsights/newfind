@@ -2,6 +2,8 @@
 
 import { use, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useRegistrationState } from "@/lib/use-registration-state";
+import { registrationState } from "@/lib/registration-state";
 import { useQuery } from "@tanstack/react-query";
 import { reviewsApi, organizerApi } from "@eventmind/api";
 import { eventsSource, isDummyMode } from "@/lib/data-source";
@@ -87,6 +89,8 @@ export default function EventDetailPage({
     queryKey: ["event", id],
     queryFn: () => eventsSource.get(id).then((r) => r.data),
   });
+
+  const registration = useRegistrationState(event);
 
   const { data: organizer } = useQuery({
     queryKey: ["public-organizer", event?.organizer_id],
@@ -202,7 +206,8 @@ export default function EventDetailPage({
   const external = isExternalEvent(event);
   const providerName = externalProviderName(event);
   const providerUrl = externalTicketUrl(event);
-  const bookable = !cancelled && !registrationClosed && (!external || !!providerUrl);
+  const bookable = registration.available && (!external || !!providerUrl);
+  const bookingLabel = registration.available && external ? `View on ${providerName}` : registration.label;
   const DIMMED = cancelled ? "grayscale opacity-60" : "";
   // The shared card controls speak CarouselEvent, so a wishlist save from here is
   // byte-identical to one from a card and renders the same in /dashboard.
@@ -210,7 +215,7 @@ export default function EventDetailPage({
   const location = locationLabel(event);
 
   function handleBookNow() {
-    if (!bookable) return;
+    if (!bookable || !registrationState(event!, Date.now()).available) return;
     if (external) {
       if (providerUrl) window.location.assign(providerUrl);
       return;
@@ -475,13 +480,15 @@ export default function EventDetailPage({
               <OrganiserEventCard event={event} organiserName={organizerName} verified={organizerVerified} />
             ) : (
               <BookingCard
+                bookingLabel={bookingLabel}
+                bookingDisabled={!bookable}
                 external={external}
                 providerName={providerName}
                 providerAvailable={!!providerUrl}
                 unlimited={event.capacity === 0}
                 cancelled={cancelled}
                 registrationClosed={registrationClosed}
-                dateLabel={fmt(event.start_date, { weekday: "long", month: "short", day: "numeric", timeZone: event.timezone || "UTC" })}
+                dateLabel={fmt(event.start_date, { weekday: "long", month: "short", day: "numeric", year: "numeric", timeZone: event.timezone || "UTC" })}
                 timeLabel={fmtTime(event.start_date,event.timezone || "UTC")}
                 location={location}
                 organizer={organizerName}
@@ -539,7 +546,7 @@ export default function EventDetailPage({
           amount={external ? `Check ${providerName}` : formatPrice(event.price, event.currency)}
           // Same priority as the booking card's CTA below, and for the same
           // reason: cancelled outranks closed outranks full.
-          cta={cancelled ? "Event cancelled" : registrationClosed ? "Registration closed" : external ? `View on ${providerName}` : "Book Now"}
+          cta={bookingLabel}
           onClick={handleBookNow}
           disabled={!bookable}
           gutters={GUTTERS}
@@ -613,6 +620,8 @@ function CancelledBanner() {
  * copy and the data are this page's own.
  */
 function BookingCard({
+  bookingLabel,
+  bookingDisabled,
   dateLabel,
   timeLabel,
   location,
@@ -632,6 +641,8 @@ function BookingCard({
   registrationClosed = false,
   onBook,
 }: {
+  bookingLabel: string;
+  bookingDisabled: boolean;
   dateLabel: string;
   timeLabel: string;
   location: string;
@@ -691,7 +702,7 @@ function BookingCard({
               directly above a disabled "Registration closed" button and read as
               a bug — scarcity copy only makes sense while the seats are
               claimable. */}
-          {!soldOut && !registrationClosed && <DetailAccentChip text={unlimited ? "Open registration" : `${left} spots left`} />}
+          {!soldOut && !registrationClosed && !bookingDisabled && <DetailAccentChip text={unlimited ? "Open registration" : `${left} spots left`} />}
         </div>}
 
         {external && <p className="mt-6 text-[16px]">Check {providerName} for admission details and availability. NewFind does not issue tickets for this listing.</p>}
@@ -711,17 +722,9 @@ function BookingCard({
             so every full-width control on this page reads as one system. The
             sticky bar below keeps the green fill; it is a different surface. */}
         <DetailCTA
-          label={
-            cancelled
-              ? "Event cancelled"
-              : registrationClosed
-                ? "Registration closed"
-                : soldOut
-                  ? "Sold Out"
-                  : external ? `View on ${providerName}` : "Book Now"
-          }
+          label={bookingLabel}
           onClick={onBook}
-          disabled={cancelled || registrationClosed || soldOut || (external && !providerAvailable)}
+          disabled={bookingDisabled || cancelled || registrationClosed || soldOut || (external && !providerAvailable)}
           variant="outline"
         />
       </DetailCardBody>

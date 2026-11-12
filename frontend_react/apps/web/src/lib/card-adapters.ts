@@ -40,7 +40,7 @@ function isThisWeek(startDate: Date): boolean {
 export function cardDateTime(iso: string, timeZone?: string): { date: string; time: string } {
   const start = new Date(iso);
   return {
-    date: start.toLocaleDateString("en-IN", { weekday: "short", day: "numeric", month: "short", timeZone }),
+    date: start.toLocaleDateString("en-IN", { weekday: "short", day: "numeric", month: "short", year: "numeric", timeZone }),
     time: start.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit", hour12: true, timeZone }),
   };
 }
