@@ -1,78 +1,39 @@
 # NewFind — Current State
 
-Owner: **Biswajith Gopinathan (Biswa-MetaInsights)**. Reviewed 2026-11-10.
+Owner: **Biswajith Gopinathan (Biswa-MetaInsights)**. Reviewed 2026-11-12.
 
-## Custom domain and authentication navigation — 2026-11-10
+## Live frontend
 
-The custom domain `https://www.newfind.events` serves the production app; the apex redirects to it and HTTPS is active. The authentication page has a responsive NewFind home header and Back to home link, and its desktop-panel logo also links home. The header and focused social-auth error panel were deployed and verified on the custom domain. The desktop sign-in/sign-up panel uses the homepage food-market photo with a fixed green overlay; the form remains on its themed plain surface. Google login on the custom domain is blocked by the backend's exact-origin check: `APP_PUBLIC_URL` still points to the Vercel hostname. The backend origin and Google OAuth authorized origin/callback require coordinated migration; existing credentials remain enabled. Do not claim custom-domain Google login verified until a fresh callback and persisted session pass.
+The integrated Gautham design is live at `https://www.newfind.events/`, source commit `6bb9ac3c7486d40c78cd068d4d197c9f9d18190c`, production deployment `6qR5LyCLegpA7XaZjQAWKhAhEeMd` (Ready, 34-second build). The restored PR 9 hero, Roboto font, original stylesheet and component geometry are retained. The original unintegrated rollback remains `d72f4b022e0db5ac121b6d9e9aa71c4652f7b602` / deployment `APq2aaEGNWqM72nViksqQhDvY4vE`.
 
-## Google activation — verified 2026-11-10 (Europe/Berlin)
+The frontend reconnects the existing API proxy, social callbacks, recovery, persistent free booking/private QR, organiser operations, event content, place discovery, profile, notification, conversation and community APIs. Help and About routes work. Prepared OpenAgenda importer code is included in the repository but has not been installed or run on the backend host. Production backend containers and database schemas are unchanged.
 
-Owner: **Biswajith Gopinathan (Biswa-MetaInsights)**. This update supersedes older Google-disabled and frontend-promotion-blocked notes below; those entries describe earlier rollout states.
+## Verification and blockers
 
-The owner privately configured Google Web OAuth credentials using the guarded host script; an environment rollback copy was created. Compose validation passed and only NewFind auth was recreated with no dependencies or rebuild; the owner supplied healthy-container evidence. The public auth capabilities then returned Google enabled and Facebook disabled.
+A booking-date correction is prepared: the reported QA event actually starts on 2030-11-09, but the old display omitted the year. Event cards/details now show the year. Shared registration checks close native bookings at the start, label ended/completed events, and keep the card/sticky/checkout controls consistent. Twelve regression cases passed, including exact start/end instants and time-zone offsets; live validation is pending.
 
-Vercel production deployment `62hQTU5VXNFhjW1j4zzHSHyeM7eJ` rebuilt reviewed commit `445e88ae4b463b54b116b4b17966bdf700ab30cb` and became Ready at `https://newfind-khaki.vercel.app`. Previous production deployment `G2Pg85bZdqdgAczGZ16ybyNfYF1Z` remains the frontend rollback candidate. No TalktoFile or production networking changes were performed during this activation.
+56 isolated automated tests passed; one optional restic test was skipped. The actual TypeScript booking client passed retry/restart/account-isolation checks against isolated running services. Production build and TypeScript passed. ESLint has no errors and four existing warnings. A follow-up commit converts the test harness to ESM; it does not change the deployed application.
 
-Verified in the public browser: enabled Google button; Google account chooser; owner-approved device verification and basic name/profile/email consent; fresh authorization callback to the signed-in NewFind dashboard; persisted session after browser reload; private profile loaded and displayed **Google connected**. The initial callback expired during the extended verification and correctly rejected stale state; a fresh attempt succeeded. No credentials or authorization codes are included in this report.
+Desktop browser verification confirms the original hero/font, sign-in header/photo/home link, live Help page, API-backed Leuven search and an enabled Google button. Production `/api/auth/capabilities` returns Google/recovery/verification enabled and Facebook disabled.
 
-Remaining OAuth evidence: separate fresh-account signup, explicit linking of an existing password account, logout/returning-login cycle, cancellation, and real-device/mobile callback testing. Automated social-auth and credential-configuration suite passed 26 tests before activation; those isolated tests do not replace the remaining live journeys. Facebook remains disabled.
+The owner selected Google and reached consent and the live NewFind callback. That email already has a password account, so explicit linking is required. Password sign-in then returned `Incorrect username or password`. Password recovery and subsequent Dashboard → Profile linking require the owner's input. This is not evidence of a completed Google session.
 
-## Deployment state
+Automatic approval review rejected the separate production-data QA run because it would create persistent live accounts, tickets and messages. It must not be rerun without explicit permission for those records. Device emulation is blocked by the organisation's DevTools policy. Normal browser zoom provides a narrow CSS viewport for geometry checks: at 454 px the event-heading location panel started at x=-104 px. The viewport-bounded scrollable picker with a mobile Close button is live. Boundary checks passed at 340, 454, 545, 681, 779 and 909 CSS pixels; the mobile-menu and event-heading entry points passed, and the live 340 px panel fits at x=16..321, y=16..218 inside a 340×234 CSS viewport. Home, sign-in and discovery, including the expanded discovery location section, have no horizontal overflow at 340 px. These are narrow CSS-viewport checks using normal browser zoom, not real-device/touch evidence. Authenticated browser journeys remain pending. Detailed evidence is in `Eventmind_files/GAUTHAM_FRONTEND_INTEGRATION_QA.md`.
 
-Social-auth backend rollout (2026-11-07, Berlin), owner **Biswajith Gopinathan**: auth and gateway at implementation revision `1a18404c527c46941be17e5dda627989c58606a6` passed additive schema/startup, protected database backup/restore and health checks. TalktoFile container start times stayed unchanged. Core monitor and Gmail TLS/authentication passed afterward. Rollback state: `/opt/newfind/.releases/oauth-20261106T234225Z`. NewFind's seven containers used approximately 382 MiB RAM and 25.3% aggregate Docker CPU during the post-rollout probe (not a steady-state benchmark). Google/Facebook capabilities remain false because credentials are absent. The matching Vercel preview build succeeded; production promotion is blocked by connector HTTP 403. Actual provider sign-in and visual/mobile callback QA remain unverified.
+## Backend and operations
 
-Homepage hero update (2026-11-06), owner **Biswajith Gopinathan**: original images and wording retained in a rotating full-width background above discovery, with an 80–120 px theme-aware bottom fade. Image brightness selects contrasting copy and scrim; Pause/Resume and reduced-motion handling are included. TypeScript/build/lint pass. Production revision `cf17b31b6a907f47b7717067c6edfa42ab210867` was verified in the public desktop browser, including full-width geometry, fade, changing foreground and no horizontal overflow. Real-device checks remain pending.
+The existing isolated NewFind backend has persistent accounts/profiles, native event creation and lifecycle, geographic search, free booking, owner-scoped attendees/check-in, conversations, communities/reviews and notification/email outbox support. Prior live release and restart tests are historical evidence; this frontend rollout does not replace backend containers or alter schemas.
 
-Typography update (2026-11-06), owner **Biswajith Gopinathan**: Inter and shared responsive type roles are live and verified through computed browser styles; logo artwork and green palette are preserved. TypeScript/build pass; focused ESLint has no errors. Complete responsive and real-device QA remains pending.
+Google provider configuration was previously activated and one real login/session was verified before the frontend rollback. Reconnecting a button is not evidence that a new signup, linking or returning-login journey works on the new candidate. Facebook remains disabled until configured.
 
-The core release is live on 2026-11-03. Backend API images were updated to application revision `b4c4849d14ff799ab17cb732b14729b8ebc8682b`; post-rollout health and persisted core workflows passed, with unchanged TalktoFile container start times. The frontend uses the production Vercel project `newfind` and its same-origin `/api` proxy.
+Local backups and health checks were previously activated; paid off-server backups remain deferred. TalktoFile and unrelated host workloads must remain untouched.
 
-Live PostgreSQL tests passed for registration/login, private profiles, event creation/content, cross-border discovery, currency validation, free booking/retry, organizer-only attendee access, private QR, duplicate check-in, chat, communities/reviews and rescheduling notifications. Records survived NewFind-only user/event/ticketing restarts. The same journeys passed through the public HTTPS Vercel API proxy; post-frontend-release persistence verification passed.
+## Remaining activation and evidence
 
-All seven NewFind containers were healthy at the core rollout. NewFind used approximately 363 MiB RAM and 9.24% aggregate Docker CPU during that QA snapshot. No new paid services were added. Four databases passed protected backup, isolated restore, checksum and table-row-count verification; daily local backups and five-minute health checks are active. Gmail SMTP was activated on 2026-11-06: auth/event refreshes passed health checks with unchanged TalktoFile start times. TLS authentication, application SMTP send and owner-confirmed inbox receipt passed. Paid remote backups remain deferred, and external monitoring alerts need an approved destination.
-
-Public browser checks verified international town search (Leuven), the attributed 200 km map and closed-registration event details with persisted agenda. Authenticated browser UI, real-device mobile QA and production concurrent-load testing are not fully verified; API tests do not substitute for those checks. This is a controlled core-feature test release, not completion of every priority 1–3 item.
-
-Frontend revision `e238d193387c4ca10a9068f4bfc8ba3e7b35f66e` was promoted to Production on 2026-11-04. The live footer shows “Developed and powered by MetaInsights BV” and company copyright; the public API gateway responds operational. The original GitHub repository was renamed in place to `Biswa-MetaInsights/newfind`, preserving repository ID 1194615580, PR #10 and the release branch. Local clone remotes use the new URL; the server remote still needs explicit verification and update.
-
-## Mobile frontend update — 2026-11-04
-
-Owner: **Biswajith Gopinathan**. Prepared higher-contrast dark logo/headline, consistent shared navigation icons, explicit first-visit city selection with persisted confirmation, 44 px city controls, bounded scrollable city picker, mobile menu ARIA state/Escape/outside dismissal, and labeled autofill-friendly 16 px authentication fields. Existing saved cities are preserved. TypeScript and production build pass; focused ESLint has no errors (one pre-existing unused `showToast` warning). Location-store runtime checks pass for hydration, reload persistence, explicit default-city confirmation and legacy records; calculated dark headline/background contrast is 14.78:1. Production Vercel promotion remains blocked by connector project access and browser sign-in. Real-device mobile and authenticated browser journeys remain unverified; these fixes must not be reported as live until promotion and verification.
-
-## Deployed core capabilities
-
-The professional-QA candidate adds persistent event operations on the existing isolated five-API stack. PostgreSQL and Redis remain private. Kafka and extra service containers are unnecessary for these journeys.
-
-| Area | Implemented behavior | Verification |
-|---|---|---|
-| Accounts | Email/password registration/login, profiles, recovery/verification; social authorization and explicit linking backend deployed | Live core API and Gmail delivery passed; one-use recovery links/session invalidation tested locally. Social auth has 20 isolated security tests plus 6 credential-file tests; frontend production promotion, credentials and real provider QA remain pending |
-| Discovery | International town/city search, manual/GPS centre, map, 1–200 km radius across borders, server filters/badges, currency-scoped comparisons, pagination | Brussels/Maastricht inclusion and Berlin/invalid coordinates exclusion checked; frontend build/type check |
-| Event authoring | Persistent agenda, FAQ, announcements, cover, venue time zone, visibility, organizer ownership and lifecycle validation | API integration and persistence across restart |
-| Tickets | Free booking, PostgreSQL capacity lock, retry identity, private locally rendered QR, persistent bookings | Live PostgreSQL booking, retries, access controls and restart persistence; concurrent-capacity test from the earlier release remains separate evidence |
-| Organizer operations | Real attendees, contacts scoped to owner, check-in/undo with audit, inventory including used tickets, overview and revenue split by currency | API integration and restart persistence |
-| Collaboration | Ticket-holder/organizer rooms, persistent messages/read cursors, polling, event-change notifications, durable email outbox | API permissions, message persistence and notification read state checked |
-| Communities | Directory/detail, owner-scoped creation, durable join/leave/reviews, linked events and member event notifications | Live API integration including restart; full authenticated browser membership/review QA remains |
-| Suggestions | Saved-interest/category/tag matching within selected radius, with nearby fallback | API integration; no paid AI service |
-| Operations | Guarded sequential build, backup and isolated restore before rollout, rollback image manifests, retention and local health timer | Guarded live rollout, protected backup and isolated restore passed |
-
-## External activation and remaining QA
-
-**This candidate is not a claim that all priorities 1–3 are complete.**
-
-- Provider event catalogue: Ticketmaster/publiq/OpenAgenda approval and credentials pending. No live import is activated. Native QA events are not a complete real-world catalogue.
-- SMTP: `metainsights.bv@gmail.com` is configured privately on the host. TLS/authentication and one approved application test email passed; the owner confirmed receipt on 2026-11-06. Complete deployed recovery/verification user journeys and event-mail delivery still need QA. No secret is stored in GitHub.
-- Google is the current priority. The deployed social backend and isolated tests cover single-use browser-bound state, Google PKCE, signed ID-token audience/issuer/expiry/nonce checks, provider-subject identity, and explicit authenticated account linking. Email equality never silently links existing accounts. Host credential entry is `backend/scripts/configure_google.py`; the exact redirect is `https://newfind-khaki.vercel.app/auth/google/callback`. Frontend production promotion, credentials, consent configuration and real sign-up/link/login verification remain pending; the agent browser currently cannot access Google Cloud. Facebook stays disabled pending its own credentials, explicit Graph API version and provider setup. Neither provider is claimed complete.
-- Paid ticket tiers, Stripe test checkout/webhooks, refunds and settlement statements: not released. Paid bookings fail closed; no real payments.
-- AI assistant: not released; paid inference is not activated.
-- Paid off-server backup storage is explicitly deferred by the owner until testing goes well (2026-11-04); do not purchase or activate it during this testing phase. Outbound monitoring alerts still require an approved destination. The restic workflow reads back the exact uploaded snapshot and verifies hashes; it never restores over production. Local encryption/restore, wrong-password/corrupt-data rejection and alert failure/recovery tests passed. Local backups/health checks do not cover host loss or notify an operator externally.
-- Full mobile/browser/accessibility, production concurrent load, cross-device organizer door operation and deployed community sharing need evidence before professional handover. An isolated 10,000-listing geographic pagination regression passed, with one inventory lookup per page; date/price discovery pages no longer fetch inventory for the entire catalogue. The current browser is signed out and its phone-width emulation attempt was blocked, so those UI checks remain pending.
-- A dedicated NewFind domain remains separate. GitHub repository rename is complete; Vercel linked-repository display and the Hetzner remote need post-rename verification. The default `main` branch still awaits PR #10 review; use the release branch for current application work.
+- External event providers require valid private host credentials/permissions and a verified import/refresh. No live catalogue activation is claimed.
+- Paid tickets, Stripe completion/webhooks, ticket tiers, refunds/settlements and paid AI inference are not released.
+- Real-device/mobile/accessibility, authenticated browser journeys, Google provider flows and production concurrency/error observations remain distinct from isolated automated checks.
 
 ## Deployment boundaries
 
-NewFind remains a separate Compose project, network and volumes. The frontend uses its same-origin `/api` proxy to the approved HTTPS backend route. Existing TalktoFile containers, volumes and Caddy configuration must remain untouched.
-
-The guarded attempts created old API image tags and protected database snapshots with isolated restore verification before reaching their respective failures. Additive columns are backward compatible; new lifecycle values may require restoring the protected pre-release snapshot for a full rollback. Never restore over live data without assessing changes since the snapshot.
-
-Operational activation and QA checklist: `Eventmind_files/OPERATIONS_READINESS.md`.
+Use the existing Vercel NewFind project and `www.newfind.events` domain. Keep Gautham's design. Preserve the existing NewFind backend, private databases/Redis, Compose isolation and unrelated TalktoFile services. Never publish secrets or restore a backup over live records as part of a frontend release.
