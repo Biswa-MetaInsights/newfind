@@ -55,7 +55,6 @@ export function CommunityJoinCard({
   nextEvent,
   eventCount,
   onJoin,
-  joinLabel = "Join this community",
 }: {
   community: Community;
   /** The community's soonest upcoming event, if it has one. */
@@ -63,14 +62,13 @@ export function CommunityJoinCard({
   /** Total events linked to this community, upcoming and past. */
   eventCount: number;
   onJoin: () => void;
-  joinLabel?: string;
 }) {
   // A real lookup, unlike the event page's hardcoded organiser (TODO.md §1).
   // Communities seeded without an organiser profile simply return nothing, and
   // the card falls back to the community's own name below.
   const { data: organizer } = useQuery({
     queryKey: ["organizer", community.organizer_id],
-    queryFn: () => organizerApi.publicProfile(community.organizer_id).then((r) => r.data),
+    queryFn: () => organizerApi.get(community.organizer_id).then((r) => r.data),
     enabled: !!community.organizer_id,
     retry: false,
     staleTime: 5 * 60 * 1000,
@@ -78,7 +76,7 @@ export function CommunityJoinCard({
 
   // A community with no organiser profile IS the organising entity, so its own
   // name is a true answer to "who's organising" — never a placeholder string.
-  const organiserName = organizer?.name || community.name;
+  const organiserName = organizer?.company_name || organizer?.full_name || community.name;
   // "Verified" is a trust claim. It draws ONLY from a real verification status.
   const verified = organizer?.verification_status === "verified";
 
@@ -156,7 +154,7 @@ export function CommunityJoinCard({
           suffix={isFree ? undefined : "/ month"}
         />
 
-        <DetailCTA label={joinLabel} onClick={onJoin} />
+        <DetailCTA label="Join this community" onClick={onJoin} />
       </DetailCardBody>
     </DetailCardShell>
   );

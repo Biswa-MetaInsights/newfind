@@ -147,10 +147,10 @@ export default function ConsoleEventsPage() {
                 literal — that is the rule in lib/currency.ts, and it is what a
                 hardcoded "INR" here was quietly breaking. A roll-up can only
                 carry one code, so the source asserts its events agree. */}
-            <StatTile label="Revenue" value={overview.portfolio.netRevenue == null ? "By currency" : formatPrice(overview.portfolio.netRevenue, overview.portfolio.currency, { freeLabel: null })}
-              sub={overview.portfolio.netRevenue == null ? "See each event’s currency" : "after refunds"} />
+            <StatTile label="Revenue" value={formatPrice(overview.portfolio.netRevenue, overview.portfolio.currency, { freeLabel: null })}
+              sub="after refunds" />
             <StatTile label="Check-in rate" value={`${overview.portfolio.checkInRate}%`}
-              sub={`${overview.portfolio.checkedIn} of ${overview.portfolio.pastCapacity} tickets`} tone="good" />
+              sub={`${overview.portfolio.checkedIn} of ${overview.portfolio.pastCapacity} past`} tone="good" />
             <StatTile label="Refunds" value={formatPrice(overview.portfolio.refunded, overview.portfolio.currency, { freeLabel: null })}
               sub={`${overview.portfolio.refundedTickets} of ${overview.portfolio.ticketsSold} tickets`} tone="warn" />
           </>
@@ -241,7 +241,7 @@ export default function ConsoleEventsPage() {
               {inTab.length > 0
                 ? `No ${price === "free" ? "free" : "paid"} events in this tab.`
                 : tab === "drafts" && !isDummyMode
-                  ? "No drafts yet. Save an event as a draft to see it here."
+                  ? "The events endpoint only returns published events, so drafts cannot be listed yet — TODO.md §19."
                   : "Nothing in this tab."}
             </p>
           )}
@@ -313,8 +313,7 @@ function NextUpHero({
   unreadChats: UnreadChat[];
 }) {
   const { next } = overview;
-  if (!next) return <p className="text-[18px] py-6">No upcoming published events. Your saved events are listed below.</p>;
-  const pct = next.capacity > 0 ? Math.round((next.sold / next.capacity) * 100) : 0;
+  const pct = Math.round((next.sold / next.capacity) * 100);
 
   return (
     <div className="flex flex-col gap-4">

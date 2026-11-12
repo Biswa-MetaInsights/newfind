@@ -1,8 +1,9 @@
 import { apiClient } from "./client";
-import type { OrganizerProfile, PublicOrganizerProfile } from "@eventmind/types";
+import type { OrganizerProfile } from "@eventmind/types";
 
 export interface OrganizerProfileCreate {
   full_name: string;
+  /** Not yet persisted — backend has no column for this. See TODO.md. */
   contact_email: string;
   company_name: string;
   company_address: string;
@@ -17,9 +18,6 @@ export interface OrganizerProfileCreate {
 }
 
 export const organizerApi = {
-  publicProfile: (userId: string) =>
-    apiClient.get<PublicOrganizerProfile>(`/user/${userId}/organizer/public`),
-
   get: (userId: string) =>
     apiClient.get<OrganizerProfile>(`/user/${userId}/organizer`),
 

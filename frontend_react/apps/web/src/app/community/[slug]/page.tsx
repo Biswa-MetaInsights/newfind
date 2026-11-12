@@ -1,10 +1,8 @@
 "use client";
 
-import { use, useState } from "react";
+import { use } from "react";
 import { useRouter } from "next/navigation";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { apiClient } from "@eventmind/api";
-import { useAuthStore } from "@eventmind/store";
+import { useQuery } from "@tanstack/react-query";
 import { communitySource, eventsSource } from "@/lib/data-source";
 import { Navbar } from "@/components/navbar/Navbar";
 import { CategoryBadge, EventBadges } from "@/components/EventBadges";
@@ -49,17 +47,10 @@ export default function CommunityDetailPage({ params }: { params: Promise<{ slug
     enabled: !!communityRes?.id,
   });
 
-  const authenticated = useAuthStore(s=>s.isAuthenticated);
-  const cache = useQueryClient();
-  const [joinError,setJoinError] = useState('');
-  const membership = useQuery({queryKey:['community-membership',communityRes?.id],queryFn:()=>apiClient.get<{joined:boolean;owner:boolean}>(`/community/${communityRes!.id}/members/me`).then(r=>r.data),enabled:authenticated&&!!communityRes});
-  const join = useMutation({mutationFn:()=>membership.data?.joined ? apiClient.delete(`/community/${communityRes!.id}/members`) : apiClient.post(`/community/${communityRes!.id}/members`),onSuccess:()=>{setJoinError('');void cache.invalidateQueries({queryKey:['community-membership',communityRes?.id]});void cache.invalidateQueries({queryKey:['community',slug]});},onError:()=>setJoinError('Membership could not be updated. Please try again. The organiser cannot leave their own community.')});
-  const joinLabel = join.isPending ? 'Saving…' : membership.data?.owner ? 'You organise this community' : membership.data?.joined ? 'Leave community' : 'Join this community';
   if (communityLoading) {
     return (
       <div className="min-h-screen" style={{ backgroundColor: BG }}>
         <Navbar />
-      {joinError&&<p role="alert" className="p-4">{joinError}</p>}
         <div className="flex justify-center py-24">
           <div className="w-10 h-10 rounded-full border-4 border-t-transparent animate-spin"
             style={{ borderColor: `${GREEN} transparent transparent transparent` }} />
@@ -102,7 +93,7 @@ export default function CommunityDetailPage({ params }: { params: Promise<{ slug
   // ⚠️ Joining does nothing yet — there is no membership table, no join endpoint
   // and no notification hook. Gautham asked for the button now and the flow
   // later; the spec lives in TODO.md under "Join a community".
-  function handleJoin() {if(!authenticated){router.push('/auth');return;}if(!join.isPending&&!membership.data?.owner)join.mutate();}
+  function handleJoin() {}
 
   return (
     <div className="min-h-screen text-left" style={{ backgroundColor: BG }}>
@@ -182,7 +173,7 @@ export default function CommunityDetailPage({ params }: { params: Promise<{ slug
 
             {/* Reviews. A community has none of its own, so these are aggregated
                 from its past events — see CommunityReviews. */}
-            <CommunityReviews communityId={community.id} />
+            <CommunityReviews pastEvents={previous} />
           </div>
 
           {/* ── Right sidebar: join card ── */}
@@ -192,7 +183,6 @@ export default function CommunityDetailPage({ params }: { params: Promise<{ slug
               nextEvent={upcoming[0]}
               eventCount={eventCount}
               onJoin={handleJoin}
-              joinLabel={joinLabel}
             />
           </div>
         </div>
@@ -213,7 +203,7 @@ export default function CommunityDetailPage({ params }: { params: Promise<{ slug
       <DetailStickyBar
         caption="Membership"
         amount={isFree ? "Free" : formatPrice(price)}
-        cta={joinLabel}
+        cta="Join this community"
         onClick={handleJoin}
         gutters={GUTTERS}
       />

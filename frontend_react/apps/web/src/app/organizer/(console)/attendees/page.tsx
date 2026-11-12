@@ -35,16 +35,15 @@
 
 import { Suspense, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { apiClient } from "@eventmind/api";
-import { organizerSource, isDummyMode } from "@/lib/data-source";
+import { useQuery } from "@tanstack/react-query";
+import { organizerSource } from "@/lib/data-source";
 import { formatPrice } from "@/lib/currency";
 import { csvFilename, downloadCsv } from "@/lib/csv";
 import { useCheckIns, setCheckedIn } from "@/lib/checkin-store";
 import type { DummyAttendee } from "@/lib/fixtures/organizer";
 import { useOrganiser, useOrganiserEvents } from "@/components/organizer/useOrganiser";
 import {
-  Card, Pill, StatTile, FilterSelect, ConsoleButton, EmptyState,
+  Card, Pill, StatTile, FilterSelect, ConsoleButton, EmptyState, NotBuiltYet,
   RowAction, RowMenu, TableScroller, TableHead, TableRow, TableFooter,
 } from "@/components/organizer/ConsoleUI";
 import type { FilterOption, RowMenuItem } from "@/components/organizer/ConsoleUI";
@@ -97,15 +96,13 @@ function AttendeesInner() {
 
   const { organiserId } = useOrganiser();
   const { data: events = [] } = useOrganiserEvents(organiserId);
-  const localCheckIns = useCheckIns();
+  const checkIns = useCheckIns();
   const [door, setDoor] = useState(false);
 
-  const { data: attendees = [], isLoading, isError, refetch } = useQuery({
+  const { data: attendees = [], isLoading } = useQuery({
     queryKey: ["organizer-attendees"],
     queryFn: () => organizerSource.attendees().then((r) => r.data),
   });
-
-  const checkIns = useMemo(() => isDummyMode ? localCheckIns : Object.fromEntries(attendees.filter(a=>a.checked_in_at).map(a=>[a.id,a.checked_in_at!])), [attendees,localCheckIns]);
 
   const titleOf = useMemo(() => {
     const m = new Map(events.map((e) => [String(e.id), e.title]));
@@ -214,7 +211,7 @@ function AttendeesInner() {
   // page — one is fixed by clearing the filter, the other by building an
   // endpoint.
   if (!isLoading && attendees.length === 0) {
-    return isError ? <div role="alert">Attendees could not be loaded. <button className="underline" onClick={()=>void refetch()}>Retry</button></div> : <EmptyState title="No attendees yet" body="Confirmed bookings will appear here." />;
+    return <NotBuiltYet what="Attendee lists" todo="TODO.md §19" />;
   }
 
   const narrowed = ticket !== ALL || status !== "any";
@@ -351,9 +348,6 @@ function AttendeeRow({
   checkedInAt?: string;
   door: boolean;
 }) {
-  const queryClient = useQueryClient();
-  const check = useMutation({mutationFn: (on: boolean) => on ? apiClient.post(`/ticket/check-in/${a.eventId}/${a.id}`) : apiClient.delete(`/ticket/check-in/${a.eventId}/${a.id}`), onSuccess: () => {void queryClient.invalidateQueries({queryKey: ['organizer-attendees']});void queryClient.invalidateQueries({queryKey: ['organizer-overview']});}});
-  const setCheck = (on: boolean) => isDummyMode ? setCheckedIn(a.id,on) : check.mutate(on);
   const confirmed = a.status === "Confirmed";
   const arrived = confirmed && !!checkedInAt;
   const firstName = a.name.split(" ")[0];
@@ -362,7 +356,7 @@ function AttendeeRow({
     ...(confirmed
       ? [{
           label: arrived ? "Undo check-in" : "Check in",
-          onSelect: () => setCheck(!arrived),
+          onSelect: () => setCheckedIn(a.id, !arrived),
         }]
       : []),
     { label: "Copy email address", onSelect: () => { void navigator.clipboard?.writeText(a.email); } },
@@ -379,7 +373,7 @@ function AttendeeRow({
           {a.initials}
         </span>
         <span className="flex flex-col min-w-0">
-          <span className="text-[17px] font-semibold truncate" style={{ color: "var(--brand-text)" }}>{a.name}</span>{check.isError&&<span role="alert" className="text-[15px]">Check-in could not be saved. Retry.</span>}
+          <span className="text-[17px] font-semibold truncate" style={{ color: "var(--brand-text)" }}>{a.name}</span>
           {a.repeat && (
             <span className="text-[15px]" style={{ color: "var(--brand-green)" }}>{a.repeat}</span>
           )}
@@ -418,16 +412,15 @@ function AttendeeRow({
         )}
         {confirmed && !arrived && (
           <RowAction
-            disabled={check.isPending}
             tone={door ? "green" : "outline"}
-            onClick={() => setCheck(true)}
+            onClick={() => setCheckedIn(a.id, true)}
             title={`Mark ${firstName} as arrived`}
           >
             Check in
           </RowAction>
         )}
         {arrived && (
-          <RowAction onClick={() => setCheck(false)} title="Take the check-in back">
+          <RowAction onClick={() => setCheckedIn(a.id, false)} title="Take the check-in back">
             Undo
           </RowAction>
         )}
