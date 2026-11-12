@@ -27,7 +27,6 @@ import { EventShareButton, EventWishlistButton } from './EventActions'
 // ─── Types ─────────────────────────────────────────────────────────────────────
 
 export interface CommunityItem {
-  slug?: string;
   id: string
   title: string
   date: string
@@ -369,7 +368,7 @@ export function CommunityCardItem({
 
   return (
     <Link
-      href={`/community/${community.slug ?? community.id}`}
+      href={`/community/${community.id}`}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       className="relative rounded-lg overflow-hidden flex flex-col"
@@ -479,7 +478,7 @@ function OnlineCommunityCard({
 
   return (
     <Link
-      href={`/community/${community.slug ?? community.id}`}
+      href={`/community/${community.id}`}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       className="relative rounded-lg overflow-hidden flex flex-col"

@@ -1,9 +1,7 @@
 "use client";
 
-import "@/lib/api-config";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { useAuthStore } from "@eventmind/store";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 export function QueryProvider({ children }: { children: React.ReactNode }) {
   const [client] = useState(
@@ -19,8 +17,5 @@ export function QueryProvider({ children }: { children: React.ReactNode }) {
         },
       })
   );
-  useEffect(() => useAuthStore.subscribe((state, previous) => {
-    if (state.userEmail !== previous.userEmail) client.clear();
-  }), [client]);
   return <QueryClientProvider client={client}>{children}</QueryClientProvider>;
 }

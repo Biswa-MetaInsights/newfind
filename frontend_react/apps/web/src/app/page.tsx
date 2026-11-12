@@ -1,39 +1,58 @@
-"use client";
+﻿"use client";
 
-import { Suspense } from "react";
+import { Suspense, useEffect, useRef } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { recommendationsApi } from "@eventmind/api";
 // PARKED 2026-08-14 (MVP) â€” `communitiesSource` dropped from this import.
-import { eventsSource } from "@/lib/data-source";
-import { useLocationStore, DEFAULT_CITY } from "@eventmind/store";
-import { apiClient } from "@eventmind/api";
-import { useAuthStore } from "@eventmind/store";
-import type { Event } from "@eventmind/types";
-import { EVENT_FORMATS } from "@eventmind/types";
+import { eventsSource, isDummyMode } from "@/lib/data-source";
+import { useLocationStore, DEFAULT_CITY, isOnlineCity } from "@eventmind/store";
+import { EVENT_FORMATS, type Event } from "@eventmind/types";
 import { Navbar } from "@/components/navbar/Navbar";
 import { HeroCarousel } from "@/components/HeroCarousel";
 import { EventsCarousel } from "@/components/EventsCarousel";
 // PARKED 2026-08-14 (MVP) â€” import { CommunityCarousel } from "@/components/CommunityCarousel";
 import { FeatureBand } from "@/components/FeatureBand";
 import { CategoryGrid } from "@/components/CategoryGrid";
-import { CityPicker, LocationPrompt } from "@/components/CityPicker";
+import { CityPicker } from "@/components/CityPicker";
 import { Footer } from "@/components/Footer";
 // PARKED 2026-08-14 (MVP) â€” `toCommunityItem` dropped from this import.
 import { toCarouselEvent } from "@/lib/card-adapters";
 
-const RADIUS_KM = 200;
+const RADIUS_KM = 100;
 
-// The private server sync populates external listings. Discovery only reads saved
-// provider/native events; it never generates fictional events when a city is empty.
+// A city ingest runs on the server for minutes (Ticketmaster is paginated per
+// classification segment), so the endpoint returns 202 straight away and we poll
+// for the events as they land rather than checking once.
+const INGEST_POLL_MS = 10_000;
+const INGEST_WINDOW_MS = 240_000;
+const INGESTED_KEY = "eventmind-ingested-cities"; // localStorage key
+
+function getIngestedCities(): Set<string> {
+  if (typeof window === "undefined") return new Set();
+  try {
+    const raw = localStorage.getItem(INGESTED_KEY);
+    return new Set(raw ? JSON.parse(raw) : []);
+  } catch {
+    return new Set();
+  }
+}
+
+function markCityIngested(city: string) {
+  if (typeof window === "undefined") return;
+  try {
+    const cities = getIngestedCities();
+    cities.add(city);
+    localStorage.setItem(INGESTED_KEY, JSON.stringify([...cities]));
+  } catch {}
+}
 
 // "View all" on the home carousels lands on the unified Explore page, scoped to the
 // selected city (matched by name on the Explore side) and the relevant view.
 // PARKED 2026-08-14 (MVP) â€” the param was `view: "events" | "communities"`;
 // narrowed to "events" while communities are deferred to Phase 2.
-function exploreHref(view: "events", cityName: string, lat?: number, lng?: number): string {
-  const params=new URLSearchParams({view,city:cityName});
-  if(lat!=null&&lng!=null){params.set("lat",String(lat));params.set("lng",String(lng));}
-  return `/explore?${params}`;
+function exploreHref(view: "events", cityName: string): string {
+  return `/explore?view=${view}&city=${encodeURIComponent(cityName)}`;
 }
 
 export default function Home() {
@@ -53,12 +72,15 @@ function DiscoveryPage() {
   const hasHydrated = useLocationStore((s) => s._hasHydrated);
   const selectedCity = hasHydrated ? _selectedCity : DEFAULT_CITY;
 
+  const queryClient = useQueryClient();
+  const inProgressRef = useRef<Set<string>>(new Set()); // prevent double-fire in same session
+
   // event_type keeps the city row to events you can physically attend (In-Person
   // + Hybrid). The geo radius alone is not enough: online events sit at lat/lng
   // 0,0 in real mode, but dummy mode ignores geo entirely, so without this the
   // online events would leak into the city row there.
   const { data: events, isLoading: eventsLoading } = useQuery({
-    queryKey: ["events", q, selectedCity.name, selectedCity.lat, selectedCity.lng],
+    queryKey: ["events", q, selectedCity.name],
     queryFn: () =>
       eventsSource
         .search({
@@ -102,8 +124,50 @@ function DiscoveryPage() {
 
   */
 
-  const signedIn=useAuthStore(s=>s.isAuthenticated);
-  const recommendations=useQuery({queryKey:['recommendations',selectedCity.lat,selectedCity.lng],queryFn:()=>apiClient.get<Event[]>('/event/recommendations',{params:{lat:selectedCity.lat,lng:selectedCity.lng,radius:200}}).then(r=>r.data),enabled:hasHydrated&&signedIn});
+  // Auto-ingest events for the selected city from Ticketmaster (once per city, ever).
+  useEffect(() => {
+    if (isDummyMode) return; // dummy mode serves local fixtures â€” never hit the ingestion backend
+    if (!hasHydrated || q) return;
+    if (isOnlineCity(selectedCity)) return; // "Online" is not a geographic city â€” nothing to ingest
+    if (inProgressRef.current.has(selectedCity.name)) return;
+    if (getIngestedCities().has(selectedCity.name)) return;
+
+    inProgressRef.current.add(selectedCity.name);
+
+    const { name: city, lat, lng } = selectedCity;
+    let timer: ReturnType<typeof setInterval> | undefined;
+    let elapsed = 0;
+
+    recommendationsApi
+      .ingestCity(city, lat, lng, RADIUS_KM)
+      .then(() => {
+        markCityIngested(city); // persist so we never re-ingest this city
+
+        // The call above only queues the ingest, so there is nothing to show yet.
+        // Re-check on an interval and let the grid fill as events are written.
+        timer = setInterval(async () => {
+          elapsed += INGEST_POLL_MS;
+          await queryClient.invalidateQueries({ queryKey: ["events", q, city] });
+
+          const fresh = queryClient.getQueryData<Event[]>(["events", q, city]);
+          if (fresh && fresh.length > 0) {
+            clearInterval(timer);
+            return;
+          }
+
+          // Nothing landed in the whole ingest window â€” fall back to AI generation.
+          if (elapsed >= INGEST_WINDOW_MS) {
+            clearInterval(timer);
+            await recommendationsApi.generateEventsForCity(city, lat, lng).catch(() => {});
+            queryClient.invalidateQueries({ queryKey: ["events", q, city] });
+          }
+        }, INGEST_POLL_MS);
+      })
+      .catch(() => inProgressRef.current.delete(city));
+
+    return () => clearInterval(timer);
+  }, [hasHydrated, selectedCity.name, q]); // eslint-disable-line react-hooks/exhaustive-deps
+
   const carouselEvents = [
     ...(events ?? []).map(toCarouselEvent),
     ...(onlineEvents ?? []).map(toCarouselEvent),
@@ -129,12 +193,11 @@ function DiscoveryPage() {
     <div className="min-h-screen" style={{ backgroundColor: "var(--brand-bg)" }}>
       <Navbar />
       <HeroCarousel />
-      <LocationPrompt />
 
       <EventsCarousel
         events={carouselEvents}
         location={selectedCity.name}
-        seeAllHref={exploreHref("events", selectedCity.name, selectedCity.lat, selectedCity.lng)}
+        seeAllHref={exploreHref("events", selectedCity.name)}
         onlineSeeAllHref={exploreHref("events", "Online")}
         isLoading={eventsLoading || onlineLoading}
         onBookNow={(id) => router.push(`/event/${id}`)}
@@ -160,7 +223,6 @@ function DiscoveryPage() {
 
       */}
 
-      {signedIn&&!!recommendations.data?.length&&<section aria-label="Suggestions based on your interests"><h2 className="px-5 sm:px-10 text-[26px] font-bold">Suggested for you</h2><EventsCarousel events={recommendations.data.map(toCarouselEvent)} location={selectedCity.name} seeAllHref="/explore" onlineSeeAllHref="/explore?city=Online" isLoading={recommendations.isPending} onBookNow={id=>router.push(`/event/${id}`)}/></section>}
       <FeatureBand />
 
       <CategoryGrid />

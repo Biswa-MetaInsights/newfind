@@ -1,5 +1,4 @@
 "use client";
-import { eventTimeUtc, localEventTime } from "@/lib/event-time";
 
 // ─────────────────────────────────────────────────────────────────────────────
 //  "Edit details" — the organiser's edit dialog on their own event page.
@@ -80,6 +79,12 @@ const REAL_CITIES = CITIES.filter((c) => !isOnlineCity(c));
  * converts to UTC first, so an organiser in IST opens the dialog to find their
  * 7pm event showing as 1:30pm. Read the local parts instead.
  */
+function toLocalInput(iso: string): string {
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return "";
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
 
 const str = (v: unknown): string => (typeof v === "string" ? v : "");
 const num = (v: unknown): number | null => (typeof v === "number" ? v : null);
@@ -231,8 +236,8 @@ export function EditEventModal({
     el.scrollIntoView({ block: "center" });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-  const [startDate, setStartDate] = useState(localEventTime(event.start_date,event.timezone||"UTC"));
-  const [endDate, setEndDate] = useState(localEventTime(event.end_date,event.timezone||"UTC"));
+  const [startDate, setStartDate] = useState(toLocalInput(event.start_date));
+  const [endDate, setEndDate] = useState(toLocalInput(event.end_date));
   const [city, setCity] = useState<City>(initialCity);
   // Fixtures and organiser-created events name the venue differently
   // (`name` vs `address`); prefill from whichever exists and always SAVE to
@@ -260,8 +265,8 @@ export function EditEventModal({
    *  warning below — shown when it is true rather than always, so it reads as a
    *  consequence of what you just did instead of boilerplate. */
   const postponing =
-    startDate !== localEventTime(event.start_date,event.timezone||"UTC") ||
-    endDate !== localEventTime(event.end_date,event.timezone||"UTC") ||
+    startDate !== toLocalInput(event.start_date) ||
+    endDate !== toLocalInput(event.end_date) ||
     city.name !== initialCity.name ||
     address !== initialVenue ||
     onlineUrl !== initialLink ||
@@ -316,8 +321,8 @@ export function EditEventModal({
           target_audience: targetAudience.join(", "),
           tags: tags.split(",").map((t) => t.trim()).filter(Boolean),
           event_website: eventWebsite.trim(),
-          start_date: eventTimeUtc(startDate,event.timezone||"UTC").toISOString(),
-          end_date: eventTimeUtc(endDate,event.timezone||"UTC").toISOString(),
+          start_date: new Date(startDate).toISOString(),
+          end_date: new Date(endDate).toISOString(),
           location,
           capacity: capacityNum,
           // ⚠️ NO `price` AND NO `currency` (Gautham, 2026-09-01). Both are
@@ -572,7 +577,7 @@ export function EditEventModal({
         {postponing && (
           <Notice>
             <b>This counts as postponing the event.</b> Ticket holders booked the old details and
-            will receive an in-app notification. Email delivery depends on the configured email service.
+            are not told — contact them yourself.
           </Notice>
         )}
 

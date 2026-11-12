@@ -4,7 +4,6 @@ import { useEffect, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { eventsApi } from "@eventmind/api";
 import { useAuthStore, useTicketsStore, useChatUnreadStore } from "@eventmind/store";
-import { isDummyMode } from "@/lib/data-source";
 import { CHAT_WS_BASE, subFromToken } from "@/lib/chat";
 
 /**
@@ -28,7 +27,7 @@ export function ChatPresence() {
   const activeRoom = useChatUnreadStore((s) => s.activeRoom);
 
   const userId = subFromToken(tokens?.access_token ?? null);
-  const ready = isDummyMode && hasHydrated && isAuthenticated && !!userId;
+  const ready = hasHydrated && isAuthenticated && !!userId;
 
   // Events this user organises — these rooms are theirs even without a ticket.
   const { data: organised } = useQuery({
