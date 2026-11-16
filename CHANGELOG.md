@@ -1,3 +1,7 @@
+# Recovery — 2026-11-16
+
+- Restore tested frontend API/auth and mobile fixes on main while preserving privacy and terms pages; backend unchanged.
+
 # NewFind — Changelog
 
 > **One short line per meaningful change** — a feature landing, a decision, a revert. Newest first.

@@ -3,7 +3,11 @@
 > **This file describes the present only.** Rewrite the relevant section in place — never append.
 > A stale entry here is a bug. History goes in `CHANGELOG.md`; specs for unbuilt work go in `TODO.md`.
 
-Last reviewed: 2026-08-14
+Last reviewed: 2026-11-16
+
+## Production connection recovery
+
+Prepared frontend recovery from the tested integration/gautham-live-features branch onto current main. The November 13 main deployment omitted the API rewrite and client configuration, returning a website 404 for /api/auth/capabilities while the configured Hetzner backend returned HTTP 200. Restore same-origin API routing, authentication navigation/social callbacks/recovery, and the previously tested frontend integrations, mobile picker and event booking/date guards. Preserve privacy/terms pages and footer links. Backend files, containers and database are unchanged. Production verification is pending deployment.
 
 ---
 
