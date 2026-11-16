@@ -232,8 +232,8 @@ the word "community" anywhere. Nothing was deleted. Current state and the full s
    - `app/community/[slug]/layout.tsx` — delete the static `metadata`, uncomment `generateMetadata`, restore its three imports.
    - `app/community/[slug]/opengraph-image.tsx` and `story/route.tsx` — set `PARKED` to `false` (or delete the const and its `if`), and put `alt` back to `"Community on NewFind"`.
    - `app/explore/page.tsx` — `parseView()` is the choke point; restoring it re-enables `showEvents`/`showCommunities`/`noun`/the `items` memo automatically. Also restore `setView`, `VIEW_SEGMENTS`, `selectView`, the `justify-between` on the switch row, and the `view === "events"` guard on Create Event.
-   - `app/page.tsx` — widen `exploreHref`'s `view` param back to `"events" | "communities"`.
-   - `components/HeroCarousel.tsx` — `subcopy` goes back to the `[SubLine, SubLine]` tuple once the events line 2 returns. ⚠️ Restoring the hero's Events/Communities toggle (parked separately, 2026-08-11) means restoring **all** of this first — see the note in that file.
+   - `lib/explore-href.ts` — widen `exploreHref`'s `view` param back to `"events" | "communities"`.
+   - Home hero — `HeroCarousel` (which carried the Events/Communities modes) was deleted 2026-11-15 in favour of `HeroChatCollage`, which is events-only. A community hero has to be rebuilt; `DESIGN_NOTES.md` §9 records the old mode design.
    - `app/dashboard/page.tsx` — drop the wishlist `.filter()` and rename the prop back to `items`.
 3. **Nothing to do on the backend.** The community service, gateway route, models and seed data were
    never touched and have been running throughout.
@@ -298,8 +298,8 @@ tabs"), so **decide between the two rather than shipping both**; two adjacent ti
 whose top step is `band:grid-cols-7`, matching today's seven tiles exactly, so an eighth needs that
 count and probably its 1400px breakpoint re-picked — see the notes in the component.
 
-**Reuse the live count — do not hardcode a figure.** `HeroCarousel`'s "About N options" is already
-this exact pattern: `GET /event/count` → `eventsSource.count()` → React Query, rounded to the
+**Reuse the live count — do not hardcode a figure.** The old `HeroCarousel`'s "About N options" (deleted
+2026-11-15, see `DESIGN_NOTES.md` §9) was this exact pattern: `GET /event/count` → `eventsSource.count()` → React Query, rounded to the
 nearest 10, and it renders **no number at all** below 10 rather than "0 options". A card that names
 a figure must take it from there and must degrade the same way, so the copy has to hold together
 with the number absent (loading, failure, or a thin catalogue). If the copy can only work with a

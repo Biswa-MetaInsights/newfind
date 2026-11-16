@@ -741,12 +741,12 @@ export function EventsCarousel({
     : filteredEvents
 
   return (
-    <section aria-label={`Events in ${location}`} className="py-8">
+    <section aria-label={`Happening in ${location}`} className="py-8">
 
       {/* ── Section header ── */}
       <div className="flex items-center justify-between px-4 sm:px-6 lg:px-12 mb-5">
         <h2 className="font-extrabold tracking-[-0.5px] flex items-center gap-1" style={{ fontSize: "clamp(18px, 4vw, 30px)", color: TEXT }}>
-          Events in{' '}
+          Happening in{' '}
           <span className="relative inline-flex items-center gap-2">
             <span style={{ color: GREEN }}>{location}</span>
             {locationSlot ?? <EditLocationButton />}

@@ -9,6 +9,14 @@
 
 ---
 
+## 2026-11-16
+
+- Home hero restyled to the polaroid mockups (dark + light): tilted polaroids, coral/lilac chat, teal callout, centred search. Roboto only, 8px radius, `CityPicker` kept; new `--hero-*` tokens. Local only.
+
+## 2026-11-15
+
+- Home hero replaced: `HeroCarousel` deleted for the chat + search + photo-collage `HeroChatCollage`, rebuilt to house tokens/Roboto/8px radius; dropped the live event count and `--brand-hero-frame`. Local only.
+
 ## 2026-11-12
 
 - Deployed core API integration behind Gautham’s restored frontend and fixed the location picker escaping narrow screens; persistent booking and responsive geometry checks passed.

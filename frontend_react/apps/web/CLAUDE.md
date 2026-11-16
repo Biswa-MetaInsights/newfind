@@ -40,7 +40,7 @@ hexes in components**, and do not restate the palette in this file — read `glo
 Tokens: `--brand-green`, `--brand-green-hover`, `--brand-on-green` (text/icons **on** a green fill),
 `--brand-bg` (page), `--brand-surface` (cards/navbar/inputs), `--brand-text`, `--brand-border`,
 `--brand-nav-border`, `--brand-control-border`, `--brand-hint`, `--brand-muted`,
-`--brand-terracotta` (+ `-hover`, `--brand-on-terracotta`), `--brand-logo`, `--brand-hero-frame` (the hero photo's frame — green in dark, **transparent in light**, which is how that border is made dark-only).
+`--brand-terracotta` (+ `-hover`, `--brand-on-terracotta`), `--brand-logo`.
 
 **Naming convention — what Gautham means:**
 - **"green" / "green shade"** → always `#184E4A` (`--brand-green`). Never another green, never Tailwind `green-*`.
@@ -58,7 +58,7 @@ Tailwind arbitrary values (`text-[var(--brand-hint)]`). **Alpha tints need
 `color-mix(in srgb, var(--brand-green) N%, transparent)`** — a CSS var can't take a hex-alpha suffix.
 
 **Intentionally not themed:** `Footer.tsx`, `/auth`'s left panel (green fill in both themes, so its
-logo/heading/blurb all take `--brand-on-green`), the `HeroCarousel` letterbox, and semantic accents
+logo/heading/blurb all take `--brand-on-green`), and semantic accents
 (badge colours, star gold, error red, status green/amber, Google/Facebook brand colours).
 
 Theme plumbing: `providers/theme-provider.tsx`, persisted to `eventmind-theme`, with a no-flash
@@ -73,6 +73,9 @@ Rationale for all of the above: `DESIGN_NOTES.md` §7.
 `layout.tsx` and exposed as `--font-app`; `globals.css` maps it to `body` and Tailwind's
 `--font-sans`. **There are no per-component font declarations** — do not re-import a font in a
 component or set `fontFamily` inline.
+
+**One approved exception (Gautham, 2026-11-16):** the home hero's polaroid captions are handwritten
+(**Caveat**, `--font-hand`, also loaded in `layout.tsx`). Nowhere else — do not extend it.
 
 **To swap the font:** change only the two marked lines in `layout.tsx` (the `next/font/google` import
 and the loader call). Keep `variable: "--font-app"`. Nothing else touches.

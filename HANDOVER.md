@@ -335,7 +335,7 @@ Communities are active in the professional-QA candidate, with persisted membersh
 | `app/dashboard/page.tsx` | My Tickets / My Wishlist / My Events / Profile — the three lists are `EventCardItem`s on `CARD_GRID`; the Profile tab's camera badge opens `ProfilePictureModal` |
 | `components/CategoryGrid.tsx` | "Browse by category" rail above the footer |
 | `components/FeatureBand.tsx` | "Why NewFind" — participant tiles left, organiser tiles right |
-| `components/HeroCarousel.tsx` | Split hero on home — copy left, image right |
+| `components/HeroChatCollage.tsx` | Home hero — polaroids either side of a fake chat, search and quick picks underneath |
 | `components/SimilarEvents.tsx` | "Similar events" rail on `/event/[id]` |
 | `components/CommunityCarousel.tsx` | Community cards on home — ⚠️ **parked, no call sites** |
 | `components/CommunityEventsRail.tsx` | "Events in this community" rail — ⚠️ **parked** |

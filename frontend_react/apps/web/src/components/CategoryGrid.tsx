@@ -1,7 +1,7 @@
 'use client'
 
 // ─────────────────────────────────────────────────────────────────────────────
-//  "Browse by category" — the two-row rail that sits directly above the footer
+//  "What are you in the mood for" (the category rail) — the two-row rail that sits directly above the footer
 //  on home.
 //
 //  A category tile borrows the EVENT CARD's chassis — same rounded-lg, same
@@ -307,7 +307,7 @@ export function CategoryGrid() {
 
   return (
     <section
-      aria-label="Browse by category"
+      aria-label="What are you in the mood for"
       className="py-8"
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
@@ -330,7 +330,7 @@ export function CategoryGrid() {
           className="font-extrabold tracking-[-0.5px]"
           style={{ fontSize: 'clamp(22px, 4vw, 30px)', color: TEXT }}
         >
-          Browse by category
+          What are you in the mood for
         </h2>
         {/*
         <Link

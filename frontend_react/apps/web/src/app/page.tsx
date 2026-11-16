@@ -11,7 +11,7 @@ import { useAuthStore } from "@eventmind/store";
 import type { Event } from "@eventmind/types";
 import { EVENT_FORMATS } from "@eventmind/types";
 import { Navbar } from "@/components/navbar/Navbar";
-import { HeroCarousel } from "@/components/HeroCarousel";
+import { HeroChatCollage } from "@/components/HeroChatCollage";
 import { EventsCarousel } from "@/components/EventsCarousel";
 // PARKED 2026-08-14 (MVP) â€” import { CommunityCarousel } from "@/components/CommunityCarousel";
 import { FeatureBand } from "@/components/FeatureBand";
@@ -20,21 +20,12 @@ import { CityPicker, LocationPrompt } from "@/components/CityPicker";
 import { Footer } from "@/components/Footer";
 // PARKED 2026-08-14 (MVP) â€” `toCommunityItem` dropped from this import.
 import { toCarouselEvent } from "@/lib/card-adapters";
+import { exploreHref } from "@/lib/explore-href";
 
 const RADIUS_KM = 200;
 
 // The private server sync populates external listings. Discovery only reads saved
 // provider/native events; it never generates fictional events when a city is empty.
-
-// "View all" on the home carousels lands on the unified Explore page, scoped to the
-// selected city (matched by name on the Explore side) and the relevant view.
-// PARKED 2026-08-14 (MVP) â€” the param was `view: "events" | "communities"`;
-// narrowed to "events" while communities are deferred to Phase 2.
-function exploreHref(view: "events", cityName: string, lat?: number, lng?: number): string {
-  const params=new URLSearchParams({view,city:cityName});
-  if(lat!=null&&lng!=null){params.set("lat",String(lat));params.set("lng",String(lng));}
-  return `/explore?${params}`;
-}
 
 export default function Home() {
   return (
@@ -128,7 +119,7 @@ function DiscoveryPage() {
   return (
     <div className="min-h-screen" style={{ backgroundColor: "var(--brand-bg)" }}>
       <Navbar />
-      <HeroCarousel />
+      <HeroChatCollage />
       <LocationPrompt />
 
       <EventsCarousel

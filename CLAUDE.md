@@ -78,7 +78,7 @@ prefix. **NewFind** is the user-facing name.
 
 ## Performance Rules
 
-- **Use `next/image` for images.** The one deliberate exception is `HeroCarousel`, which needs `<img>` because its wipe relies on `clip-path` (eslint-disabled inline). **Do not "fix" it.** Any new `<img>` needs the same kind of justification.
+- **Use `next/image` for images.** Any `<img>` needs a written justification (there is currently no exception).
 - **Use `next/link` for internal navigation.** Never a bare `<a>`.
 - **Always give `<Image>` a meaningful `sizes` prop** — do not leave the default.
 - Lazy-load below-the-fold components with `next/dynamic` where appropriate.

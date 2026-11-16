@@ -17,6 +17,7 @@ import { SegmentedControl } from "@/components/SegmentedControl";
 // PARKED 2026-08-14 (MVP) — import { CommunityCardItem } from "@/components/CommunityCarousel";
 // PARKED 2026-08-14 (MVP) — `toCommunityItem` dropped from this import.
 import { toCarouselEvent } from "@/lib/card-adapters";
+import { isoDate, addDays } from "@/lib/date-range";
 
 const GREEN = "var(--brand-green)";
 
@@ -121,23 +122,12 @@ const DATE_PRESETS: { value: DatePreset; label: string }[] = [
 // the catalogue is simply empty.
 const DEFAULT_PRESET: DatePreset = "week";
 
-// Local-date ISO (YYYY-MM-DD). toISOString() would shift the day for anyone
-// east/west of UTC, which is exactly the bug that makes "Today" return nothing.
-const isoDate = (d: Date) =>
-  `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
-
 // "2026-07-21" → "21/07/26", for DISPLAY only — state and the API stay on ISO.
 // Split rather than `new Date(iso)`, which parses a bare date as UTC midnight and
 // would show the previous day for anyone west of Greenwich.
 const shortDate = (iso: string) => {
   const [y, m, d] = iso.split("-");
   return y && m && d ? `${d}/${m}/${y.slice(2)}` : iso;
-};
-
-const addDays = (d: Date, n: number) => {
-  const out = new Date(d);
-  out.setDate(out.getDate() + n);
-  return out;
 };
 
 function presetRange(preset: DatePreset): [string, string] {
@@ -286,8 +276,8 @@ function ExploreContent() {
 
   // View + filter state — initialise from URL so links are shareable
   // PARKED 2026-08-14 (MVP) — was `const [view, setView] = …`. With the view
-  // switch parked nothing sets it, so the setter is dropped (same pattern as the
-  // pinned `mode` in HeroCarousel.tsx). PHASE 2 RESTORE: put `setView` back.
+  // switch parked nothing sets it, so the setter is dropped.
+  // PHASE 2 RESTORE: put `setView` back.
   const [view] = useState<View>(parseView(searchParams.get("view")));
   const [sort, setSort] = useState<Sort>(parseSort(searchParams.get("sort")));
   const [q, setQ] = useState(searchParams.get("q") ?? "");

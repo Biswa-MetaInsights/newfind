@@ -6,6 +6,8 @@ Owner: **Biswajith Gopinathan (Biswa-MetaInsights)**. Reviewed 2026-11-12.
 
 The integrated Gautham design is live at `https://www.newfind.events/`, source commit `6bb9ac3c7486d40c78cd068d4d197c9f9d18190c`, production deployment `6qR5LyCLegpA7XaZjQAWKhAhEeMd` (Ready, 34-second build). The restored PR 9 hero, Roboto font, original stylesheet and component geometry are retained. The original unintegrated rollback remains `d72f4b022e0db5ac121b6d9e9aa71c4652f7b602` / deployment `APq2aaEGNWqM72nViksqQhDvY4vE`.
 
+**Local only, not deployed:** the home hero is now `HeroChatCollage` (four tilted polaroids around a fake group chat, search bar + quick picks underneath; from the "Photos 1 — polaroids" mockups) in place of `HeroCarousel`, which was deleted. It uses borrowed photos from `public/hero/`; the briefed pottery / run-club / gig shots are still to come. The live site above still serves the old hero until this ships.
+
 The frontend reconnects the existing API proxy, social callbacks, recovery, persistent free booking/private QR, organiser operations, event content, place discovery, profile, notification, conversation and community APIs. Help and About routes work. Prepared OpenAgenda importer code is included in the repository but has not been installed or run on the backend host. Production backend containers and database schemas are unchanged.
 
 ## Verification and blockers
