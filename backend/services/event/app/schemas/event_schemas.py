@@ -88,3 +88,9 @@ class EventSearch(BaseModel):
     q: Optional[str] = None
     category: Optional[str] = None
     date_from: Optional[datetime] = None
+
+
+class ProviderDeleteBatch(BaseModel):
+    """Authenticated tombstones from an event-data provider sync."""
+    source: str = Field(..., min_length=2, max_length=50)
+    external_ids: List[str] = Field(..., min_length=1, max_length=500)
