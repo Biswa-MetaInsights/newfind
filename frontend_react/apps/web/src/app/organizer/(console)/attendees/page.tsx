@@ -43,6 +43,7 @@ import { csvFilename, downloadCsv } from "@/lib/csv";
 import { useCheckIns, setCheckedIn } from "@/lib/checkin-store";
 import type { DummyAttendee } from "@/frontend_testing/fixtures/organizer";
 import { useOrganiser, useOrganiserEvents } from "@/components/organizer/useOrganiser";
+import { formatEventMoment } from "@/lib/event-time";
 import {
   Card, Pill, StatTile, FilterSelect, ConsoleButton, EmptyState,
   RowAction, RowMenu, TableScroller, TableHead, TableRow, TableFooter,
@@ -323,7 +324,7 @@ function AttendeesInner() {
                 columns={["Attendee", "Contact", "Ticket", "Paid", "Booked", "Status", <span key="a" className="text-right block">Actions</span>]}
               />
               {rows.map((a) => (
-                <AttendeeRow key={a.id} attendee={a} checkedInAt={checkIns[a.id]} door={door} />
+                <AttendeeRow key={a.id} attendee={a} checkedInAt={checkIns[a.id]} door={door} zone={events.find((e) => e.id === a.eventId)?.timezone} />
               ))}
             </TableScroller>
             <TableFooter
@@ -344,9 +345,11 @@ const timeOf = (iso: string) =>
   new Date(iso).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
 
 function AttendeeRow({
-  attendee: a, checkedInAt, door,
+  attendee: a, checkedInAt, door, zone,
 }: {
   attendee: DummyAttendee;
+  /** The attendee's event zone: "Booked" arrives as a raw ISO string. */
+  zone?: string;
   /** ISO time from the local door record, or undefined if they have not arrived. */
   checkedInAt?: string;
   door: boolean;
@@ -397,7 +400,7 @@ function AttendeeRow({
       <div className="text-[17px] font-semibold" style={{ color: "var(--brand-text)" }}>
         {formatPrice(a.paid, a.currency, { freeLabel: null })}
       </div>
-      <div className="text-[17px]" style={{ color: "var(--brand-hint)" }}>{a.booked}</div>
+      <div className="text-[17px]" style={{ color: "var(--brand-hint)" }}>{formatEventMoment(a.booked, zone)}</div>
       <div className="flex flex-col items-start gap-1">
         {arrived ? (
           <>

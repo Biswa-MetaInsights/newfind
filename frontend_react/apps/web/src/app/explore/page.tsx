@@ -611,7 +611,7 @@ function ExploreContent() {
               (keeps city picking simple):
           <details className="min-w-0"><summary className="cursor-pointer py-3">Location: {city.name}</summary><div className="py-3"><LocationSelector value={city} onChange={setCity}/></div></details>
           */}
-          <CityPicker value={city} onChange={setCity} />
+          <CityPicker value={city} onChange={setCity} outlined />
 
           {/* Sort by */}
           <label className="flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm"

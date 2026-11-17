@@ -10,8 +10,10 @@ import { LocationSelector } from "./LocationSelector";
 /** Uncontrolled by default: reads and writes the global location store. Pass
  *  `value` + `onChange` to drive it from local state instead (Explore's `city`
  *  is page state seeded from the URL, and must not overwrite the navbar's city). */
-export function CityPicker({ variant = "pill", label, value, onChange }: {
+export function CityPicker({ variant = "pill", label, value, onChange, outlined = false }: {
   variant?: "pill" | "icon" | "inline"; label?: string; value?: City; onChange?: (city: City) => void;
+  /** Wears the 2px control outline. Explore's top bar only, where its neighbours (search, sort) are outlined. */
+  outlined?: boolean;
 } = {}) {
   const ready = useLocationStore(s => s._hasHydrated);
   const selected = useLocationStore(s => s.selectedCity);
@@ -48,14 +50,15 @@ export function CityPicker({ variant = "pill", label, value, onChange }: {
     <div className="group relative min-w-0" ref={ref}>
       <button ref={trigger} type="button" onClick={() => setOpen(value => !value)}
         aria-label={label || `Select city, currently ${city.name}`} aria-expanded={open} aria-controls={open ? popupId : undefined}
-        className="flex min-h-11 min-w-11 items-center justify-center gap-2 rounded-lg px-3 py-2 max-w-[180px] transition-colors duration-150 hover:text-[var(--brand-green)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--brand-text)]">
+        className={`flex min-h-11 min-w-11 items-center justify-center gap-2 rounded-lg px-3 py-2 max-w-[180px] ${outlined ? "border-2 border-[var(--brand-control-border)] bg-[var(--brand-bg)]" : ""} focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--brand-text)]`}>
         <LocationPinIcon className="w-4 h-4 shrink-0" />
         {variant !== "icon" && <span className="truncate">{label || city.name}</span>}
       </button>
       {/* Old page's tooltip (Gautham 2026-11-17). Navbar trigger only: it opens rightward, so it
-          would clip beside the other triggers. CSS group-hover, so it is hover-devices-only. */}
+          would clip beside the other triggers. Laptop/desktop only (Gautham, 2026-11-17): `lg+` and a
+          hovering pointer, so phones and tablets never see it. */}
       {variant === "inline" && !open && (
-        <span role="tooltip" className="hidden lg:group-hover:block absolute left-full top-1/2 -translate-y-1/2 ml-2 whitespace-nowrap text-sm font-medium px-3 py-1.5 rounded-lg shadow-lg z-50 pointer-events-none border border-[var(--brand-border)] bg-[var(--brand-surface)] text-[var(--brand-text)]">
+        <span role="tooltip" className="hidden lg:group-hover:block [@media(hover:none)]:hidden absolute left-full top-1/2 -translate-y-1/2 ml-2 whitespace-nowrap text-sm font-medium px-3 py-1.5 rounded-lg shadow-lg z-50 pointer-events-none border border-[var(--brand-border)] bg-[var(--brand-surface)] text-[var(--brand-text)]">
           Click here to change your location
         </span>
       )}

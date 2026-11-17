@@ -383,7 +383,7 @@ function TicketCard({ ticket }: { ticket: StoredTicket }) {
   const card: CarouselEvent = {
     id: ticket.event_id,
     title: ticket.event_title,
-    ...cardDateTime(ticket.start_date),
+    ...cardDateTime(ticket.start_date, ticket.timezone),
     venue: "",
     price: isFree ? "Free" : formatPrice(ticket.price_paid, ticket.currency, { decimals: true }),
     imageUrl: "",

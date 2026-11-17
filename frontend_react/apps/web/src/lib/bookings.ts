@@ -13,7 +13,7 @@ async function storedTicket(ticket: TicketRecord): Promise<StoredTicket> {
   const { data: event } = await eventsApi.get(ticket.event_id);
   return {
     id: ticket.id, event_id: ticket.event_id, event_title: event.title,
-    start_date: event.start_date, currency: event.currency,
+    start_date: event.start_date, timezone: event.timezone, currency: event.currency,
     price_paid: ticket.price_paid, seat_info: "General Admission",
     qr_hash: ticket.qr_code_hash, claimed_at: ticket.purchased_at,
   };

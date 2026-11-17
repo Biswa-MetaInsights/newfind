@@ -10,7 +10,8 @@ import { Roboto, Caveat } from "next/font/google";
 import { QueryProvider } from "@/providers/query-provider";
 import { ThemeProvider } from "@/providers/theme-provider";
 import { ChatPresence } from "@/components/ChatPresence";
-import { DevBanner } from "@/frontend_testing/DevBanner";
+// PARKED 2026-11-17 (Gautham): the dev banner is no longer shown. DevBanner.tsx stays (frontend_testing is never deleted).
+// import { DevBanner } from "@/frontend_testing/DevBanner";
 import { NO_FLASH_SCRIPT } from "@/lib/theme";
 import "@/lib/api-config";
 import "./globals.css";
@@ -88,8 +89,8 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col font-sans">
         <ThemeProvider>
           <QueryProvider>
-            {/* DEV ONLY — data mode + dev flags; see frontend_testing/DevBanner. */}
-            {process.env.NODE_ENV === "development" && <DevBanner />}
+            {/* PARKED 2026-11-17 (Gautham): DEV ONLY banner (data mode + dev flags), removed from the page.
+                Re-enable: uncomment the import above and `{process.env.NODE_ENV === "development" && <DevBanner />}`. */}
             {children}
             {/* Invisible: lights the navbar chat button on new messages. */}
             <ChatPresence />

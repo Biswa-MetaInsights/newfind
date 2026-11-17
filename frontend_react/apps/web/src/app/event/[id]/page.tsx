@@ -66,6 +66,7 @@ import { heroTitleSize } from "@/lib/hero-title";
 import { GUTTERS } from "@/lib/layout";
 import { isExternalEvent, externalTicketUrl, externalProviderName } from "@/lib/external-events";
 import { formatPrice } from "@/lib/currency";
+import { zoneAbbreviation } from "@/lib/event-time";
 
 const GREEN = "var(--brand-green)";
 
@@ -75,10 +76,11 @@ function fmt(iso: string, opts: Intl.DateTimeFormatOptions) {
 
 /** Clock time and zone label as two strings — the zone renders small and muted beside the time. */
 function fmtTime(iso: string, timeZone: string) {
-  const parts = new Intl.DateTimeFormat("en-US", { hour: "numeric", minute: "2-digit", timeZone, timeZoneName: "short" }).formatToParts(new Date(iso));
+  const date = new Date(iso);
+  const parts = new Intl.DateTimeFormat("en-US", { hour: "numeric", minute: "2-digit", timeZone }).formatToParts(date);
   return {
-    time: parts.filter(p => p.type !== "timeZoneName").map(p => p.value).join("").trim(),
-    zone: parts.find(p => p.type === "timeZoneName")?.value ?? "",
+    time: parts.map(p => p.value).join("").trim(),
+    zone: zoneAbbreviation(date, timeZone),
   };
 }
 
@@ -223,7 +225,9 @@ export default function EventDetailPage({
   function handleBookNow() {
     if (!bookable || !registrationState(event!, Date.now()).available) return;
     if (external) {
-      if (providerUrl) window.location.assign(providerUrl);
+      // New tab (Gautham, 2026-11-17): the visitor keeps the NewFind event page. `noopener` so the
+      // provider page cannot reach back through window.opener.
+      if (providerUrl) window.open(providerUrl, "_blank", "noopener,noreferrer");
       return;
     }
     router.push(isAuthenticated ? `/checkout/${id}` : "/auth");

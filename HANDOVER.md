@@ -365,7 +365,7 @@ Communities are active in the professional-QA candidate, with persisted membersh
 | `components/brand/*` | Official logo, wordmark, lockup, loader |
 | `frontend_testing/dev-flags.ts` | Dev-only flags (organiser-setup bypass, assistant in real mode) — **dev only, never delete** |
 | `frontend_testing/BypassStrip.tsx` | Terracotta strip linking onboarding ⇄ create while the bypass is on |
-| `frontend_testing/DevBanner.tsx` | One line above every page in `next dev`: data mode + dev flags |
+| `frontend_testing/DevBanner.tsx` | (parked, not mounted) one line above every page in `next dev`: data mode + dev flags |
 
 ### The organiser console (`/organizer/events`)
 
@@ -435,7 +435,7 @@ Organiser onboarding is required in production. The dev tooling stays in the rep
 - **Never delete `frontend_testing/` or `apps/web/src/frontend_testing/`** (rules: `frontend_testing/README.md`). `pnpm --filter @eventmind/web type-check` runs `scripts/check-frontend-testing.mjs` first and fails if either folder is missing or a flag in `dev-flags.ts` lacks its `NODE_ENV === "development" &&` half. It must pass before a release.
 - **Production env must not set `NEXT_PUBLIC_SKIP_*` or `NEXT_PUBLIC_DEV_*`.** They would do nothing (the `NODE_ENV` half is `false` in a build), but a set one means someone expected it to.
 - **Once per release, confirm the flags are compiled to `false`:** after `next build` (stop the dev server first; the build shares `.next` with it), grep `.next/static/chunks` for `"SHOW_EVENT_ASSISTANT",0,!1,"SKIP_ORGANIZER_VERIFICATION",0,!1`; it must appear, and `NEXT_PUBLIC_SKIP_` / `NEXT_PUBLIC_DEV_` must not. ⚠️ **`Dev bypass on` itself DOES appear in two client chunks** (measured 2026-11-17, with both env vars forced to `true` during the build): `BypassStrip` is not tree-shaken, so its text ships as unreachable code behind the `!1`. Only the flags matter, but if the text must not ship, that is a code change (`frontend_to_test.md` §5 #4).
-- `frontend_testing/` is in `.dockerignore`; how the frontend itself is deployed (believed Vercel) is still unconfirmed.
+- `frontend_testing/` is in `.dockerignore`; how the frontend itself is deployed is unconfirmed (`STATUS.md` says Vercel; Gautham half-remembers a manual Hetzner deploy; Biswajith knows, see `backend_to-do.md` §9). Whatever the method, never copy `frontend_testing/` or `.env.local` to the server.
 - Run backend integration tests too. Set `NEXT_PUBLIC_DATA_MODE=real` and an HTTPS `NEXT_PUBLIC_API_URL` only after backend health checks pass.
 
 ---

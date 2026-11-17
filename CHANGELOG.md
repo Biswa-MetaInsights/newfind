@@ -11,6 +11,9 @@
 
 ## 2026-11-17
 
+- Review follow-ups (3): event chat page scrolls to the newest message, announces only the newest to screen readers, Send looks disabled when it is, no blank page while loading; deployment is recorded as a question for Biswajith (`backend_to-do.md` §9).
+- Review follow-ups (2): ticket cards, console "Booked"/next-up/earnings dates and the console events table show the event's own time zone; external listings open in a new tab; Tickets-tab, org-name-limit and earnings-picker notes in `backend_to-do.md`.
+- Review follow-ups: "Suggested for you" chip also in the Online row; Explore city picker outlined; dev banner parked; city picker has no hover change; dev flags default to off (real data); navbar city tooltip laptop/desktop only; event-page zone shows CET/CEST-style abbreviations.
 - Review round, Phase 5: close-out checks. Signed-in and signed-out sweeps clean, `type-check` guard fail/pass confirmed, production build compiles both dev flags to `false` (but the `BypassStrip` text still ships as dead code), stale `EditPencil` row fixed.
 - Review round, Phase 4: `frontend_testing/` seed + reset scripts (replace `seed_events.py`), live demo fixtures and checklist, CDP mocks (bell, social sign-in), scenario screenshots, chat demo, Mailpit notes.
 - Review round, Phase 3: dev-only `frontend_testing/` (root docs + in-app flags, `BypassStrip`, `DevBanner`), organiser-setup bypass restored on onboarding ⇄ create, assistant-in-real-mode flag, `type-check` guard; dummy fixtures moved to `src/frontend_testing/fixtures/`.

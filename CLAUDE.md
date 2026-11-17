@@ -105,7 +105,7 @@ prefix. **NewFind** is the user-facing name.
     ```
     **If it OOMs, delete `.next` and retry BEFORE falling back to `dev:webpack`** — a stale Turbopack cache is the usual culprit, and plain `dev` is ~12x faster. Details: `HANDOVER.md` → *How to Run*.
 12. **Never attribute commits to a tool.** No `Co-Authored-By:` trailers for AI assistants, no "Generated with…" lines, no tool attribution in commit messages or PR descriptions. **Biswajith and Gautham are the only contributors on this repo.**
-13. **`frontend_testing/` (repo root) and `apps/web/src/frontend_testing/` are DEV ONLY: never delete them, never ship them.** Every dev flag (the organiser-setup bypass included) is `NODE_ENV === "development" && <env var>` in `dev-flags.ts`, so production always requires organiser onboarding. `type-check` runs a guard that fails if either folder or that rule goes. See `frontend_testing/README.md`.
+13. **`frontend_testing/` (repo root) and `apps/web/src/frontend_testing/` are DEV ONLY: never delete them, never ship them.** Every dev flag (the organiser-setup bypass included) is `NODE_ENV === "development" && <env var>` in `dev-flags.ts`, so production always requires organiser onboarding. `type-check` runs a guard that fails if either folder or that rule goes. See `frontend_testing/README.md`. **Default = real data, every dev flag `false` in `.env.local`; turn them on only when Gautham says "frontend testing", then turn them off.**
 
 ---
 

@@ -26,6 +26,8 @@ the dummy-data fixtures, seed scripts and request mocks. It lives in two places:
 
 ## Dev flags
 
+**Default (Gautham, 2026-11-17): `NEXT_PUBLIC_DATA_MODE=real` and every flag below `false`.** Anyone opening the page sees the real page with real data. Turn a flag on only when Gautham says "frontend testing", and turn it back off afterwards.
+
 Set in `apps/web/.env.local`, then restart `next dev` (`NEXT_PUBLIC_*` values are inlined at start).
 
 | Variable | Effect when `true` (development only) |
@@ -33,8 +35,8 @@ Set in `apps/web/.env.local`, then restart `next dev` (`NEXT_PUBLIC_*` values ar
 | `NEXT_PUBLIC_SKIP_ORGANIZER_VERIFICATION` | `/organizer/create` opens without an organiser profile; `/organizer/onboarding` stops redirecting to it; both show the terracotta **bypass strip** linking to each other, and create's back arrow goes to onboarding. Skips the *check*, not the requirement: a real-mode submit without a profile can still be refused by the backend. |
 | `NEXT_PUBLIC_DEV_SHOW_EVENT_ASSISTANT` | Shows the AI event assistant on `/event/[id]` in **real** data mode too (product shows it in dummy mode only). Needs `OPENAI_API_KEY` in the backend `.env`. |
 
-The **dev banner** (one line above every page, `next dev` only) shows the data mode and both flags,
-so a screenshot carries its own context.
+The **dev banner** (`DevBanner.tsx`) is **parked since 2026-11-17**: the file stays, but `app/layout.tsx` no longer
+mounts it. Uncomment the import and the render there to bring it back (one line above every page, `next dev` only).
 
 ## Dummy vs real data mode
 
@@ -108,6 +110,8 @@ Local SMTP with Mailpit, for forgot-password, verification and event-change emai
 
 ## Open question
 
-**How is the frontend deployed?** Believed to be Vercel (`STATUS.md` → *Deployment boundaries*
-says so) but not confirmed. Nothing in this root folder is imported by the app, so it cannot appear
-in a bundle either way; what is unconfirmed is whether it can ride along in the deploy artefact.
+**How is the frontend deployed?** Unconfirmed (2026-11-17). `STATUS.md` → *Deployment boundaries* says Vercel;
+Gautham half-remembers a manual Hetzner deploy but is not sure; Biswajith knows (question recorded in
+`Eventmind_files/backend_to-do.md` §9). Nothing in this root folder is imported by the app, so it cannot
+appear in a bundle. Whatever the method, do not copy `frontend_testing/` (it holds `accounts.local.json`,
+local test logins) or `.env.local` to the server.
