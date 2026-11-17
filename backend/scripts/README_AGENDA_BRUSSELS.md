@@ -42,6 +42,6 @@ Then run incremental syncs on a schedule more frequent than once per day. The pr
 python backend/scripts/sync_agenda_brussels.py --mode incremental
 ```
 
-The sync upserts on `(source, external_id)`, so repeated runs do not duplicate events. It uses the provider's documented image CDN resizing parameters when available. Deletions are soft-cancelled and require `PROVIDER_SYNC_TOKEN`; if that secret is absent, deletion IDs are logged but not applied. Keep the state file on durable storage in production.
+The sync upserts on `(source, external_id)`, so repeated runs do not duplicate events. It uses the provider's documented image CDN resizing parameters when available. Deletions are soft-cancelled and require `PROVIDER_SYNC_TOKEN`; if that secret is absent, the sync stops without advancing its checkpoint, so deletions can be replayed after the secret is configured. Keep the state file on durable storage in production.
 
 The command reports records that cannot be normalized and stops without advancing its checkpoint when an event upsert fails. The API response shape should be confirmed against live sample records before production because the provider's documentation does not include a complete JSON schema.
