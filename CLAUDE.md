@@ -98,14 +98,14 @@ prefix. **NewFind** is the user-facing name.
 7. **Save new project documents to `Eventmind_files/`**, not inside `eventmind/`.
 8. **Never commit `.env.local`, `.env` or `start.bat`** — all git-ignored, all hold secrets.
 9. **Keep Node at v20+** — `.nvmrc` pins 24.16.0; run `nvm use` inside `frontend_react/`.
-10. **If you delete `platform_dev.db`** — restart all services first (so the community service creates the `communities` table), then re-run `seed_events.py`.
+10. **If you delete `platform_dev.db`** — restart all services first (so the community service creates the `communities` table), then re-run `node frontend_testing/seed/seed.mjs` (`seed_events.py` is replaced and no longer works).
 11. **Always stop the dev server with `Ctrl+C` in its terminal** — never just close the window. Killing the terminal on Windows orphans the Next.js worker processes; they accumulate across runs (we once found 321 zombie `node` processes), eat RAM, and cause heap-allocation crashes on later runs. Clean up orphans after a crash:
     ```powershell
     Get-CimInstance Win32_Process -Filter "Name='node.exe'" | Where-Object { $_.CommandLine -match 'next' } | ForEach-Object { Stop-Process -Id $_.ProcessId -Force }
     ```
     **If it OOMs, delete `.next` and retry BEFORE falling back to `dev:webpack`** — a stale Turbopack cache is the usual culprit, and plain `dev` is ~12x faster. Details: `HANDOVER.md` → *How to Run*.
 12. **Never attribute commits to a tool.** No `Co-Authored-By:` trailers for AI assistants, no "Generated with…" lines, no tool attribution in commit messages or PR descriptions. **Biswajith and Gautham are the only contributors on this repo.**
-13. **Production access:** organiser onboarding is required; no development verification bypass is included.
+13. **`frontend_testing/` (repo root) and `apps/web/src/frontend_testing/` are DEV ONLY: never delete them, never ship them.** Every dev flag (the organiser-setup bypass included) is `NODE_ENV === "development" && <env var>` in `dev-flags.ts`, so production always requires organiser onboarding. `type-check` runs a guard that fails if either folder or that rule goes. See `frontend_testing/README.md`.
 
 ---
 

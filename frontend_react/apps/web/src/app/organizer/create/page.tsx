@@ -54,6 +54,8 @@ import {
 import { isUploadedImage } from "@/lib/image-upload";
 import { GUTTERS } from "@/lib/layout";
 import { hoverCapable } from "@/lib/pointer";
+import { SKIP_ORGANIZER_VERIFICATION } from "@/frontend_testing/dev-flags";
+import { BypassStrip } from "@/frontend_testing/BypassStrip";
 
 const GREEN = "var(--brand-green)";
 
@@ -447,11 +449,15 @@ export default function CreateEventPage() {
   const [error, setError] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [success, setSuccess] = useState(false);
-  const [verificationChecked, setVerificationChecked] = useState(false);
+  /* Starts true under the dev bypass — the gate is then already open on the first
+     render. Setting it from inside the effect instead would trip
+     `react-hooks/set-state-in-effect` and cost a throwaway render. */
+  const [verificationChecked, setVerificationChecked] = useState(SKIP_ORGANIZER_VERIFICATION);
 
   useEffect(() => {
     if (!hasHydrated) return;
     if (!isAuthenticated) { router.replace("/auth"); return; }
+    if (SKIP_ORGANIZER_VERIFICATION) return;
     const userId = subFromToken(tokens?.access_token ?? null);
     if (!userId) return;
 
@@ -642,11 +648,26 @@ export default function CreateEventPage() {
         className={`pt-8 max-w-[1536px] mx-auto ${GUTTERS}`}
         style={{ paddingBottom: STICKY_BAR_HEIGHT_COMPACT + 32 }}
       >
+        {/* DEV ONLY — the return half of the create ⇄ onboarding round trip, the
+            twin of the strip on /organizer/onboarding. The back arrow below
+            already walks there under the bypass, but it reads as a back button,
+            so it is not a door anyone can SPOT. Renders nothing unless the dev
+            bypass is on; see frontend_testing/. */}
+        <BypassStrip href="/organizer/onboarding" label="← Set up your organisation" />
 
         {/* Header */}
         <div className="flex items-center gap-4 mb-6">
+          {/* Under the dev bypass this walks to /organizer/onboarding rather than
+              into history, so the two pages can be reviewed as a pair. For a real
+              organiser it stays plain history — they reach this form from the
+              console, and sending them to a setup page they have already
+              completed would be a bug, not a shortcut. */}
           <button
-            onClick={() => router.back()}
+            onClick={() =>
+              SKIP_ORGANIZER_VERIFICATION
+                ? router.push("/organizer/onboarding")
+                : router.back()
+            }
             className="w-9 h-9 shrink-0 rounded-full flex items-center justify-center transition-colors"
             style={{ border: "2px solid var(--brand-control-border)", backgroundColor: "var(--brand-bg)" }}
           >

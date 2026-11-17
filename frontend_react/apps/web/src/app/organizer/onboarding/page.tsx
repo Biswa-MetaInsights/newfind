@@ -17,6 +17,8 @@ import {
   STICKY_BAR_HEIGHT,
 } from "@/components/DetailCard";
 import { GUTTERS } from "@/lib/layout";
+import { SKIP_ORGANIZER_VERIFICATION } from "@/frontend_testing/dev-flags";
+import { BypassStrip } from "@/frontend_testing/BypassStrip";
 
 const GREEN = "var(--brand-green)";
 
@@ -95,6 +97,11 @@ export default function OrganizerOnboardingPage() {
   useEffect(() => {
     if (!hasHydrated) return;
     if (!isAuthenticated) { router.replace("/auth"); return; }
+    /* An organiser who already has a profile normally gets bounced straight to
+       the create form. Under the dev bypass that redirect is exactly what stops
+       you from LOOKING at this page — and it would fire the moment the create
+       page's back button landed you here, so the pair would ping-pong. */
+    if (SKIP_ORGANIZER_VERIFICATION) return;
     const userId = subFromToken(tokens?.access_token ?? null);
     if (!userId) return;
     organizerApi.get(userId)
@@ -165,6 +172,9 @@ export default function OrganizerOnboardingPage() {
         className={`pt-8 max-w-[1536px] mx-auto ${GUTTERS}`}
         style={{ paddingBottom: STICKY_BAR_HEIGHT + 32 }}
       >
+        {/* DEV ONLY — the forward half of the create ⇄ onboarding round trip.
+            Renders nothing unless the dev bypass is on; see frontend_testing/. */}
+        <BypassStrip href="/organizer/create" label="Skip to Create Event →" />
 
         {/* Header — the create page's back arrow and title block. Plain history
             here in both modes: under the bypass the dev strip above is already

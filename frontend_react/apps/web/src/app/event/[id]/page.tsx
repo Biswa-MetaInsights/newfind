@@ -11,6 +11,7 @@ import type { Review, ReviewAggregates } from "@eventmind/api";
 import { useAuthStore } from "@eventmind/store";
 import { Navbar } from "@/components/navbar/Navbar";
 import { EventChatWidget } from "@/components/EventChatWidget";
+import { SHOW_EVENT_ASSISTANT } from "@/frontend_testing/dev-flags";
 import {
   EventBackButton,
   EventCancelButton,
@@ -527,7 +528,8 @@ export default function EventDetailPage({
       <SimilarEvents event={event} />
 
       {/* ── AI Event Assistant widget ── */}
-      {isDummyMode && <EventChatWidget event={event} />}
+      {/* Dummy mode only in the product; the dev flag adds real mode locally. */}
+      {(isDummyMode || SHOW_EVENT_ASSISTANT) && <EventChatWidget event={event} />}
 
       {/* ── Sticky bar ──
           ⚠️ It follows the sidebar: the organiser's says what they came to find
