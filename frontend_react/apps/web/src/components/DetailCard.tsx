@@ -117,11 +117,13 @@ export function DetailCardHeader({
 // ── Body pieces ──────────────────────────────────────────────────────────────
 
 /** One icon + label row (date, time, location). */
-export function DetailLine({ icon, text }: { icon: React.ReactNode; text: string }) {
+export function DetailLine({ icon, text, suffix }: { icon: React.ReactNode; text: string; suffix?: string }) {
   return (
     <div className="flex items-center gap-3 min-w-0">
       <span className="shrink-0">{icon}</span>
       <span className="text-[16px] font-semibold text-[var(--brand-text)] truncate">{text}</span>
+      {/* Optional small muted tail — the event page puts the time zone here, beside the time. */}
+      {suffix && <span className="shrink-0 text-[14px] text-[var(--brand-muted)]">{suffix}</span>}
     </div>
   );
 }

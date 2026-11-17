@@ -8,7 +8,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "type-check": "tsc --noEmit",
+    "type-check": "node scripts/check-frontend-testing.mjs && tsc --noEmit",
     "sweep": "node scripts/responsive-sweep.mjs"
   },
   "dependencies": {

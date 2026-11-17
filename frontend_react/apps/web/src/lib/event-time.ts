@@ -17,3 +17,33 @@ export function eventTimeUtc(value: string, zone: string): Date {
   }
   throw new Error('This local time does not exist because the clocks change. Please choose another time.');
 }
+
+// English short zone names differ by locale: en-US gives "EST" for New York but "GMT+1" for Brussels,
+// en-GB gives "CET"/"CEST", en-IN "IST", en-AU "AEDT". Try each until one is a real abbreviation
+// (it follows the date, so Brussels reads CET in winter and CEST in summer); zones with no common
+// English abbreviation (Tokyo) fall back to the "GMT+9" offset form.
+const ZONE_LOCALES = ['en-US', 'en-GB', 'en-AU', 'en-IN', 'en-NZ', 'en-ZA', 'en-CA'];
+export function zoneAbbreviation(date: Date, timeZone: string): string {
+  let offsetForm = '';
+  for (const locale of ZONE_LOCALES) {
+    const name = new Intl.DateTimeFormat(locale, { timeZone, timeZoneName: 'short' }).formatToParts(date).find(p => p.type === 'timeZoneName')?.value ?? '';
+    if (!offsetForm) offsetForm = name;
+    if (name && !/^(GMT|UTC)[+\-\u2212]/.test(name)) return name;
+  }
+  return offsetForm;
+}
+
+/**
+ * One moment as organiser-console text: "04 Dec 2026, 19:00 CET", in the EVENT's own time zone
+ * (never the browser's, Gautham 2026-11-17). Used for every raw ISO the console used to print.
+ * No zone (the event is not in the list, or a legacy row) falls back to the browser's zone with no
+ * label; a value that is not a date (dummy fixtures hold ready-made text) is returned unchanged.
+ */
+export function formatEventMoment(value: string, zone?: string): string {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return value;
+  let timeZone = zone || undefined;
+  if (timeZone) { try { new Intl.DateTimeFormat('en-GB', { timeZone }); } catch { timeZone = undefined; } }
+  const text = date.toLocaleString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', hourCycle: 'h23', timeZone });
+  return timeZone ? `${text} ${zoneAbbreviation(date, timeZone)}` : text;
+}

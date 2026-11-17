@@ -67,6 +67,10 @@ export interface EventsCarouselProps {
   onBookNow?: (id: string) => void
   /** Optional control rendered in place of the default edit-location button (e.g. <CityPicker variant="icon" />). */
   locationSlot?: ReactNode
+  /** Personal recommendations. Their in-person/hybrid ones become a "Suggested for you" tab
+   *  after "All" in the city row, their online/hybrid ones the same tab in the Online row
+   *  (Gautham, 2026-11-17). A row with none (signed out, or no results) has no such tab. */
+  suggestedEvents?: CarouselEvent[]
 }
 
 // ─── Brand constants ───────────────────────────────────────────────────────────
@@ -105,7 +109,9 @@ const IMAGE_SIZES =
   '(max-width: 639px) calc(100vw - 32px), (max-width: 1279px) calc(50vw - 34px), calc(25vw - 39px)'
 
 const FILTER_TABS = ['All', 'This Week', 'Free', 'Music', 'Food']
+const SUGGESTED_TAB = 'Suggested for you'
 const ONLINE_FILTER_TABS = ['All', 'Free', 'This Week', 'Selling Fast']
+const ONLINE_TABS_WITH_SUGGESTED = [ONLINE_FILTER_TABS[0], SUGGESTED_TAB, ...ONLINE_FILTER_TABS.slice(1)]
 
 // ─── Filter tabs ───────────────────────────────────────────────────────────────
 
@@ -547,19 +553,24 @@ function OnlineEventsRow({
   seeAllHref,
   onBookNow,
   isLoading = false,
+  suggestedEvents,
 }: {
   events: CarouselEvent[]
   seeAllHref: string
   onBookNow?: (id: string) => void
   isLoading?: boolean
+  suggestedEvents?: CarouselEvent[]
 }) {
-  const [activeTab, setActiveTab] = useState('All')
+  const [pickedTab, setActiveTab] = useState('All')
   const onlineEvents = events.filter(inOnlineRow)
+  const suggestedOnline = (suggestedEvents ?? []).filter(inOnlineRow)
+  const tabs = suggestedOnline.length > 0 ? ONLINE_TABS_WITH_SUGGESTED : ONLINE_FILTER_TABS
+  // Same derived fallback as the city row: a vanished tab drops back to "All".
+  const activeTab = tabs.includes(pickedTab) ? pickedTab : 'All'
 
   const filteredOnline: CarouselEvent[] = (() => {
     if (activeTab === 'All') return onlineEvents
-    if (activeTab === 'Recommended')
-      return onlineEvents.filter((e) => e.badgeTypes?.includes('recommended'))
+    if (activeTab === SUGGESTED_TAB) return suggestedOnline
     if (activeTab === 'Free')
       return onlineEvents.filter((e) => e.price === 'Free')
     if (activeTab === 'This Week')
@@ -594,7 +605,7 @@ function OnlineEventsRow({
 
       {/* Filter tabs — tab row on a wide mouse-driven screen, dropdown below lg
           or on touch (see FilterTabs) */}
-      <FilterTabs tabs={ONLINE_FILTER_TABS} active={activeTab} onChange={setActiveTab} label="Filter online events" />
+      <FilterTabs tabs={tabs} active={activeTab} onChange={setActiveTab} label="Filter online events" />
 
       <div className="px-4 sm:px-6 lg:px-12 pb-3">
         {isLoading ? (
@@ -718,15 +729,22 @@ export function EventsCarousel({
   isLoading = false,
   onBookNow,
   locationSlot,
+  suggestedEvents,
 }: EventsCarouselProps) {
-  const [activeTab, setActiveTab] = useState('All')
+  const [pickedTab, setActiveTab] = useState('All')
 
   const offlineEvents = events.filter(inCityRow)
+  const suggested = (suggestedEvents ?? []).filter(inCityRow)
+  const tabs = suggested.length > 0
+    ? [FILTER_TABS[0], SUGGESTED_TAB, ...FILTER_TABS.slice(1)]
+    : FILTER_TABS
+  // Derived, not reset in an effect: if the picked tab disappears (sign-out, a
+  // city change that empties the suggestions) the row falls back to "All".
+  const activeTab = tabs.includes(pickedTab) ? pickedTab : 'All'
 
   const filteredEvents: CarouselEvent[] = (() => {
     if (activeTab === 'All') return offlineEvents
-    if (activeTab === 'Recommended')
-      return offlineEvents.filter((e) => e.badgeTypes?.includes('recommended'))
+    if (activeTab === SUGGESTED_TAB) return suggested
     if (activeTab === 'Free')
       return offlineEvents.filter((e) => e.price === 'Free')
     if (activeTab === 'This Week')
@@ -741,17 +759,20 @@ export function EventsCarousel({
     : filteredEvents
 
   return (
-    <section aria-label={`Events in ${location}`} className="py-8">
+    <section aria-label={`Happening in ${location}`} className="py-8">
 
       {/* ── Section header ── */}
       <div className="flex items-center justify-between px-4 sm:px-6 lg:px-12 mb-5">
-        <h2 className="font-extrabold tracking-[-0.5px] flex items-center gap-1" style={{ fontSize: "clamp(18px, 4vw, 30px)", color: TEXT }}>
-          Events in{' '}
-          <span className="relative inline-flex items-center gap-2">
-            <span style={{ color: GREEN }}>{location}</span>
+        <div className="flex min-w-0 items-center gap-1">
+          <h2 className="font-extrabold tracking-[-0.5px]" style={{ fontSize: "clamp(18px, 4vw, 30px)", color: TEXT }}>
+            Happening in
+          </h2>
+          {/* The picker is a sibling of the heading, not part of it, so it keeps
+              ordinary control type (small, regular) like every other city picker. */}
+          <span className="relative inline-flex items-center">
             {locationSlot ?? <EditLocationButton />}
           </span>
-        </h2>
+        </div>
         <Link
           href={seeAllHref}
           aria-label={`View all events in ${location}`}
@@ -767,7 +788,7 @@ export function EventsCarousel({
 
       {/* ── Filter tabs — tab row on a wide mouse-driven screen, dropdown below
           lg or on touch (see FilterTabs) ── */}
-      <FilterTabs tabs={FILTER_TABS} active={activeTab} onChange={setActiveTab} label={`Filter events in ${location}`} />
+      <FilterTabs tabs={tabs} active={activeTab} onChange={setActiveTab} label={`Filter events in ${location}`} />
 
       {/* ── Event grid ── */}
       <div className="px-4 sm:px-6 lg:px-12 pb-8">
@@ -795,7 +816,7 @@ export function EventsCarousel({
         )}
       </div>
 
-      <OnlineEventsRow events={events} seeAllHref={onlineSeeAllHref ?? seeAllHref} onBookNow={onBookNow} isLoading={isLoading} />
+      <OnlineEventsRow events={events} seeAllHref={onlineSeeAllHref ?? seeAllHref} onBookNow={onBookNow} isLoading={isLoading} suggestedEvents={suggestedEvents} />
     </section>
   )
 }

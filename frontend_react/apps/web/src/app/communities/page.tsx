@@ -1,3 +1,17 @@
+import { redirect } from "next/navigation";
+
+// PARKED 2026-11-17 — Communities must not be visible to users anywhere
+// (PARKED_README.md). The route now lands on home; the directory page it used
+// to render is kept intact, commented out below.
+//
+// PHASE 2 RESTORE: delete this redirect, uncomment the block below (it is a
+// client component, so 'use client' goes back on the first line).
+export default function CommunitiesPage() {
+  redirect("/");
+}
+
+/* PARKED 2026-11-17 — the Communities directory page.
+
 'use client';
 import { useState } from 'react';
 import Link from 'next/link';
@@ -14,3 +28,5 @@ export default function CommunitiesPage(){
     {groups.isPending?<p>Loading communities…</p>:groups.isError?<p role="alert">Communities could not be loaded. Please retry.</p>:!groups.data?.length?<p>No matching communities yet.</p>:<div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">{groups.data.map(c=><article key={c.id} className="rounded-lg border border-[var(--brand-border)] p-6"><h2 className="font-bold text-[22px]"><Link href={`/community/${c.slug??c.id}`}>{c.name}</Link></h2><p className="my-3 line-clamp-3 text-[17px]">{c.description}</p><p>{c.member_count} {c.member_count===1?'member':'members'}</p><Link className="inline-block mt-5 font-bold underline" href={`/community/${c.slug??c.id}`}>View community</Link></article>)}</div>}
   </main></>;
 }
+
+*/

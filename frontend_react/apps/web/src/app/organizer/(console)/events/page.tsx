@@ -49,6 +49,7 @@ import {
 } from "@/lib/organizer-rows";
 import type { PriceFilter, RowSort, ConsoleRow } from "@/lib/organizer-rows";
 import { useOrganiser, useOrganiserEvents } from "@/components/organizer/useOrganiser";
+import { formatEventMoment } from "@/lib/event-time";
 import { TAG_SHAPE } from "@/components/EventBadges";
 import {
   Card, InkPanel, InkStatTile, StatTile, MicroLabel, Pill, Tabs, ProgressBar,
@@ -127,7 +128,7 @@ export default function ConsoleEventsPage() {
   return (
     <div className="flex flex-col gap-6">
       {overview ? (
-        <NextUpHero overview={overview} todos={todos} unreadChats={unreadChats} />
+        <NextUpHero overview={overview} todos={todos} unreadChats={unreadChats} zone={events.find((e) => e.id === overview.next?.eventId)?.timezone} />
       ) : nextReal ? (
         <RealNextUpHero row={nextReal} />
       ) : null}
@@ -307,10 +308,13 @@ function NextUpHero({
   overview,
   todos,
   unreadChats,
+  zone,
 }: {
   overview: Overview;
   todos: Todo[];
   unreadChats: UnreadChat[];
+  /** The next event's own IANA zone: the backend sends its start as a raw ISO string. */
+  zone?: string;
 }) {
   const { next } = overview;
   if (!next) return <p className="text-[18px] py-6">No upcoming published events. Your saved events are listed below.</p>;
@@ -346,7 +350,7 @@ function NextUpHero({
               </span>
             </div>
             <p className="text-[17px] mt-1.5" style={{ color: "var(--brand-hint)" }}>
-              {next.when}
+              {formatEventMoment(next.when, zone)}
             </p>
           </div>
 

@@ -438,7 +438,8 @@ export function Navbar() {
   // hide half the product's story. Items behind a login route to /auth rather
   // than to a page that bounces.
   const participantItems: NavItem[] = [
-    { emoji: "👥", label: "Communities", onTap: () => { closeAll(); router.push("/communities"); } },
+    // PARKED 2026-11-17 — Communities are parked (PARKED_README.md). PHASE 2 RESTORE: uncomment.
+    // { emoji: "👥", label: "Communities", onTap: () => { closeAll(); router.push("/communities"); } },
     { emoji: "🔍", label: "Explore Events", onTap: () => { closeAll(); router.push("/explore?view=events"); } },
     { emoji: "🎟️", label: "My Tickets",     onTap: () => { closeAll(); router.push(isAuthenticated ? "/dashboard?tab=tickets" : "/auth"); } },
     { emoji: "❤️", label: "My Wishlist",    onTap: () => { closeAll(); router.push(isAuthenticated ? "/dashboard?tab=wishlist" : "/auth"); } },

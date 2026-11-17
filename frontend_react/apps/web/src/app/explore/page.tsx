@@ -5,8 +5,10 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useInfiniteQuery } from "@tanstack/react-query";
 // PARKED 2026-08-14 (MVP) — `communitiesSource` dropped from this import.
 import { eventsSource } from "@/lib/data-source";
-import { EventMap } from "@/components/EventMap";
-import { LocationSelector } from "@/components/LocationSelector";
+// PARKED 2026-11-17 — the Explore map (keeps city picking simple). EventMap.tsx and
+// leaflet stay installed. PHASE 2 RESTORE: uncomment, plus `mapOpen` and the map block.
+// import { EventMap } from "@/components/EventMap";
+import { CityPicker } from "@/components/CityPicker";
 import { useLocationStore, DEFAULT_CITY, CITIES, isOnlineCity } from "@eventmind/store";
 import type { City } from "@eventmind/store";
 import { EVENT_FORMATS, type Event, type Community } from "@eventmind/types";
@@ -17,6 +19,7 @@ import { SegmentedControl } from "@/components/SegmentedControl";
 // PARKED 2026-08-14 (MVP) — import { CommunityCardItem } from "@/components/CommunityCarousel";
 // PARKED 2026-08-14 (MVP) — `toCommunityItem` dropped from this import.
 import { toCarouselEvent } from "@/lib/card-adapters";
+import { isoDate, addDays } from "@/lib/date-range";
 
 const GREEN = "var(--brand-green)";
 
@@ -121,23 +124,12 @@ const DATE_PRESETS: { value: DatePreset; label: string }[] = [
 // the catalogue is simply empty.
 const DEFAULT_PRESET: DatePreset = "week";
 
-// Local-date ISO (YYYY-MM-DD). toISOString() would shift the day for anyone
-// east/west of UTC, which is exactly the bug that makes "Today" return nothing.
-const isoDate = (d: Date) =>
-  `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
-
 // "2026-07-21" → "21/07/26", for DISPLAY only — state and the API stay on ISO.
 // Split rather than `new Date(iso)`, which parses a bare date as UTC midnight and
 // would show the previous day for anyone west of Greenwich.
 const shortDate = (iso: string) => {
   const [y, m, d] = iso.split("-");
   return y && m && d ? `${d}/${m}/${y.slice(2)}` : iso;
-};
-
-const addDays = (d: Date, n: number) => {
-  const out = new Date(d);
-  out.setDate(out.getDate() + n);
-  return out;
 };
 
 function presetRange(preset: DatePreset): [string, string] {
@@ -286,8 +278,8 @@ function ExploreContent() {
 
   // View + filter state — initialise from URL so links are shareable
   // PARKED 2026-08-14 (MVP) — was `const [view, setView] = …`. With the view
-  // switch parked nothing sets it, so the setter is dropped (same pattern as the
-  // pinned `mode` in HeroCarousel.tsx). PHASE 2 RESTORE: put `setView` back.
+  // switch parked nothing sets it, so the setter is dropped.
+  // PHASE 2 RESTORE: put `setView` back.
   const [view] = useState<View>(parseView(searchParams.get("view")));
   const [sort, setSort] = useState<Sort>(parseSort(searchParams.get("sort")));
   const [q, setQ] = useState(searchParams.get("q") ?? "");
@@ -313,7 +305,8 @@ function ExploreContent() {
     searchParams.get("free") === "true" ? 0 : parsePrice(searchParams.get("price_max"))
   );
   const [priceCurrency, setPriceCurrency] = useState(searchParams.get('currency') || 'EUR');
-  const [mapOpen, setMapOpen] = useState(false);
+  // PARKED 2026-11-17 — the Explore map's toggle; see the import note at the top.
+  // const [mapOpen, setMapOpen] = useState(false);
   const [sellingFast, setSellingFast] = useState(searchParams.get("selling_fast") === "true");
   const [radius, setRadius] = useState(Math.min(200,Math.max(1,Number(searchParams.get("radius")) || DEFAULT_RADIUS)));
   // Lazy initialiser so presetRange() runs once, not on every render. A URL that
@@ -612,8 +605,13 @@ function ExploreContent() {
             />
           </div>
 
-          {/* City picker */}
+          {/* City picker — the navbar's CityPicker, controlled by this page's local
+              `city` (seeded from the URL) so a search here doesn't move the navbar's.
+              PARKED 2026-11-17 — the <details> + inline LocationSelector it replaced
+              (keeps city picking simple):
           <details className="min-w-0"><summary className="cursor-pointer py-3">Location: {city.name}</summary><div className="py-3"><LocationSelector value={city} onChange={setCity}/></div></details>
+          */}
+          <CityPicker value={city} onChange={setCity} outlined />
 
           {/* Sort by */}
           <label className="flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm"
@@ -915,7 +913,10 @@ function ExploreContent() {
         <div className="flex-1 min-w-0 w-full">
         <div className="flex items-center gap-2 mb-6">
           <span className="text-sm font-semibold" style={{ color: "var(--brand-hint)" }}>
+            {/* PARKED 2026-11-17 — the Explore map and its Show/Hide toggle (keeps city picking
+                simple). See the import note at the top for the restore.
             <div className="mb-5 space-y-4">{!online&&<button type="button" className="px-4 py-3 rounded-lg border-2 border-[var(--brand-control-border)] font-semibold" onClick={()=>setMapOpen(v=>!v)}>{mapOpen?'Hide map':'Show map'}</button>}{mapOpen&&!online&&<EventMap events={events??[]} center={city} radius={radius} onPick={setCity}/>}</div>
+            */}
                 {isLoading ? "Searching…" : `${countLabel(items.length)} found`}
           </span>
           {q && (

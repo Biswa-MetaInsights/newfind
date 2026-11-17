@@ -118,23 +118,34 @@
      grid of event cards outlined at 3.34:1 is a page of boxes, not a page of
      events. The rule is what the border is AROUND, not how big it is. */
   --brand-control-border: #8B8172;
-  /* The 5px frame around HeroCarousel's photo panel. DARK-MODE ONLY, by
-     Gautham's call (2026-08-20) — transparent here, green in the dark block.
-     It is a token rather than a `dark:` class because the theme is driven by
-     `data-theme` on <html>, not by prefers-color-scheme, so Tailwind's stock
-     `dark:` variant would follow the OS instead of the toggle.
-     ⚠️ The border stays 5px in BOTH themes so the panel's geometry — and the
-     photo crop inside it, since `aspect-[16/9]` sizes the border box — never
-     shifts when the theme flips. The panel pairs this with
-     `background-clip: padding-box`, without which its dark letterbox fill would
-     paint through the transparent frame and put a black border back. */
-  --brand-hero-frame: transparent;
   --brand-hint: #111827;   /* == --brand-text; see the token note above */
   --brand-muted: #9CA3AF;  /* placeholders + muted fills ONLY */
   /* Logo/wordmark tint — follows the brand green in BOTH themes (green in light,
      the lighter dark-mode green in dark so it stays readable on the dark ground).
      Defined via var() so it resolves per-theme automatically. */
   --brand-logo: var(--brand-green);
+
+  /* ── Home hero (HeroChatCollage) — scoped tokens, approved by Gautham ─────────
+     The polaroid-hero mockups use a palette the brand system has no tokens for.
+     Everything is prefixed --hero- so nothing else picks it up. Bubbles and the
+     callout are the same in both themes; the card, polaroid frame and shadows
+     follow it. The callout carries DARK ink, not the mockup's linen: linen on
+     #45B09E is ~2.4:1, which fails even the 3:1 large-text bar. */
+  --hero-bubble-a: #E07A55;  /* coral — the "friend" side of the chat */
+  --hero-bubble-b: #C9B3E6;  /* lilac — the "you" side */
+  --hero-bubble-a-ink: #1A0F0A;
+  --hero-bubble-b-ink: #1A140A;
+  --hero-callout: #45B09E;
+  --hero-callout-ink: #0E1A18;
+  --hero-card: #FFFFFF;      /* chat card + search bar (new white surface, light only) */
+  --hero-polaroid: #FFFFFF;
+  --hero-polaroid-ink: #0E1A18;
+  /* Search bar: white in BOTH themes (Gautham, 2026-11-16), so its ink is dark in
+     both. The dark block below swaps the fill to linen. */
+  --hero-search: #FFFFFF;
+  --hero-search-ink: #0E1A18;
+  --hero-shadow-card: 0 24px 60px rgba(14, 26, 24, 0.12);
+  --hero-shadow-polaroid: 0 18px 40px rgba(14, 26, 24, 0.16), 0 2px 6px rgba(14, 26, 24, 0.08);
 
   /* legacy aliases — body + Tailwind color-* tokens */
   --background: var(--brand-bg);
@@ -161,13 +172,17 @@
      (#0F1A18), so controls read as controls without a heavy outline. Left at
      the nav-border value on purpose — the blending problem is light-only. */
   --brand-control-border: #33433F;
-  /* The hero photo frame — visible ONLY here. On the dark ground the panel
-     needs an edge; on linen it read as an unnecessary outline. See :root. */
-  --brand-hero-frame: var(--brand-green);
   --brand-hint: #F2EFEA;   /* brand white (linen) — deliberately the linen, not
                               --brand-text's #ECEAE4; Gautham asked for the brand
                               white shade specifically. */
   --brand-muted: #8B938F;  /* placeholders + muted fills ONLY */
+
+  /* Home hero — only the values that differ from light (see the :root block). */
+  --hero-card: var(--brand-surface);
+  --hero-polaroid: #F3EEE4;  /* linen frame, like the dark mockup */
+  --hero-search: #F2EFEA;    /* brand white (linen), like the polaroids */
+  --hero-shadow-card: 0 30px 70px rgba(0, 0, 0, 0.4);
+  --hero-shadow-polaroid: 0 20px 44px rgba(0, 0, 0, 0.45);
   /* --brand-logo inherits `var(--brand-green)` from :root, which resolves to the
      dark-mode green (#2F8A80) here — a readable green on the dark ground. */
 
