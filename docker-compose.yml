@@ -61,6 +61,7 @@ services:
     environment:
       - DATABASE_URL=postgresql://user:password@postgres:5432/event_db
       - KAFKA_BOOTSTRAP_SERVERS=kafka:29092
+      - PROVIDER_SYNC_TOKEN=${PROVIDER_SYNC_TOKEN:-}
 
   ticketing:
     build: ./backend/services/ticketing
