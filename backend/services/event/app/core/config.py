@@ -21,6 +21,9 @@ class Settings(BaseSettings):
     OPENAI_API_KEY: Optional[str] = None
     TICKETING_SERVICE_URL: str = "http://localhost:8004"
 
+    # Provider delta/deletion sync endpoint; unset disables tombstone writes.
+    PROVIDER_SYNC_TOKEN: Optional[str] = None
+
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
 settings = Settings()
