@@ -3,8 +3,8 @@
 import { useEffect, useId, useRef, useState } from "react";
 import { useLocationStore, DEFAULT_CITY } from "@eventmind/store";
 import type { City } from "@eventmind/store";
-import { GUTTERS } from "@/lib/layout";
 import { LocationPinIcon } from "./EventIcons";
+import { CaretIcon } from "./organizer/ConsoleIcons";
 import { LocationSelector } from "./LocationSelector";
 
 /** Uncontrolled by default: reads and writes the global location store. Pass
@@ -53,6 +53,7 @@ export function CityPicker({ variant = "pill", label, value, onChange, outlined 
         className={`flex min-h-11 min-w-11 items-center justify-center gap-2 rounded-lg px-3 py-2 max-w-[180px] ${outlined ? "border-2 border-[var(--brand-control-border)] bg-[var(--brand-bg)]" : ""} focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--brand-text)]`}>
         <LocationPinIcon className="w-4 h-4 shrink-0" />
         {variant !== "icon" && <span className="truncate">{label || city.name}</span>}
+        {variant !== "icon" && <CaretIcon className="w-4 h-4 shrink-0" />}
       </button>
       {/* Old page's tooltip (Gautham 2026-11-17). Navbar trigger only: it opens rightward, so it
           would clip beside the other triggers. Laptop/desktop only (Gautham, 2026-11-17): `lg+` and a
@@ -74,24 +75,5 @@ export function CityPicker({ variant = "pill", label, value, onChange, outlined 
         </div>
       )}
     </div>
-  );
-}
-
-export function LocationPrompt() {
-  const ready = useLocationStore(s => s._hasHydrated);
-  const confirmed = useLocationStore(s => s.hasSelectedCity);
-  const city = useLocationStore(s => s.selectedCity);
-  // Preserve existing users' non-default selections from older store versions.
-  if (!ready || confirmed || city.lat !== DEFAULT_CITY.lat || city.lng !== DEFAULT_CITY.lng) return null;
-  return (
-    <section aria-label="Set your search location" className={`${GUTTERS} pb-6`}>
-      <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-[var(--brand-border)] bg-[var(--brand-surface)] p-4 text-[var(--brand-text)]">
-        <div className="min-w-0 flex-1 basis-60">
-          <p className="font-bold">Find events near you</p>
-          <p className="mt-1 text-sm">New York is the starting location. Choose your city or use your location to explore events within 200 km.</p>
-        </div>
-        <CityPicker label="Choose city" />
-      </div>
-    </section>
   );
 }

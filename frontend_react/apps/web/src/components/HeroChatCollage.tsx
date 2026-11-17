@@ -263,7 +263,7 @@ export function HeroChatCollage() {
                 className="h-12 min-w-0 flex-1 bg-transparent text-[17px] text-[var(--hero-search-ink)] outline-none placeholder:text-[var(--brand-muted)]"
               />
             </label>
-            <div className="sm:border-l-2 sm:border-[var(--brand-control-border)] sm:pl-1 [&_button[aria-expanded]]:text-[var(--hero-search-ink)] [&_button[aria-expanded]:hover]:text-[var(--brand-on-green)]">
+            <div className="sm:border-l-2 sm:border-[var(--brand-control-border)] sm:pl-1 [&_button[aria-expanded]]:text-[var(--hero-search-ink)]">
               <CityPicker />
             </div>
             <button

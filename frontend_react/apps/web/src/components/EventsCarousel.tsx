@@ -763,13 +763,16 @@ export function EventsCarousel({
 
       {/* ── Section header ── */}
       <div className="flex items-center justify-between px-4 sm:px-6 lg:px-12 mb-5">
-        <h2 className="font-extrabold tracking-[-0.5px] flex items-center gap-1" style={{ fontSize: "clamp(18px, 4vw, 30px)", color: TEXT }}>
-          Happening in{' '}
-          <span className="relative inline-flex items-center gap-2">
-            <span style={{ color: GREEN }}>{location}</span>
+        <div className="flex min-w-0 items-center gap-1">
+          <h2 className="font-extrabold tracking-[-0.5px]" style={{ fontSize: "clamp(18px, 4vw, 30px)", color: TEXT }}>
+            Happening in
+          </h2>
+          {/* The picker is a sibling of the heading, not part of it, so it keeps
+              ordinary control type (small, regular) like every other city picker. */}
+          <span className="relative inline-flex items-center">
             {locationSlot ?? <EditLocationButton />}
           </span>
-        </h2>
+        </div>
         <Link
           href={seeAllHref}
           aria-label={`View all events in ${location}`}

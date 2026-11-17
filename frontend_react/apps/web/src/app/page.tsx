@@ -16,7 +16,7 @@ import { EventsCarousel } from "@/components/EventsCarousel";
 // PARKED 2026-08-14 (MVP) â€” import { CommunityCarousel } from "@/components/CommunityCarousel";
 import { FeatureBand } from "@/components/FeatureBand";
 import { CategoryGrid } from "@/components/CategoryGrid";
-import { CityPicker, LocationPrompt } from "@/components/CityPicker";
+import { CityPicker } from "@/components/CityPicker";
 import { Footer } from "@/components/Footer";
 // PARKED 2026-08-14 (MVP) â€” `toCommunityItem` dropped from this import.
 import { toCarouselEvent } from "@/lib/card-adapters";
@@ -120,7 +120,6 @@ function DiscoveryPage() {
     <div className="min-h-screen" style={{ backgroundColor: "var(--brand-bg)" }}>
       <Navbar />
       <HeroChatCollage />
-      <LocationPrompt />
 
       <EventsCarousel
         events={carouselEvents}
@@ -129,7 +128,7 @@ function DiscoveryPage() {
         onlineSeeAllHref={exploreHref("events", "Online")}
         isLoading={eventsLoading || onlineLoading}
         onBookNow={(id) => router.push(`/event/${id}`)}
-        locationSlot={<CityPicker variant="icon" />}
+        locationSlot={<CityPicker />}
         suggestedEvents={signedIn ? recommendations.data?.map(toCarouselEvent) : undefined}
       />
 
