@@ -11,6 +11,9 @@
 
 ## 2026-11-17
 
+- Review round, Phase 5: close-out checks. Signed-in and signed-out sweeps clean, `type-check` guard fail/pass confirmed, production build compiles both dev flags to `false` (but the `BypassStrip` text still ships as dead code), stale `EditPencil` row fixed.
+- Review round, Phase 4: `frontend_testing/` seed + reset scripts (replace `seed_events.py`), live demo fixtures and checklist, CDP mocks (bell, social sign-in), scenario screenshots, chat demo, Mailpit notes.
+- Review round, Phase 3: dev-only `frontend_testing/` (root docs + in-app flags, `BypassStrip`, `DevBanner`), organiser-setup bypass restored on onboarding ⇄ create, assistant-in-real-mode flag, `type-check` guard; dummy fixtures moved to `src/frontend_testing/fixtures/`.
 - Review round, Phase 2: Communities and the Explore map parked (`PARKED_README.md`); Explore picks location with `CityPicker`; "Suggested for you" moved from its own carousel into a home tab.
 - Review round, Phase 1: Old-page bell glyph and city tooltip, no coordinates entry, auth page without photo/top bar, zone label beside the event time, no year on cards, "Tonight" pick, footer icons and Visibility field parked (`PARKED_README.md`).
 

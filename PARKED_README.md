@@ -19,6 +19,9 @@
 | **Explore map** | "Show map" button and the Leaflet/OpenStreetMap map | `app/explore/page.tsx` (results-count line); `components/EventMap.tsx` and the `leaflet` dependency are kept | 2026-11-17 | To keep city picking simple for users: Explore now uses the same city dropdown as the home page | Uncomment the `EventMap` import, the `mapOpen` state and the button/`<EventMap/>` block; the block needs moving out of the inline `<span>` it sat in. The sidebar's old `<details>` + `LocationSelector` control is commented beside its `CityPicker` replacement if the map's pin-drop comes back with it. | parked |
 | **Hero "Tonight" quick pick** | One of four quick picks in the hero search | `components/HeroChatCollage.tsx` (`quickPicks`) | 2026-11-17 | It returned no results (backend `date_to` bug, `Eventmind_files/backend_to-do.md` §1) | Re-add the entry once the backend treats a date-only `date_to` as end of day. | parked |
 
+## Dev-only tooling (not parked, never delete)
+- **`frontend_testing/` (repo root) and `frontend_react/apps/web/src/frontend_testing/`** hold the dev flags, the organiser-setup bypass strip, the dev banner and the dummy-mode fixtures. They are switched off in production by `NODE_ENV`, not by commenting out, so they carry no `PARKED` marker. Do not delete or "clean up" either folder; `type-check` fails if they go. Rules: `frontend_testing/README.md`.
+
 ## Removed on purpose (not parked)
 - **Photo on the sign-in / sign-up page.** The left panel keeps its solid green and logo link; `hero-3.png` stays in `public/hero`. Reason in `DESIGN_NOTES.md` §1.
 - **Year on event cards.** The event page keeps the year. Reason in `DESIGN_NOTES.md` §1.
