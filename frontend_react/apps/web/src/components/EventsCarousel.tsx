@@ -67,6 +67,9 @@ export interface EventsCarouselProps {
   onBookNow?: (id: string) => void
   /** Optional control rendered in place of the default edit-location button (e.g. <CityPicker variant="icon" />). */
   locationSlot?: ReactNode
+  /** Personal recommendations. Their in-city ones become a "Suggested for you" tab
+   *  after "All"; with none (signed out, or no results) the tab is not rendered. */
+  suggestedEvents?: CarouselEvent[]
 }
 
 // ─── Brand constants ───────────────────────────────────────────────────────────
@@ -105,6 +108,7 @@ const IMAGE_SIZES =
   '(max-width: 639px) calc(100vw - 32px), (max-width: 1279px) calc(50vw - 34px), calc(25vw - 39px)'
 
 const FILTER_TABS = ['All', 'This Week', 'Free', 'Music', 'Food']
+const SUGGESTED_TAB = 'Suggested for you'
 const ONLINE_FILTER_TABS = ['All', 'Free', 'This Week', 'Selling Fast']
 
 // ─── Filter tabs ───────────────────────────────────────────────────────────────
@@ -558,8 +562,6 @@ function OnlineEventsRow({
 
   const filteredOnline: CarouselEvent[] = (() => {
     if (activeTab === 'All') return onlineEvents
-    if (activeTab === 'Recommended')
-      return onlineEvents.filter((e) => e.badgeTypes?.includes('recommended'))
     if (activeTab === 'Free')
       return onlineEvents.filter((e) => e.price === 'Free')
     if (activeTab === 'This Week')
@@ -718,15 +720,22 @@ export function EventsCarousel({
   isLoading = false,
   onBookNow,
   locationSlot,
+  suggestedEvents,
 }: EventsCarouselProps) {
-  const [activeTab, setActiveTab] = useState('All')
+  const [pickedTab, setActiveTab] = useState('All')
 
   const offlineEvents = events.filter(inCityRow)
+  const suggested = (suggestedEvents ?? []).filter(inCityRow)
+  const tabs = suggested.length > 0
+    ? [FILTER_TABS[0], SUGGESTED_TAB, ...FILTER_TABS.slice(1)]
+    : FILTER_TABS
+  // Derived, not reset in an effect: if the picked tab disappears (sign-out, a
+  // city change that empties the suggestions) the row falls back to "All".
+  const activeTab = tabs.includes(pickedTab) ? pickedTab : 'All'
 
   const filteredEvents: CarouselEvent[] = (() => {
     if (activeTab === 'All') return offlineEvents
-    if (activeTab === 'Recommended')
-      return offlineEvents.filter((e) => e.badgeTypes?.includes('recommended'))
+    if (activeTab === SUGGESTED_TAB) return suggested
     if (activeTab === 'Free')
       return offlineEvents.filter((e) => e.price === 'Free')
     if (activeTab === 'This Week')
@@ -767,7 +776,7 @@ export function EventsCarousel({
 
       {/* ── Filter tabs — tab row on a wide mouse-driven screen, dropdown below
           lg or on touch (see FilterTabs) ── */}
-      <FilterTabs tabs={FILTER_TABS} active={activeTab} onChange={setActiveTab} label={`Filter events in ${location}`} />
+      <FilterTabs tabs={tabs} active={activeTab} onChange={setActiveTab} label={`Filter events in ${location}`} />
 
       {/* ── Event grid ── */}
       <div className="px-4 sm:px-6 lg:px-12 pb-8">

@@ -5,8 +5,10 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useInfiniteQuery } from "@tanstack/react-query";
 // PARKED 2026-08-14 (MVP) — `communitiesSource` dropped from this import.
 import { eventsSource } from "@/lib/data-source";
-import { EventMap } from "@/components/EventMap";
-import { LocationSelector } from "@/components/LocationSelector";
+// PARKED 2026-11-17 — the Explore map (keeps city picking simple). EventMap.tsx and
+// leaflet stay installed. PHASE 2 RESTORE: uncomment, plus `mapOpen` and the map block.
+// import { EventMap } from "@/components/EventMap";
+import { CityPicker } from "@/components/CityPicker";
 import { useLocationStore, DEFAULT_CITY, CITIES, isOnlineCity } from "@eventmind/store";
 import type { City } from "@eventmind/store";
 import { EVENT_FORMATS, type Event, type Community } from "@eventmind/types";
@@ -303,7 +305,8 @@ function ExploreContent() {
     searchParams.get("free") === "true" ? 0 : parsePrice(searchParams.get("price_max"))
   );
   const [priceCurrency, setPriceCurrency] = useState(searchParams.get('currency') || 'EUR');
-  const [mapOpen, setMapOpen] = useState(false);
+  // PARKED 2026-11-17 — the Explore map's toggle; see the import note at the top.
+  // const [mapOpen, setMapOpen] = useState(false);
   const [sellingFast, setSellingFast] = useState(searchParams.get("selling_fast") === "true");
   const [radius, setRadius] = useState(Math.min(200,Math.max(1,Number(searchParams.get("radius")) || DEFAULT_RADIUS)));
   // Lazy initialiser so presetRange() runs once, not on every render. A URL that
@@ -602,8 +605,13 @@ function ExploreContent() {
             />
           </div>
 
-          {/* City picker */}
+          {/* City picker — the navbar's CityPicker, controlled by this page's local
+              `city` (seeded from the URL) so a search here doesn't move the navbar's.
+              PARKED 2026-11-17 — the <details> + inline LocationSelector it replaced
+              (keeps city picking simple):
           <details className="min-w-0"><summary className="cursor-pointer py-3">Location: {city.name}</summary><div className="py-3"><LocationSelector value={city} onChange={setCity}/></div></details>
+          */}
+          <CityPicker value={city} onChange={setCity} />
 
           {/* Sort by */}
           <label className="flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm"
@@ -905,7 +913,10 @@ function ExploreContent() {
         <div className="flex-1 min-w-0 w-full">
         <div className="flex items-center gap-2 mb-6">
           <span className="text-sm font-semibold" style={{ color: "var(--brand-hint)" }}>
+            {/* PARKED 2026-11-17 — the Explore map and its Show/Hide toggle (keeps city picking
+                simple). See the import note at the top for the restore.
             <div className="mb-5 space-y-4">{!online&&<button type="button" className="px-4 py-3 rounded-lg border-2 border-[var(--brand-control-border)] font-semibold" onClick={()=>setMapOpen(v=>!v)}>{mapOpen?'Hide map':'Show map'}</button>}{mapOpen&&!online&&<EventMap events={events??[]} center={city} radius={radius} onPick={setCity}/>}</div>
+            */}
                 {isLoading ? "Searching…" : `${countLabel(items.length)} found`}
           </span>
           {q && (

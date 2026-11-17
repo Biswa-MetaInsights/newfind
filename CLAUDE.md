@@ -32,6 +32,7 @@
 | Specs for unbuilt work, and what's blocked on a decision | **`TODO.md`** | Index table at the top, then grep `^## N\.`. A `§19.12` reference means heading `## 19.` |
 | Why the design is the way it is — measurements, rejected alternatives | **`DESIGN_NOTES.md`** | Grep `^## N\.` for the § you were sent to |
 | When or why something changed | **`CHANGELOG.md`** | Newest first under `## YYYY-MM-DD`. **Never read it whole** — it only grows. |
+| Backend bugs/questions; frontend to-test; parked code | `Eventmind_files/backend_to-do.md`, `frontend_to_test.md`; `PARKED_README.md` | Only when asked. **Never delete parked code.** |
 | Product direction — PRD, competitor analysis, migration notes | `Eventmind_files/` | **Only when Gautham asks.** Not for fixing a bug or implementing a decided feature. |
 
 **Where new writing goes:** conventions and gotchas still true tomorrow → `HANDOVER.md` (or here, if

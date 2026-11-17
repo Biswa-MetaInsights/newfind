@@ -130,6 +130,7 @@ function DiscoveryPage() {
         isLoading={eventsLoading || onlineLoading}
         onBookNow={(id) => router.push(`/event/${id}`)}
         locationSlot={<CityPicker variant="icon" />}
+        suggestedEvents={signedIn ? recommendations.data?.map(toCarouselEvent) : undefined}
       />
 
       {/* PARKED 2026-08-14 (MVP) â€” the community carousel ("Communities in {city}"
@@ -151,7 +152,6 @@ function DiscoveryPage() {
 
       */}
 
-      {signedIn&&!!recommendations.data?.length&&<section aria-label="Suggestions based on your interests"><h2 className="px-5 sm:px-10 text-[26px] font-bold">Suggested for you</h2><EventsCarousel events={recommendations.data.map(toCarouselEvent)} location={selectedCity.name} seeAllHref="/explore" onlineSeeAllHref="/explore?city=Online" isLoading={recommendations.isPending} onBookNow={id=>router.push(`/event/${id}`)}/></section>}
       <FeatureBand />
 
       <CategoryGrid />

@@ -10,7 +10,7 @@ import { CityPicker } from "@/components/CityPicker";
 import { BrandMark } from "@/components/brand/BrandMark";
 import { GUTTERS } from "@/lib/layout";
 import { exploreHref } from "@/lib/explore-href";
-import { isoDate, weekendRange } from "@/lib/date-range";
+import { weekendRange } from "@/lib/date-range";
 
 // The home hero: two polaroids either side of a fake group chat that ends with
 // NewFind's answer, then a search bar and four quick picks underneath.
@@ -152,10 +152,11 @@ export function HeroChatCollage() {
   const hasHydrated = useLocationStore((s) => s._hasHydrated);
   const city = hasHydrated ? _selectedCity : DEFAULT_CITY;
 
-  const today = isoDate(new Date());
   const [weekendFrom, weekendTo] = weekendRange();
+  // PARKED 2026-11-17 (Gautham): the "Tonight" quick pick. Re-enable with
+  //   const today = isoDate(new Date()); { label: "Tonight", href: `/explore?view=events&date_from=${today}&date_to=${today}` },
+  // (Explore's own "Today" date preset still exists.) See PARKED_README.md.
   const quickPicks = [
-    { label: "Tonight", href: `/explore?view=events&date_from=${today}&date_to=${today}` },
     { label: "This weekend", href: `/explore?view=events&date_from=${weekendFrom}&date_to=${weekendTo}` },
     { label: "Free", href: "/explore?view=events&free=true" },
     { label: "Online", href: eventType(EVENT_FORMATS.online) },
@@ -258,7 +259,7 @@ export function HeroChatCollage() {
                 name="q"
                 value={q}
                 onChange={(e) => setQ(e.target.value)}
-                placeholder="Try pottery, run club, comedy…"
+                placeholder="Try pottery, marathon, dance,…"
                 className="h-12 min-w-0 flex-1 bg-transparent text-[17px] text-[var(--hero-search-ink)] outline-none placeholder:text-[var(--brand-muted)]"
               />
             </label>

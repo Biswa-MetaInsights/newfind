@@ -8,11 +8,13 @@ The integrated Gautham design is live at `https://www.newfind.events/`, source c
 
 **Local only, not deployed:** the home hero is now `HeroChatCollage` (four tilted polaroids around a fake group chat, search bar + quick picks underneath; from the "Photos 1 — polaroids" mockups) in place of `HeroCarousel`, which was deleted. It uses borrowed photos from `public/hero/`; the briefed pottery / run-club / gig shots are still to come. The live site above still serves the old hero until this ships.
 
+**Also local only (review round, 2026-11-17):** Communities are parked from users again — no nav entry, `/communities` and `/community/*` redirect home, OG/story images 404, no community section on the create form (APIs untouched). Explore's map is parked and its location control is the navbar's `CityPicker`. Home's separate "Suggested for you" carousel is now a tab after "All" in the main row, shown only when signed in with in-city recommendations. Details in `PARKED_README.md`.
+
 The frontend reconnects the existing API proxy, social callbacks, recovery, persistent free booking/private QR, organiser operations, event content, place discovery, profile, notification, conversation and community APIs. Help and About routes work. Prepared OpenAgenda importer code is included in the repository but has not been installed or run on the backend host. Production backend containers and database schemas are unchanged.
 
 ## Verification and blockers
 
-A booking-date correction is prepared: the reported QA event actually starts on 2030-11-09, but the old display omitted the year. Event cards/details now show the year. Shared registration checks close native bookings at the start, label ended/completed events, and keep the card/sticky/checkout controls consistent. Twelve regression cases passed, including exact start/end instants and time-zone offsets; live validation is pending.
+A booking-date correction is prepared: the reported QA event actually starts on 2030-11-09, but the old display omitted the year. Event details show the year; event cards no longer do (to fit the venue, Gautham 2026-11-17). Shared registration checks close native bookings at the start, label ended/completed events, and keep the card/sticky/checkout controls consistent. Twelve regression cases passed, including exact start/end instants and time-zone offsets; live validation is pending.
 
 56 isolated automated tests passed; one optional restic test was skipped. The actual TypeScript booking client passed retry/restart/account-isolation checks against isolated running services. Production build and TypeScript passed. ESLint has no errors and four existing warnings. A follow-up commit converts the test harness to ESM; it does not change the deployed application.
 

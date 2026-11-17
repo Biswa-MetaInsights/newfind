@@ -72,8 +72,13 @@ function fmt(iso: string, opts: Intl.DateTimeFormatOptions) {
   return new Date(iso).toLocaleDateString("en-US", opts);
 }
 
+/** Clock time and zone label as two strings — the zone renders small and muted beside the time. */
 function fmtTime(iso: string, timeZone: string) {
-  return new Date(iso).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", timeZone, timeZoneName: "short" });
+  const parts = new Intl.DateTimeFormat("en-US", { hour: "numeric", minute: "2-digit", timeZone, timeZoneName: "short" }).formatToParts(new Date(iso));
+  return {
+    time: parts.filter(p => p.type !== "timeZoneName").map(p => p.value).join("").trim(),
+    zone: parts.find(p => p.type === "timeZoneName")?.value ?? "",
+  };
 }
 
 export default function EventDetailPage({
@@ -489,7 +494,8 @@ export default function EventDetailPage({
                 cancelled={cancelled}
                 registrationClosed={registrationClosed}
                 dateLabel={fmt(event.start_date, { weekday: "long", month: "short", day: "numeric", year: "numeric", timeZone: event.timezone || "UTC" })}
-                timeLabel={fmtTime(event.start_date,event.timezone || "UTC")}
+                timeLabel={fmtTime(event.start_date,event.timezone || "UTC").time}
+                timeZoneLabel={fmtTime(event.start_date,event.timezone || "UTC").zone}
                 location={location}
                 organizer={organizerName}
                 verified={organizerVerified}
@@ -624,6 +630,7 @@ function BookingCard({
   bookingDisabled,
   dateLabel,
   timeLabel,
+  timeZoneLabel,
   location,
   organizer,
   verified = false,
@@ -645,6 +652,7 @@ function BookingCard({
   bookingDisabled: boolean;
   dateLabel: string;
   timeLabel: string;
+  timeZoneLabel?: string;
   location: string;
   organizer: string;
   external?: boolean;
@@ -685,7 +693,7 @@ function BookingCard({
             time is still more than a 375px phone holds. */}
         <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-4">
           <DetailLine icon={<CalendarIcon color={GREEN} className={DETAIL_ICON} />} text={dateLabel} />
-          <DetailLine icon={<ClockIcon color={GREEN} className={DETAIL_ICON} />} text={timeLabel} />
+          <DetailLine icon={<ClockIcon color={GREEN} className={DETAIL_ICON} />} text={timeLabel} suffix={timeZoneLabel} />
         </div>
         <div className="mt-5">
           <DetailLine icon={<LocationPinIcon color={GREEN} className={DETAIL_ICON} />} text={location} />

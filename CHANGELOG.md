@@ -9,6 +9,11 @@
 
 ---
 
+## 2026-11-17
+
+- Review round, Phase 2: Communities and the Explore map parked (`PARKED_README.md`); Explore picks location with `CityPicker`; "Suggested for you" moved from its own carousel into a home tab.
+- Review round, Phase 1: Old-page bell glyph and city tooltip, no coordinates entry, auth page without photo/top bar, zone label beside the event time, no year on cards, "Tonight" pick, footer icons and Visibility field parked (`PARKED_README.md`).
+
 ## 2026-11-16
 
 - Home hero restyled to the polaroid mockups (dark + light): tilted polaroids, coral/lilac chat, teal callout, centred search. Roboto only, 8px radius, `CityPicker` kept; new `--hero-*` tokens. Local only.
