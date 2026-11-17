@@ -1,6 +1,6 @@
 import { apiClient, authApi } from '@eventmind/api';
 import { useAuthStore } from '@eventmind/store';
-import type { DummyAttendee, DummyEarningRow, dummyPortfolio, dummyNextEvent } from './fixtures/organizer';
+import type { DummyAttendee, DummyEarningRow, dummyPortfolio, dummyNextEvent } from '@/frontend_testing/fixtures/organizer';
 
 export function currentUserId(): string {
   const token = useAuthStore.getState().tokens?.access_token;

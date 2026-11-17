@@ -41,7 +41,7 @@ import { organizerSource, isDummyMode } from "@/lib/data-source";
 import { formatPrice } from "@/lib/currency";
 import { csvFilename, downloadCsv } from "@/lib/csv";
 import { useCheckIns, setCheckedIn } from "@/lib/checkin-store";
-import type { DummyAttendee } from "@/lib/fixtures/organizer";
+import type { DummyAttendee } from "@/frontend_testing/fixtures/organizer";
 import { useOrganiser, useOrganiserEvents } from "@/components/organizer/useOrganiser";
 import {
   Card, Pill, StatTile, FilterSelect, ConsoleButton, EmptyState,

@@ -53,7 +53,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { organizerSource } from "@/lib/data-source";
-import { CONVENIENCE_FEE_RATE, type DummyPaymentTerm } from "@/lib/fixtures/organizer";
+import { CONVENIENCE_FEE_RATE, type DummyPaymentTerm } from "@/frontend_testing/fixtures/organizer";
 import { formatPrice } from "@/lib/currency";
 import {
   Card, StatTile, FilterButton, FilterSelect, ConsoleButton,

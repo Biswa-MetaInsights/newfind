@@ -29,13 +29,13 @@ import { isOnlineEvent, type Event, type Community } from "@eventmind/types";
 import { loadOverview, currentUserId, type Attendee } from "./operations";
 import { apiClient } from "@eventmind/api";
 import { type EventExtras } from "./event-extras";
-import { dummyEvents, dummyOnlineEvents, dummyMyEvents, DUMMY_ORGANISER_ID } from "./fixtures/events";
-import { dummyCommunities, dummyOnlineCommunities } from "./fixtures/communities";
+import { dummyEvents, dummyOnlineEvents, dummyMyEvents, DUMMY_ORGANISER_ID } from "@/frontend_testing/fixtures/events";
+import { dummyCommunities, dummyOnlineCommunities } from "@/frontend_testing/fixtures/communities";
 import {
   dummyAttendees, dummyEarnings, dummyPaymentTerms,
   dummyPortfolio, dummyNextEvent,
   type DummyEarningRow, type DummyPaymentTerm,
-} from "./fixtures/organizer";
+} from "@/frontend_testing/fixtures/organizer";
 
 export type DataMode = "dummy" | "real";
 
