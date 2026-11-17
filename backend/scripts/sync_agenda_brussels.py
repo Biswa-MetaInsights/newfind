@@ -150,6 +150,7 @@ def resize_agenda_image(url: str) -> str:
 
 def event_location(event: dict[str, Any]) -> dict[str, Any]:
     place = pick(event, "place", "venue", "location")
+    place_label = place.strip() if isinstance(place, str) and place.strip() else None
     if not isinstance(place, dict):
         place = {}
     location: dict[str, Any] = {}
@@ -177,6 +178,8 @@ def event_location(event: dict[str, Any]) -> dict[str, Any]:
             location["longitude"] = float(longitude)
     except (TypeError, ValueError):
         pass
+    if place_label and not location.get("name"):
+        location["name"] = place_label
     if not location:
         location["name"] = "Brussels"
     return location
@@ -356,7 +359,10 @@ class AgendaBrusselsSync:
         if not ids:
             return 0, 0
         if not self.sync_token:
-            logger.warning("Provider returned %d deletions, but PROVIDER_SYNC_TOKEN is unset; not applying tombstones", len(ids))
+            message = "Provider returned %d deletions, but PROVIDER_SYNC_TOKEN is unset" % len(ids)
+            if not self.args.dry_run:
+                raise RuntimeError(message + "; refusing to advance the deletion checkpoint")
+            logger.warning("%s; dry run will not apply tombstones", message)
             return 0, len(ids)
         if self.args.dry_run:
             logger.info("Would cancel %d deleted provider events", len(ids))
