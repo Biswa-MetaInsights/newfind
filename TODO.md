@@ -232,8 +232,8 @@ the word "community" anywhere. Nothing was deleted. Current state and the full s
    - `app/community/[slug]/layout.tsx` — delete the static `metadata`, uncomment `generateMetadata`, restore its three imports.
    - `app/community/[slug]/opengraph-image.tsx` and `story/route.tsx` — set `PARKED` to `false` (or delete the const and its `if`), and put `alt` back to `"Community on NewFind"`.
    - `app/explore/page.tsx` — `parseView()` is the choke point; restoring it re-enables `showEvents`/`showCommunities`/`noun`/the `items` memo automatically. Also restore `setView`, `VIEW_SEGMENTS`, `selectView`, the `justify-between` on the switch row, and the `view === "events"` guard on Create Event.
-   - `app/page.tsx` — widen `exploreHref`'s `view` param back to `"events" | "communities"`.
-   - `components/HeroCarousel.tsx` — `subcopy` goes back to the `[SubLine, SubLine]` tuple once the events line 2 returns. ⚠️ Restoring the hero's Events/Communities toggle (parked separately, 2026-08-11) means restoring **all** of this first — see the note in that file.
+   - `lib/explore-href.ts` — widen `exploreHref`'s `view` param back to `"events" | "communities"`.
+   - Home hero — `HeroCarousel` (which carried the Events/Communities modes) was deleted 2026-11-15 in favour of `HeroChatCollage`, which is events-only. A community hero has to be rebuilt; `DESIGN_NOTES.md` §9 records the old mode design.
    - `app/dashboard/page.tsx` — drop the wishlist `.filter()` and rename the prop back to `items`.
 3. **Nothing to do on the backend.** The community service, gateway route, models and seed data were
    never touched and have been running throughout.
@@ -298,8 +298,8 @@ tabs"), so **decide between the two rather than shipping both**; two adjacent ti
 whose top step is `band:grid-cols-7`, matching today's seven tiles exactly, so an eighth needs that
 count and probably its 1400px breakpoint re-picked — see the notes in the component.
 
-**Reuse the live count — do not hardcode a figure.** `HeroCarousel`'s "About N options" is already
-this exact pattern: `GET /event/count` → `eventsSource.count()` → React Query, rounded to the
+**Reuse the live count — do not hardcode a figure.** The old `HeroCarousel`'s "About N options" (deleted
+2026-11-15, see `DESIGN_NOTES.md` §9) was this exact pattern: `GET /event/count` → `eventsSource.count()` → React Query, rounded to the
 nearest 10, and it renders **no number at all** below 10 rather than "0 options". A card that names
 a figure must take it from there and must degrade the same way, so the copy has to hold together
 with the number absent (loading, failure, or a thin catalogue). If the copy can only work with a
@@ -376,7 +376,7 @@ mobile). Left as-is for now.
 **Real today:** Events read through `organizerSource.events()` with the signed-in organizer ID. The console now explicitly requests draft, published, cancelled and completed states instead of silently showing published events only. Each state is currently capped at 200 rows; cursor pagination remains pending for larger organizer portfolios.
 
 **Not real — and deliberately NOT faked.** In `dummy` data mode these render the fixtures in
-`lib/fixtures/organizer.ts` so the whole design is visible with no backend; in `real` mode
+`frontend_testing/fixtures/organizer.ts` so the whole design is visible with no backend; in `real` mode
 `organizerSource` returns empty and each section renders `NotBuiltYet`, which says the endpoint does
 not exist rather than showing a zero. ⚠️ **Do not "fix" that by serving the fixtures in real mode** —
 an organiser reading invented revenue or invented attendees for their own event is the one failure
@@ -386,7 +386,7 @@ this design must not have.
 > 2026-08-21). The revenue figures, the earnings table and its totals, the portfolio roll-ups,
 > the check-in rate, the refund amounts, the unread counts — all of it. What the fixtures do is
 > **derive** those figures from the organiser's own events (`dummyMyEvents` in
-> `lib/fixtures/events.ts`), so the shape of the answer is already settled and the front end has
+> `frontend_testing/fixtures/events.ts`), so the shape of the answer is already settled and the front end has
 > nowhere left to invent one. **That derivation is a specification, not an implementation** — it
 > runs on eight fixture events in one currency with no concurrency and no money movement, and
 > every item below is what it takes to compute the same thing honestly. The rule that survives
@@ -513,7 +513,7 @@ this design must not have.
 13. **"in N days" on the upcoming-event chip has to be computed server-side.** The chip beside the
     hero's title on `/organizer/events` (Gautham, 2026-09-11 — it replaced the "Paid" chip, which
     said nothing this band exists to answer) reads `overview.next.inDays`, and that is a **fixture
-    number**: `lib/fixtures/organizer.ts` writes it, nothing derives it. In real mode there is no
+    number**: `frontend_testing/fixtures/organizer.ts` writes it, nothing derives it. In real mode there is no
     overview at all, so `RealNextUpHero` shows no chip rather than counting the days itself.
     ⚠️ **Do not "fix" that by subtracting dates in the browser.** A countdown computed from the
     viewer's clock is wrong for anyone whose timezone differs from the event's, which on this
@@ -577,7 +577,7 @@ at `/organizer/events` — Gautham's call, not a silent deletion.
   answer who asked, who approved, when, or how much came back.
 
 ⚠️ **The frontend already speaks the whole vocabulary, and it is a specification** (the §19 rule).
-`lib/fixtures/organizer.ts` carries per-event `refunds` (an amount) and `refundedTickets` (a count),
+`frontend_testing/fixtures/organizer.ts` carries per-event `refunds` (an amount) and `refundedTickets` (a count),
 an attendee status of **`"Refund requested"`** whose row action is **Review**, the Earnings page's
 `net = gross − refunds` column, the portfolio's "Refunds issued" roll-up, and two of the payment
 terms at the foot of Earnings — **"Refund window: Up to 48h before"** and **"Who approves refunds:

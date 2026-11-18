@@ -24,7 +24,7 @@ export function NotificationBell() {
   const userId = currentUserId();
   const notices = useQuery({queryKey:['notifications',userId],queryFn:()=>collaboration.notices().then(r=>r.data),refetchInterval:30000});
   useEffect(()=>{if(!open)return;const close=(e:MouseEvent)=>{if(!ref.current?.contains(e.target as Node))setOpen(false);};const escape=(e:KeyboardEvent)=>{if(e.key==='Escape')setOpen(false);};document.addEventListener('mousedown',close);document.addEventListener('keydown',escape);return()=>{document.removeEventListener('mousedown',close);document.removeEventListener('keydown',escape);};},[open]);
-  return <div className="relative" ref={ref}><button type="button" aria-label="Notifications" aria-expanded={open} onClick={()=>setOpen(v=>!v)} className="relative p-2 rounded-lg hover:bg-[var(--brand-green)] hover:text-[var(--brand-on-green)]">
+  return <div className="relative" ref={ref}><button type="button" aria-label="Notifications" title="Notifications" aria-expanded={open} onClick={()=>setOpen(v=>!v)} className="relative p-2 rounded-lg transition-[background-color,color] duration-150 hover:bg-[var(--brand-green)] hover:text-[var(--brand-on-green)]">
     <BellIcon className="w-[21px] h-[21px]" />
     {!!notices.data?.unread_count&&<span className="absolute -top-1 -right-1 rounded-full bg-[var(--brand-terracotta)] text-[var(--brand-on-terracotta)] px-1 text-[15px]">{notices.data.unread_count}</span>}
   </button>{open&&<section aria-label="Notifications" className="absolute right-0 mt-2 w-[min(360px,85vw)] rounded-lg shadow-xl border border-[var(--brand-border)] bg-[var(--brand-surface)] p-4 z-[80]"><NotificationList/></section>}</div>;

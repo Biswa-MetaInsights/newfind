@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { authApi } from "@eventmind/api";
@@ -10,7 +9,6 @@ import type { AuthTokens } from "@eventmind/types";
 import { isAxiosError } from "@eventmind/api";
 import { BrandLogo } from "@/components/brand";
 import { SocialSignIn } from "@/components/SocialSignIn";
-import { GUTTERS } from "@/lib/layout";
 
 export default function AuthPage() {
   const router = useRouter();
@@ -76,25 +74,15 @@ export default function AuthPage() {
   }
 
   return (
-    <div className="flex min-h-[100dvh] flex-col" style={{ backgroundColor: "var(--brand-bg)" }}>
-      <header className="shrink-0 border-b border-[var(--brand-nav-border)] bg-[var(--brand-bg)]">
-        <nav aria-label="Home navigation" className={`flex min-h-[72px] flex-wrap items-center justify-between gap-x-4 gap-y-1 py-2 ${GUTTERS}`}>
-          <Link href="/" aria-label="NewFind — home" className="inline-flex shrink-0 items-center rounded-lg focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--brand-green)]">
-            <BrandLogo markSize={55} gap={16} style={{ color: "var(--brand-logo)" }} />
-          </Link>
-          <Link href="/" className="text-[18px] font-bold inline-flex min-h-11 items-center rounded-lg text-[var(--brand-text)] hover:underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--brand-green)]">
-            Back to home
-          </Link>
-        </nav>
-      </header>
+    <div className="relative flex min-h-[100dvh] flex-col" style={{ backgroundColor: "var(--brand-bg)" }}>
+      {/* Top bar and panel photo removed 2026-11-17 (Gautham): a page used for ~10 s should be simple
+          and reliable. "Back to home" floats top-right; the logo stays the way home. */}
+      <Link href="/" className="absolute right-4 top-4 z-20 inline-flex min-h-11 items-center rounded-lg px-2 text-[18px] font-bold text-[var(--brand-text)] hover:underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--brand-green)] sm:right-6 lg:right-20">
+        Back to home
+      </Link>
       <div className="flex flex-1">
-      {/* Homepage photography with a consistent green overlay in both themes. */}
       <div className="relative hidden overflow-hidden lg:flex lg:flex-1 items-center justify-center p-16"
         style={{ backgroundColor: "var(--brand-green)", color: "var(--brand-on-green)" }}>
-        <Image src="/hero/hero-3.png" alt="" fill
-          sizes="(min-width: 1024px) 50vw, 0px" className="object-cover" />
-        <div aria-hidden="true" className="absolute inset-0"
-          style={{ background: "linear-gradient(180deg, color-mix(in srgb, var(--brand-green) 55%, transparent), color-mix(in srgb, var(--brand-green) 88%, transparent))" }} />
         <div className="relative z-10 max-w-md">
           <Link href="/" aria-label="NewFind — home" className="inline-block rounded-lg focus-visible:outline-2 focus-visible:outline-offset-4">
             <BrandLogo markSize={70} gap={14} className="mb-10" />
@@ -111,6 +99,9 @@ export default function AuthPage() {
       {/* Right panel — auth form */}
       <div className="flex flex-1 items-center justify-center px-4 sm:px-6 py-12 lg:px-20" style={{ backgroundColor: "var(--brand-bg)" }}>
         <div className="w-full max-w-md">
+          <Link href="/" aria-label="NewFind — home" className="mb-8 inline-flex rounded-lg focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--brand-green)] lg:hidden">
+            <BrandLogo markSize={44} gap={12} style={{ color: "var(--brand-logo)" }} />
+          </Link>
           <h2 className="text-3xl font-bold text-[var(--brand-text)] mb-3">
             {isLogin ? "Welcome Back" : "Create Account"}
           </h2>

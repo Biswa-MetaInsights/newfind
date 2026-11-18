@@ -15,7 +15,8 @@ import { communityImageUrl, locationLabel } from "@/lib/event-media";
 //
 // PHASE 2 RESTORE: set PARKED to false (or delete it and its `if` below), and
 // put `alt` back to "Community on NewFind".
-const PARKED: boolean = false;
+// Re-parked 2026-11-17 (PARKED_README.md).
+const PARKED: boolean = true;
 
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";

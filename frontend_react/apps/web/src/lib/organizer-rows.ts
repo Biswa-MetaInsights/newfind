@@ -125,12 +125,12 @@ export function toConsoleRow(event: Event, now = Date.now()): ConsoleRow {
     // never reintroduce a hardcoded one.
     when: isDraft && !event.start_date
       ? "No date set"
-      : start.toLocaleDateString("en-GB", { weekday: "short", day: "2-digit", month: "short" }),
+      : start.toLocaleDateString("en-GB", { weekday: "short", day: "2-digit", month: "short", timeZone: event.timezone || undefined }),
     whenSub: isDraft
       ? "draft"
       : bucket === "past"
         ? "closed"
-        : start.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" }),
+        : start.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit", timeZone: event.timezone || undefined }),
     place: placeOf(event),
     price: formatPrice(event.price, event.currency),
     free,

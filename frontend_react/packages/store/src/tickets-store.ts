@@ -6,6 +6,9 @@ export interface StoredTicket {
   event_id: string;
   event_title: string;
   start_date: string;
+  /** The event's IANA zone, so a ticket card shows the VENUE's clock time, not the browser's.
+   *  Optional: tickets persisted before this field existed have none and fall back to browser time. */
+  timezone?: string;
   price_paid: number;
   /** Currency the ticket was actually paid in — stored per ticket, NOT looked
    *  up from the event later. Optional because tickets persisted to

@@ -4,8 +4,8 @@ import { eventTimeUtc } from "@/lib/event-time";
 import { LocationSelector } from "@/components/LocationSelector";
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
-// PARKED 2026-08-14 (MVP) — `communityApi` dropped from this import.
-import { communityApi, organizerApi } from "@eventmind/api";
+// PARKED 2026-08-14 (MVP), re-parked 2026-11-17 — `communityApi` dropped from this import.
+import { organizerApi } from "@eventmind/api";
 import { useAuthStore, CITIES } from "@eventmind/store";
 import type { City } from "@eventmind/store";
 // PARKED 2026-08-14 (MVP) — `Community` dropped from this import.
@@ -54,6 +54,8 @@ import {
 import { isUploadedImage } from "@/lib/image-upload";
 import { GUTTERS } from "@/lib/layout";
 import { hoverCapable } from "@/lib/pointer";
+import { SKIP_ORGANIZER_VERIFICATION } from "@/frontend_testing/dev-flags";
+import { BypassStrip } from "@/frontend_testing/BypassStrip";
 
 const GREEN = "var(--brand-green)";
 
@@ -356,7 +358,9 @@ export default function CreateEventPage() {
   // Location
   const [city, setCity] = useState<City>(CITIES.find(c=>c.name==="Brussels")!);
   const [eventTimezone, setEventTimezone] = useState("Europe/Brussels");
-  const [visibility, setVisibility] = useState<"public"|"unlisted"|"private">("public");
+  // PARKED 2026-11-17 (Gautham): the Visibility field (Private + Unlisted) is commented out below;
+  // private events are not in MVP/phase 1. State stays so the payload still sends "public". See PARKED_README.md.
+  const [visibility] = useState<"public"|"unlisted"|"private">("public");
   const [address, setAddress] = useState("");
   const [onlineUrl, setOnlineUrl] = useState("");
 
@@ -428,8 +432,16 @@ export default function CreateEventPage() {
   const [editingList, setEditingList] = useState<{ kind: ListKind; rows: Row[] } | null>(null);
   const [editingCover, setEditingCover] = useState(false);
 
+  /* PARKED 2026-11-17 — the whole "add this event to my community" feature.
+     Communities are parked (PARKED_README.md). These four pieces are
+     interdependent — the state, the lookup, the payload field and the form
+     section — so they park as one set; leaving any one live breaks the others.
+     PHASE 2 RESTORE: uncomment all four and put `communityApi` back in the import.
+
   const [community,setCommunity]=useState<import('@eventmind/types').Community|null>(null);
   const [communityId,setCommunityId]=useState('');
+
+  */
 
   // Form state
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -437,18 +449,23 @@ export default function CreateEventPage() {
   const [error, setError] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [success, setSuccess] = useState(false);
-  const [verificationChecked, setVerificationChecked] = useState(false);
+  /* Starts true under the dev bypass — the gate is then already open on the first
+     render. Setting it from inside the effect instead would trip
+     `react-hooks/set-state-in-effect` and cost a throwaway render. */
+  const [verificationChecked, setVerificationChecked] = useState(SKIP_ORGANIZER_VERIFICATION);
 
   useEffect(() => {
     if (!hasHydrated) return;
     if (!isAuthenticated) { router.replace("/auth"); return; }
+    if (SKIP_ORGANIZER_VERIFICATION) return;
     const userId = subFromToken(tokens?.access_token ?? null);
     if (!userId) return;
 
     organizerApi.get(userId)
       .then(() => {
         setVerificationChecked(true);
-        communityApi.getByOrganizer(userId).then(r=>setCommunity(r.data)).catch(()=>{});
+        // PARKED 2026-11-17 — the organiser's community lookup; see the parked state block above.
+        // communityApi.getByOrganizer(userId).then(r=>setCommunity(r.data)).catch(()=>{});
       })
       .catch(() => router.replace("/organizer/onboarding"));
   }, [hasHydrated, isAuthenticated, router, tokens]);
@@ -574,7 +591,7 @@ export default function CreateEventPage() {
         tags: parsedTags,
         language,
         event_website: eventWebsite.trim() || undefined,
-        community_id: communityId || undefined,
+        // PARKED 2026-11-17 — community_id: communityId || undefined,
         // The field stays nullable on the event model, so omitting it is valid.
         timezone: eventTimezone,
         visibility,
@@ -631,11 +648,26 @@ export default function CreateEventPage() {
         className={`pt-8 max-w-[1536px] mx-auto ${GUTTERS}`}
         style={{ paddingBottom: STICKY_BAR_HEIGHT_COMPACT + 32 }}
       >
+        {/* DEV ONLY — the return half of the create ⇄ onboarding round trip, the
+            twin of the strip on /organizer/onboarding. The back arrow below
+            already walks there under the bypass, but it reads as a back button,
+            so it is not a door anyone can SPOT. Renders nothing unless the dev
+            bypass is on; see frontend_testing/. */}
+        <BypassStrip href="/organizer/onboarding" label="← Set up your organisation" />
 
         {/* Header */}
         <div className="flex items-center gap-4 mb-6">
+          {/* Under the dev bypass this walks to /organizer/onboarding rather than
+              into history, so the two pages can be reviewed as a pair. For a real
+              organiser it stays plain history — they reach this form from the
+              console, and sending them to a setup page they have already
+              completed would be a bug, not a shortcut. */}
           <button
-            onClick={() => router.back()}
+            onClick={() =>
+              SKIP_ORGANIZER_VERIFICATION
+                ? router.push("/organizer/onboarding")
+                : router.back()
+            }
             className="w-9 h-9 shrink-0 rounded-full flex items-center justify-center transition-colors"
             style={{ border: "2px solid var(--brand-control-border)", backgroundColor: "var(--brand-bg)" }}
           >
@@ -964,7 +996,9 @@ export default function CreateEventPage() {
                   has to tab through the date to reach it. Split, each control is
                   the size of the thing it holds and either can be fixed alone. */}
               <FormField label="Event time zone" required inline><input value={eventTimezone} onChange={e=>setEventTimezone(e.target.value)} placeholder="Europe/Brussels" list="event-timezones" className={inputCls(false)}/><datalist id="event-timezones">{['UTC','Europe/Brussels','Europe/London','Europe/Paris','Europe/Berlin','Europe/Amsterdam','Europe/Luxembourg','Asia/Kolkata','America/New_York','America/Los_Angeles','Asia/Tokyo','Australia/Sydney'].map(z=><option key={z} value={z}/>)}</datalist></FormField>
+              {/* PARKED 2026-11-17 (Gautham): Visibility field.
               <FormField label="Visibility" inline><select value={visibility} onChange={e=>setVisibility(e.target.value as typeof visibility)} className={inputCls(false)}><option value="public">Public — discoverable</option><option value="unlisted">Unlisted — accessible by link</option><option value="private">Private — organiser access only</option></select></FormField>
+              */}
               <FormField label="Start Date" required inline width="xs" error={fieldErrors.startDay}>
                 <DateTimeInput
                   type="date"
@@ -1195,7 +1229,9 @@ export default function CreateEventPage() {
 
           </div>
 
+          {/* PARKED 2026-11-17 — the Community section; see the parked state block near the top.
           {community&&<Section title="Community"><label className="flex items-center gap-3 text-[18px]"><input type="checkbox" checked={!!communityId} onChange={e=>setCommunityId(e.target.checked?community.id:'')}/>Add this event to {community.name}</label></Section>}
+          */}
 
 
           {/* ── Whatever the save had to say, last in the sequence ──

@@ -11,6 +11,7 @@ import type { Review, ReviewAggregates } from "@eventmind/api";
 import { useAuthStore } from "@eventmind/store";
 import { Navbar } from "@/components/navbar/Navbar";
 import { EventChatWidget } from "@/components/EventChatWidget";
+import { SHOW_EVENT_ASSISTANT } from "@/frontend_testing/dev-flags";
 import {
   EventBackButton,
   EventCancelButton,
@@ -65,6 +66,7 @@ import { heroTitleSize } from "@/lib/hero-title";
 import { GUTTERS } from "@/lib/layout";
 import { isExternalEvent, externalTicketUrl, externalProviderName } from "@/lib/external-events";
 import { formatPrice } from "@/lib/currency";
+import { zoneAbbreviation } from "@/lib/event-time";
 
 const GREEN = "var(--brand-green)";
 
@@ -72,8 +74,14 @@ function fmt(iso: string, opts: Intl.DateTimeFormatOptions) {
   return new Date(iso).toLocaleDateString("en-US", opts);
 }
 
+/** Clock time and zone label as two strings — the zone renders small and muted beside the time. */
 function fmtTime(iso: string, timeZone: string) {
-  return new Date(iso).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", timeZone, timeZoneName: "short" });
+  const date = new Date(iso);
+  const parts = new Intl.DateTimeFormat("en-US", { hour: "numeric", minute: "2-digit", timeZone }).formatToParts(date);
+  return {
+    time: parts.map(p => p.value).join("").trim(),
+    zone: zoneAbbreviation(date, timeZone),
+  };
 }
 
 export default function EventDetailPage({
@@ -217,7 +225,9 @@ export default function EventDetailPage({
   function handleBookNow() {
     if (!bookable || !registrationState(event!, Date.now()).available) return;
     if (external) {
-      if (providerUrl) window.location.assign(providerUrl);
+      // New tab (Gautham, 2026-11-17): the visitor keeps the NewFind event page. `noopener` so the
+      // provider page cannot reach back through window.opener.
+      if (providerUrl) window.open(providerUrl, "_blank", "noopener,noreferrer");
       return;
     }
     router.push(isAuthenticated ? `/checkout/${id}` : "/auth");
@@ -489,7 +499,8 @@ export default function EventDetailPage({
                 cancelled={cancelled}
                 registrationClosed={registrationClosed}
                 dateLabel={fmt(event.start_date, { weekday: "long", month: "short", day: "numeric", year: "numeric", timeZone: event.timezone || "UTC" })}
-                timeLabel={fmtTime(event.start_date,event.timezone || "UTC")}
+                timeLabel={fmtTime(event.start_date,event.timezone || "UTC").time}
+                timeZoneLabel={fmtTime(event.start_date,event.timezone || "UTC").zone}
                 location={location}
                 organizer={organizerName}
                 verified={organizerVerified}
@@ -521,7 +532,8 @@ export default function EventDetailPage({
       <SimilarEvents event={event} />
 
       {/* ── AI Event Assistant widget ── */}
-      {isDummyMode && <EventChatWidget event={event} />}
+      {/* Dummy mode only in the product; the dev flag adds real mode locally. */}
+      {(isDummyMode || SHOW_EVENT_ASSISTANT) && <EventChatWidget event={event} />}
 
       {/* ── Sticky bar ──
           ⚠️ It follows the sidebar: the organiser's says what they came to find
@@ -624,6 +636,7 @@ function BookingCard({
   bookingDisabled,
   dateLabel,
   timeLabel,
+  timeZoneLabel,
   location,
   organizer,
   verified = false,
@@ -645,6 +658,7 @@ function BookingCard({
   bookingDisabled: boolean;
   dateLabel: string;
   timeLabel: string;
+  timeZoneLabel?: string;
   location: string;
   organizer: string;
   external?: boolean;
@@ -685,7 +699,7 @@ function BookingCard({
             time is still more than a 375px phone holds. */}
         <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-4">
           <DetailLine icon={<CalendarIcon color={GREEN} className={DETAIL_ICON} />} text={dateLabel} />
-          <DetailLine icon={<ClockIcon color={GREEN} className={DETAIL_ICON} />} text={timeLabel} />
+          <DetailLine icon={<ClockIcon color={GREEN} className={DETAIL_ICON} />} text={timeLabel} suffix={timeZoneLabel} />
         </div>
         <div className="mt-5">
           <DetailLine icon={<LocationPinIcon color={GREEN} className={DETAIL_ICON} />} text={location} />

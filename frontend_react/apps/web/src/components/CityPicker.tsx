@@ -2,15 +2,24 @@
 
 import { useEffect, useId, useRef, useState } from "react";
 import { useLocationStore, DEFAULT_CITY } from "@eventmind/store";
-import { GUTTERS } from "@/lib/layout";
+import type { City } from "@eventmind/store";
 import { LocationPinIcon } from "./EventIcons";
+import { CaretIcon } from "./organizer/ConsoleIcons";
 import { LocationSelector } from "./LocationSelector";
 
-export function CityPicker({ variant = "pill", label }: { variant?: "pill" | "icon" | "inline"; label?: string } = {}) {
+/** Uncontrolled by default: reads and writes the global location store. Pass
+ *  `value` + `onChange` to drive it from local state instead (Explore's `city`
+ *  is page state seeded from the URL, and must not overwrite the navbar's city). */
+export function CityPicker({ variant = "pill", label, value, onChange, outlined = false }: {
+  variant?: "pill" | "icon" | "inline"; label?: string; value?: City; onChange?: (city: City) => void;
+  /** Wears the 2px control outline. Explore's top bar only, where its neighbours (search, sort) are outlined. */
+  outlined?: boolean;
+} = {}) {
   const ready = useLocationStore(s => s._hasHydrated);
   const selected = useLocationStore(s => s.selectedCity);
-  const setCity = useLocationStore(s => s.setCity);
-  const city = ready ? selected : DEFAULT_CITY;
+  const setStoreCity = useLocationStore(s => s.setCity);
+  const city = value ?? (ready ? selected : DEFAULT_CITY);
+  const setCity = onChange ?? setStoreCity;
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   const trigger = useRef<HTMLButtonElement>(null);
@@ -38,13 +47,22 @@ export function CityPicker({ variant = "pill", label }: { variant?: "pill" | "ic
   }, [open]);
 
   return (
-    <div className="relative min-w-0" ref={ref}>
+    <div className="group relative min-w-0" ref={ref}>
       <button ref={trigger} type="button" onClick={() => setOpen(value => !value)}
         aria-label={label || `Select city, currently ${city.name}`} aria-expanded={open} aria-controls={open ? popupId : undefined}
-        className="flex min-h-11 min-w-11 items-center justify-center gap-2 rounded-lg px-3 py-2 max-w-[180px] hover:bg-[var(--brand-green)] hover:text-[var(--brand-on-green)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--brand-text)]">
+        className={`flex min-h-11 min-w-11 items-center justify-center gap-2 rounded-lg px-3 py-2 max-w-[180px] ${outlined ? "border-2 border-[var(--brand-control-border)] bg-[var(--brand-bg)]" : ""} focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--brand-text)]`}>
         <LocationPinIcon className="w-4 h-4 shrink-0" />
         {variant !== "icon" && <span className="truncate">{label || city.name}</span>}
+        {variant !== "icon" && <CaretIcon className="w-4 h-4 shrink-0" />}
       </button>
+      {/* Old page's tooltip (Gautham 2026-11-17). Navbar trigger only: it opens rightward, so it
+          would clip beside the other triggers. Laptop/desktop only (Gautham, 2026-11-17): `lg+` and a
+          hovering pointer, so phones and tablets never see it. */}
+      {variant === "inline" && !open && (
+        <span role="tooltip" className="hidden lg:group-hover:block [@media(hover:none)]:hidden absolute left-full top-1/2 -translate-y-1/2 ml-2 whitespace-nowrap text-sm font-medium px-3 py-1.5 rounded-lg shadow-lg z-50 pointer-events-none border border-[var(--brand-border)] bg-[var(--brand-surface)] text-[var(--brand-text)]">
+          Click here to change your location
+        </span>
+      )}
       {open && (
         <div id={popupId} role="region" aria-label="Choose search location"
           className="fixed inset-x-4 top-4 p-4 max-h-[calc(100dvh-32px)] overflow-y-auto overscroll-contain rounded-lg shadow-xl z-[90] border border-[var(--brand-border)] bg-[var(--brand-surface)] lg:absolute lg:inset-x-auto lg:right-0 lg:top-full lg:mt-2 lg:w-[320px] lg:max-h-[70dvh]">
@@ -57,24 +75,5 @@ export function CityPicker({ variant = "pill", label }: { variant?: "pill" | "ic
         </div>
       )}
     </div>
-  );
-}
-
-export function LocationPrompt() {
-  const ready = useLocationStore(s => s._hasHydrated);
-  const confirmed = useLocationStore(s => s.hasSelectedCity);
-  const city = useLocationStore(s => s.selectedCity);
-  // Preserve existing users' non-default selections from older store versions.
-  if (!ready || confirmed || city.lat !== DEFAULT_CITY.lat || city.lng !== DEFAULT_CITY.lng) return null;
-  return (
-    <section aria-label="Set your search location" className={`${GUTTERS} pb-6`}>
-      <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-[var(--brand-border)] bg-[var(--brand-surface)] p-4 text-[var(--brand-text)]">
-        <div className="min-w-0 flex-1 basis-60">
-          <p className="font-bold">Find events near you</p>
-          <p className="mt-1 text-sm">New York is the starting location. Choose your city or use your location to explore events within 200 km.</p>
-        </div>
-        <CityPicker label="Choose city" />
-      </div>
-    </section>
   );
 }

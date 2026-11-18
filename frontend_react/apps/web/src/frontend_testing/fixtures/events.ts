@@ -14,7 +14,7 @@
 // organiser console draws (see `organizerSource.events` in lib/data-source.ts).
 // That is why the console's rooms, attendees, earnings and roll-ups all key off
 // event ids from that third array: there is one set of events in this app, seen
-// from two sides, never two invented worlds. `lib/fixtures/organizer.ts` derives
+// from two sides, never two invented worlds. `frontend_testing/fixtures/organizer.ts` derives
 // every organiser-side figure from it — do not hand-write a title or a total
 // there that does not correspond to an event here.
 
@@ -220,7 +220,7 @@ export const dummyOnlineEvents: Event[] = [
 // why the console reads each row's own currency instead of naming one. Keep all
 // eight on ONE currency, though — the console SUMS them on the dashboard and the
 // Earnings page, and a total across two currencies is a lie. `assertOneCurrency`
-// in lib/fixtures/organizer.ts fails loudly if that ever stops being true.
+// in frontend_testing/fixtures/organizer.ts fails loudly if that ever stops being true.
 //
 // ⚠️ Only the four future, published ones reach discovery — `dummyEventSearch`
 // filters drafts and finished events out, the same way the real events endpoint
@@ -230,7 +230,7 @@ export const dummyOnlineEvents: Event[] = [
 // ⚠️ The numbers here are LOAD-BEARING. Every figure the console shows —
 // tickets sold, revenue, refunds, check-in rate, the earnings table and its
 // totals — is derived from `tickets_sold × price` on these eight events plus the
-// per-event extras in lib/fixtures/organizer.ts. Change a capacity or a price
+// per-event extras in frontend_testing/fixtures/organizer.ts. Change a capacity or a price
 // and the dashboard changes with it, which is exactly the point. Nothing is
 // typed in twice.
 function mine(

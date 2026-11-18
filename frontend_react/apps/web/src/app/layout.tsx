@@ -6,10 +6,12 @@ import type { Metadata } from "next";
 //    2. the loader call below (`Roboto({ ... })` → `Inter({ ... })`)
 //  Everything else inherits automatically via the `--font-app` CSS variable.
 // ─────────────────────────────────────────────────────────────────────────────
-import { Roboto } from "next/font/google";
+import { Roboto, Caveat } from "next/font/google";
 import { QueryProvider } from "@/providers/query-provider";
 import { ThemeProvider } from "@/providers/theme-provider";
 import { ChatPresence } from "@/components/ChatPresence";
+// PARKED 2026-11-17 (Gautham): the dev banner is no longer shown. DevBanner.tsx stays (frontend_testing is never deleted).
+// import { DevBanner } from "@/frontend_testing/DevBanner";
 import { NO_FLASH_SCRIPT } from "@/lib/theme";
 import "@/lib/api-config";
 import "./globals.css";
@@ -18,6 +20,13 @@ const appFont = Roboto({
   subsets: ["latin"],
   style: ["normal", "italic"],
   variable: "--font-app",
+});
+
+// THE ONE APPROVED EXCEPTION to "Roboto everywhere" (Gautham, 2026-11-16): the
+// handwriting on the home hero's polaroid captions. Used by HeroChatCollage only.
+const handFont = Caveat({
+  subsets: ["latin"],
+  variable: "--font-hand",
 });
 
 // PARKED 2026-08-14 (MVP) — the title/description pair below (and its two twins
@@ -72,7 +81,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${appFont.variable} h-full antialiased`} suppressHydrationWarning>
+    <html lang="en" className={`${appFont.variable} ${handFont.variable} h-full antialiased`} suppressHydrationWarning>
       <head>
         {/* Sets data-theme before first paint so there's no light→dark flash. */}
         <script dangerouslySetInnerHTML={{ __html: NO_FLASH_SCRIPT }} />
@@ -80,6 +89,8 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col font-sans">
         <ThemeProvider>
           <QueryProvider>
+            {/* PARKED 2026-11-17 (Gautham): DEV ONLY banner (data mode + dev flags), removed from the page.
+                Re-enable: uncomment the import above and `{process.env.NODE_ENV === "development" && <DevBanner />}`. */}
             {children}
             {/* Invisible: lights the navbar chat button on new messages. */}
             <ChatPresence />
