@@ -30,5 +30,5 @@ export function EventMap({events,center,radius,onPick}:{events:Event[];center:Ci
     }).catch(()=>setError('The map could not be loaded. You can still browse the event list.'));
     return()=>{disposed=true;map?.remove();};
   },[events,center,radius,onPick]);
-  return <section aria-label="Map of nearby events" className="space-y-2"><div ref={element} className="h-[360px] sm:h-[450px] w-full rounded-lg border-2 border-[var(--brand-control-border)] z-0"/>{error&&<p role="status">{error}</p>}<p className="text-[15px]">Distances are straight-line distances. Click a map marker to open an event.{onPick?' Click elsewhere to move the search centre.':''}</p></section>;
+  return <section aria-label="Map of nearby events" className="space-y-2"><div ref={element} className="h-[360px] sm:h-[450px] w-full rounded-lg border-2 border-[var(--brand-control-border)] z-0"/>{error&&<p role="status">{error}</p>}<p className="text-meta">Distances are straight-line distances. Click a map marker to open an event.{onPick?' Click elsewhere to move the search centre.':''}</p></section>;
 }

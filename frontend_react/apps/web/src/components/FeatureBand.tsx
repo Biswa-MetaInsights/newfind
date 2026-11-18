@@ -331,19 +331,19 @@ const TILE =
   'bg-[var(--brand-surface)] border-[var(--brand-control-border)]'
 
 /** ⚠️ THE TYPE SCALE IS THE EVENT CARD'S, not this band's own (Gautham,
- *  2026-08-19): a tile title uses `text-[20px] font-bold leading-snug` and its body
- *  uses `text-[18px] leading-relaxed`, the same pair `EventCardItem` uses for an event title and its
+ *  2026-08-19): a tile title is `text-title font-bold` and its body
+ *  `text-body`, the same pair `EventCardItem` uses for an event title and its
  *  date/venue line — the two sit on the same page and were visibly out of step
  *  at 18/16. **If `EventsCarousel`'s card sizes move, move these with them**;
  *  they are a deliberate match, not a coincidence. The `SeeAllTile` in that file
  *  carries the same note for the same reason. */
 const TILE_TITLE =
-  'text-[20px] font-bold leading-snug transition-colors duration-200 text-[var(--brand-text)]'
+  'text-title font-bold leading-snug transition-colors duration-200 text-[var(--brand-text)]'
 
 /** `--brand-hint` is the secondary-text token and is NOT gray — do not "restore"
  *  it to --brand-muted, which is placeholders and fills. */
 const TILE_BODY =
-  'text-[18px] leading-relaxed transition-colors duration-200 text-[var(--brand-hint)]'
+  'text-body leading-relaxed transition-colors duration-200 text-[var(--brand-hint)]'
 
 /** ⚠️ ONE ACCENT PER HALF, and it drives everything (Gautham, 2026-08-19):
  *  **participants are GREEN, organisers are TERRACOTTA.** The accent is the
@@ -366,8 +366,9 @@ const TILE_BODY =
  *
  *  ⚠️ CONTRAST, stated so it is a known trade and not a surprise: linen on
  *  `--brand-green` is ~8.3:1, but white on `--brand-terracotta` is ~4.2:1 —
- *  fine for the 18px bold title (AA large needs 3:1) and **just under AA for the
- *  16px body** (4.5:1). It is a transient hover state on copy that is fully
+ *  just under AA for both the `text-title` bold title and the `text-body` copy
+ *  (both need 4.5:1; the title stopped counting as "large" text when it went
+ *  20→18px on 2026-11-18). It is a transient hover state on copy that is fully
  *  legible at rest, and the terracotta is Gautham's; do not darken the token to
  *  "fix" it, because `--brand-terracotta` is shared with the chat launcher and
  *  the category chip. */
@@ -399,7 +400,7 @@ const SKIN: Record<Audience, { tile: string; fg: string; badge: string; link: st
  *  ⚠️ IT IS STYLED AS A STATUS TAG (Gautham, 2026-08-19): "use the Selling Fast
  *  / This Week tags on the event card as the reference". Silhouette from
  *  `EventBadges`' exported `TAG_SHAPE`, then `gap-1.5 font-bold leading-5` +
- *  `px-2.5 py-1.5 text-[16px]` — the exact chrome `EventBadge` renders. Those
+ *  `px-2.5 py-1.5 text-small` — the exact chrome `EventBadge` renders. Those
  *  utilities are RESTATED rather than imported because `TAG` is private to that
  *  file, which exports only the shape on purpose; **if `EventBadge`'s padding or
  *  size changes, change these to match.** The one thing not copied is the glyph
@@ -429,7 +430,7 @@ function AudienceBadge({ audience }: { audience: Audience }) {
   return (
     <span
       className={
-        `${TAG_SHAPE} gap-1.5 font-bold leading-5 px-2.5 py-1.5 text-[16px] ` +
+        `${TAG_SHAPE} gap-1.5 font-bold leading-5 px-2.5 py-1.5 text-small ` +
         `transition-colors duration-200 ${SKIN[audience].badge}`
       }
     >
@@ -496,7 +497,7 @@ function CTATile({ audience, cta }: { audience: Audience; cta: AudienceCTA }) {
           rest colour cannot simply be reused there. */}
       <span
         className={
-          'text-[18px] font-bold transition-colors duration-200 ' +
+          'text-body font-bold transition-colors duration-200 ' +
           `${SKIN[audience].link} ${SKIN[audience].fg}`
         }
       >
@@ -547,7 +548,7 @@ export function FeatureBand() {
             stretch the whole box (swashes included). See the constants above. */}
         <h2
           className="font-extrabold tracking-[-0.5px]"
-          style={{ fontSize: 'clamp(22px, 4vw, 30px)', color: TEXT }}
+          style={{ fontSize: 'clamp(20px, 3vw, 26px)', color: TEXT }}
         >
           Why
           <Wordmark

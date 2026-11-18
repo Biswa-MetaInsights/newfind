@@ -224,11 +224,11 @@ export function FormField({
         below ? "lg:flex-col lg:flex-nowrap lg:items-start" : ""
       }`}
     >
-      <label className="text-sm font-semibold" style={{ color: "var(--brand-text)" }}>
+      <label className="text-meta font-semibold" style={{ color: "var(--brand-text)" }}>
         {label}
       </label>
       {notes.length > 0 && (
-        <span className="flex flex-wrap gap-x-2 text-xs" style={{ color: "var(--brand-terracotta)" }}>
+        <span className="flex flex-wrap gap-x-2 text-meta" style={{ color: "var(--brand-terracotta)" }}>
           {notes.map((n) => (
             <span key={n}>({n})</span>
           ))}
@@ -237,7 +237,7 @@ export function FormField({
     </div>
   );
 
-  const message = error && <p className="text-xs" style={{ color: "#EF4444" }}>{error}</p>;
+  const message = error && <p className="text-meta" style={{ color: "#EF4444" }}>{error}</p>;
   const capped = width ? WIDTH[width] : "";
 
   if (inline) {
@@ -329,7 +329,7 @@ export function FormSection({
       className="rounded-lg p-5 sm:p-6 space-y-5"
       style={{ backgroundColor: "var(--brand-bg)", border: "2px solid var(--brand-control-border)" }}
     >
-      <h2 className="text-[18px] font-bold" style={{ color: "var(--brand-text)" }}>
+      <h2 className="text-body font-bold" style={{ color: "var(--brand-text)" }}>
         {title}
         {optional && (
           <span className="ml-2 font-medium" style={{ color: "var(--brand-terracotta)" }}>(Optional)</span>
@@ -387,7 +387,7 @@ export const formRow = (sm: "sm:grid-cols-2" | "sm:grid-cols-3" = "sm:grid-cols-
  */
 export function inputCls(hasError: boolean): string {
   return (
-    "w-full px-4 py-3 rounded-lg text-sm transition-colors border-2 " +
+    "w-full px-4 py-3 rounded-lg text-meta transition-colors border-2 " +
     "placeholder:text-[var(--brand-muted)] focus:outline-none focus:ring-2 resize-none " +
     (hasError
       ? "border-red-400 bg-red-50 focus:ring-red-200"
@@ -718,14 +718,14 @@ export function ClockFace({
     !twelveHour && mode === "hour" && hourKnown && (h === 0 || h > 12) ? INNER : OUTER;
 
   const segment = (on: boolean) =>
-    `text-[32px] font-extrabold tracking-[-0.5px] tabular-nums leading-none rounded-lg px-1 transition-colors ${
+    `text-figure font-extrabold tracking-[-0.5px] tabular-nums leading-none rounded-lg px-1 transition-colors ${
       on ? "text-[var(--brand-green)]" : "text-[var(--brand-text)]"
     }`;
   const caption = (text: string) => (
-    <span className="text-xs font-medium" style={{ color: "var(--brand-hint)" }}>{text}</span>
+    <span className="text-meta font-medium" style={{ color: "var(--brand-hint)" }}>{text}</span>
   );
   const meridiem = (on: boolean) =>
-    `px-2.5 py-1 rounded-lg text-xs font-bold border-2 transition-colors ${
+    `px-2.5 py-1 rounded-lg text-meta font-bold border-2 transition-colors ${
       on
         ? "bg-[var(--brand-green)] border-[var(--brand-green)] text-[var(--brand-on-green)]"
         : "border-[var(--brand-control-border)] text-[var(--brand-text)] hover:bg-[var(--brand-green)] hover:border-[var(--brand-green)] hover:text-[var(--brand-on-green)]"
@@ -747,7 +747,7 @@ export function ClockFace({
             </button>
             {units && caption("hours")}
           </div>
-          <span className="text-[32px] font-extrabold leading-none" style={{ color: "var(--brand-hint)" }}>:</span>
+          <span className="text-figure font-extrabold leading-none" style={{ color: "var(--brand-hint)" }}>:</span>
           <div className="flex flex-col items-center gap-1">
             <button type="button" onClick={() => setMode("minute")} className={segment(mode === "minute")} aria-label="Set the minutes">
               {minuteKnown ? pad2(m) : "--"}
@@ -806,7 +806,7 @@ export function ClockFace({
         {marks.map((mk) => (
           <span
             key={`${mk.ring}-${mk.label}`}
-            className={`absolute flex items-center justify-center text-sm font-semibold tabular-nums pointer-events-none ${
+            className={`absolute flex items-center justify-center text-meta font-semibold tabular-nums pointer-events-none ${
               mk.on ? "text-[var(--brand-green)]" : mk.ring === INNER ? "text-[var(--brand-on-green)] opacity-70" : "text-[var(--brand-on-green)]"
             }`}
             style={{

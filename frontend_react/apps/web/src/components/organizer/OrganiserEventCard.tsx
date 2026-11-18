@@ -96,7 +96,7 @@ export function OrganiserEventCard({
                 }}
               />
             </div>
-            <p className="text-[15px] mt-2 text-[var(--brand-hint)]">
+            <p className="text-meta mt-2 text-[var(--brand-hint)]">
               {overSold
                 ? `${sold - capacity} more sold than the ${capacity} places allowed.`
                 : left === 0
@@ -133,10 +133,10 @@ export function OrganiserEventCard({
 function Row({ label, value, note }: { label: string; value: string; note?: string }) {
   return (
     <div className="flex items-baseline justify-between gap-3">
-      <p className="text-[16px] font-semibold text-[var(--brand-hint)]">{label}</p>
+      <p className="text-small font-semibold text-[var(--brand-hint)]">{label}</p>
       <div className="text-right min-w-0">
-        <p className="text-[20px] font-bold text-[var(--brand-text)]">{value}</p>
-        {note && <p className="text-[15px] text-[var(--brand-hint)] truncate">{note}</p>}
+        <p className="text-title font-bold text-[var(--brand-text)]">{value}</p>
+        {note && <p className="text-meta text-[var(--brand-hint)] truncate">{note}</p>}
       </div>
     </div>
   );

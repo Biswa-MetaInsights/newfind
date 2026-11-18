@@ -95,7 +95,7 @@ export function EditPencil({
           picker closed. */}
       {hovered && !active && (
         <span
-          className="[@media(hover:none)]:hidden absolute left-full top-1/2 -translate-y-1/2 ml-2 whitespace-nowrap text-sm font-medium px-3 py-1.5 rounded-lg shadow-lg z-50 pointer-events-none"
+          className="[@media(hover:none)]:hidden absolute left-full top-1/2 -translate-y-1/2 ml-2 whitespace-nowrap text-meta font-medium px-3 py-1.5 rounded-lg shadow-lg z-50 pointer-events-none"
           style={{ backgroundColor: SURFACE, color: GREEN, border: `1px solid ${BORDER}` }}
         >
           {tooltip}

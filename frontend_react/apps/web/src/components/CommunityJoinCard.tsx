@@ -103,7 +103,7 @@ export function CommunityJoinCard({
       />
 
       <DetailCardBody>
-        <p className="text-[13px] font-bold tracking-[0.08em] mb-4 text-[var(--brand-hint)]">
+        <p className="text-meta font-bold tracking-[0.08em] mb-4 text-[var(--brand-hint)]">
           Next event
         </p>
 

@@ -11,5 +11,5 @@
  */
 export function heroTitleSize(title: string): string {
   const vw = Math.min(5, 169 / Math.max(title.length, 1));
-  return `clamp(20px, ${vw.toFixed(2)}vw, 64px)`;
+  return `clamp(20px, ${vw.toFixed(2)}vw, 52px)`;
 }

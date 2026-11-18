@@ -52,8 +52,8 @@ export default function CheckoutPage({
 
   if (isError) {
     return <div className="min-h-screen bg-[var(--brand-bg)] text-[var(--brand-text)]"><Navbar />
-      <main className={`py-12 ${GUTTERS}`}><h1 className="text-[28px] font-bold">Event could not be loaded</h1>
-        <p role="alert" className="mt-4 text-[18px]">The event may be unavailable, or the connection was interrupted.</p>
+      <main className={`py-12 ${GUTTERS}`}><h1 className="text-heading font-bold">Event could not be loaded</h1>
+        <p role="alert" className="mt-4 text-body">The event may be unavailable, or the connection was interrupted.</p>
         <button onClick={() => void refetch()} className="mt-6 px-5 py-3 rounded-lg bg-[var(--brand-green)] text-[var(--brand-on-green)]">Try again</button>
       </main></div>;
   }
@@ -69,16 +69,16 @@ export default function CheckoutPage({
 
   if (!registration.available) {
     return <div className="min-h-screen bg-[var(--brand-bg)] text-[var(--brand-text)]"><Navbar />
-      <main className={`py-12 ${GUTTERS}`}><h1 className="text-[28px] font-bold">{registration.label}</h1>
-        <p className="mt-4 text-[18px]">This event is not accepting new bookings.</p>
+      <main className={`py-12 ${GUTTERS}`}><h1 className="text-heading font-bold">{registration.label}</h1>
+        <p className="mt-4 text-body">This event is not accepting new bookings.</p>
         <button onClick={() => router.push(`/event/${id}`)} className="mt-6 px-5 py-3 rounded-lg bg-[var(--brand-green)] text-[var(--brand-on-green)]">View event details</button>
       </main></div>;
   }
 
   if (isExternalEvent(event)) {
     return <div className="min-h-screen bg-[var(--brand-bg)]"><Navbar /><main className={`py-12 ${GUTTERS}`}>
-      <h1 className="text-[28px] font-bold">Book with the original ticket provider</h1>
-      <p className="mt-4 text-[18px]">NewFind does not issue tickets for this external listing.</p>
+      <h1 className="text-heading font-bold">Book with the original ticket provider</h1>
+      <p className="mt-4 text-body">NewFind does not issue tickets for this external listing.</p>
       <button className="mt-6 px-5 py-3 rounded-lg bg-[var(--brand-green)] text-[var(--brand-on-green)]" onClick={() => router.push(`/event/${id}`)}>View event details</button>
     </main></div>;
   }
@@ -122,7 +122,7 @@ export default function CheckoutPage({
       <Navbar />
 
       <div className={`py-10 ${GUTTERS}`}>
-        <h1 className="text-[28px] font-bold text-[var(--brand-text)] mb-8">Checkout</h1>
+        <h1 className="text-heading font-bold text-[var(--brand-text)] mb-8">Checkout</h1>
 
         {/* Two columns on lg+, stacked below. Order summary stays first when stacked
             — you confirm what you are buying before you pay for it. */}
@@ -130,7 +130,7 @@ export default function CheckoutPage({
 
           {/* ── Left: Order summary ── */}
           <div>
-            <h2 className="text-[22px] font-bold text-[var(--brand-text)] mb-6">Your Order</h2>
+            <h2 className="text-subhead font-bold text-[var(--brand-text)] mb-6">Your Order</h2>
 
             <div className="bg-[var(--brand-bg)] rounded-lg p-5 sm:p-8" style={{ border: "1px solid var(--brand-border)" }}>
               {/* Event row */}
@@ -143,27 +143,27 @@ export default function CheckoutPage({
                   </svg>
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-[20px] font-bold text-[var(--brand-text)] truncate">{event.title}</p>
-                  <p className="text-sm text-[var(--brand-hint)] mt-1">General Admission</p>
+                  <p className="text-title font-bold text-[var(--brand-text)] truncate">{event.title}</p>
+                  <p className="text-meta text-[var(--brand-hint)] mt-1">General Admission</p>
                 </div>
-                <p className="text-[20px] font-bold text-[var(--brand-text)] shrink-0">
+                <p className="text-title font-bold text-[var(--brand-text)] shrink-0">
                   {isFree ? "Free" : money(subtotal)}
                 </p>
               </div>
 
               {/* Ticket count */}
               <div className="flex items-center justify-between py-5" style={{ borderBottom: "1px solid var(--brand-border)" }}>
-                <span className="text-[16px] text-[var(--brand-text)]">Tickets</span>
+                <span className="text-small text-[var(--brand-text)]">Tickets</span>
                 <div className="flex items-center gap-4">
                   <button
                     onClick={() => setTicketCount((c) => Math.max(1, c - 1))}
-                    className="w-8 h-8 [@media(pointer:coarse)]:w-11 [@media(pointer:coarse)]:h-11 rounded-full flex items-center justify-center font-bold text-lg transition-colors"
+                    className="w-8 h-8 [@media(pointer:coarse)]:w-11 [@media(pointer:coarse)]:h-11 rounded-full flex items-center justify-center font-bold text-body transition-colors"
                     style={{ backgroundColor: `color-mix(in srgb, var(--brand-green) 8%, transparent)`, color: GREEN }}
                   >−</button>
-                  <span className="text-[18px] font-bold w-6 text-center text-[var(--brand-text)]">{ticketCount}</span>
+                  <span className="text-body font-bold w-6 text-center text-[var(--brand-text)]">{ticketCount}</span>
                   <button
                     onClick={() => setTicketCount((c) => c + 1)}
-                    className="w-8 h-8 [@media(pointer:coarse)]:w-11 [@media(pointer:coarse)]:h-11 rounded-full flex items-center justify-center font-bold text-lg transition-colors"
+                    className="w-8 h-8 [@media(pointer:coarse)]:w-11 [@media(pointer:coarse)]:h-11 rounded-full flex items-center justify-center font-bold text-body transition-colors"
                     style={{ backgroundColor: `color-mix(in srgb, var(--brand-green) 8%, transparent)`, color: GREEN }}
                   >+</button>
                 </div>
@@ -187,7 +187,7 @@ export default function CheckoutPage({
 
           {/* ── Right: Free confirmation OR Payment card ── */}
           <div>
-            <h2 className="text-[22px] font-bold text-[var(--brand-text)] mb-6">
+            <h2 className="text-subhead font-bold text-[var(--brand-text)] mb-6">
               {isFree ? "Confirm Registration" : "Payment Method"}
             </h2>
 
@@ -202,26 +202,26 @@ export default function CheckoutPage({
                       <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75" />
                     </svg>
                     <div>
-                      <p className="text-xs text-[var(--brand-hint)]">Booking account</p>
-                      <p className="text-sm font-semibold text-[var(--brand-text)]">{userEmail}</p>
+                      <p className="text-meta text-[var(--brand-hint)]">Booking account</p>
+                      <p className="text-meta font-semibold text-[var(--brand-text)]">{userEmail}</p>
                     </div>
                   </div>
-                  <p className="text-sm text-[var(--brand-hint)] leading-relaxed">
+                  <p className="text-meta text-[var(--brand-hint)] leading-relaxed">
                     This is a free event. Click &quot;Claim Free Ticket&quot; below to reserve your spot.
                   </p>
                 </div>
               ) : (
-                <p className="text-sm text-[var(--brand-hint)]">
+                <p className="text-meta text-[var(--brand-hint)]">
                   Paid bookings are currently unavailable. Free events can be booked now.
                 </p>
               )}
 
-              {error && <p className="mt-4 text-sm text-red-500">{error}</p>}
+              {error && <p className="mt-4 text-meta text-red-500">{error}</p>}
 
               <button
                 onClick={handlePay}
                 disabled={isProcessing || !isFree}
-                className="mt-6 w-full py-4 rounded-lg text-[var(--brand-on-green)] text-[18px] font-bold transition-colors disabled:opacity-60"
+                className="mt-6 w-full py-3 rounded-lg text-[var(--brand-on-green)] text-control font-bold transition-colors disabled:opacity-60"
                 style={{ backgroundColor: GREEN }}
                 onMouseEnter={(e) => !isProcessing && (e.currentTarget.style.backgroundColor = "var(--brand-green-hover)")}
                 onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = GREEN)}
@@ -237,7 +237,7 @@ export default function CheckoutPage({
               </button>
 
               {!isFree && (
-                <p className="text-center text-xs text-[var(--brand-hint)] mt-4">
+                <p className="text-center text-meta text-[var(--brand-hint)] mt-4">
                   Payments are disabled during initial testing
                 </p>
               )}
@@ -259,7 +259,7 @@ export default function CheckoutPage({
                 <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
               </svg>
             </div>
-            <h2 className="text-[24px] font-bold text-[var(--brand-text)] mb-3">
+            <h2 className="text-subhead font-bold text-[var(--brand-text)] mb-3">
               {isFree ? "You're registered!" : "Order Confirmed!"}
             </h2>
             <p className="text-[var(--brand-hint)] mb-8 leading-relaxed">
@@ -269,7 +269,7 @@ export default function CheckoutPage({
             </p>
             <button
               onClick={() => router.push("/dashboard")}
-              className="w-full py-4 rounded-lg text-[var(--brand-on-green)] text-[16px] font-bold"
+              className="w-full py-4 rounded-lg text-[var(--brand-on-green)] text-small font-bold"
               style={{ backgroundColor: GREEN }}
             >
               Go to My Tickets
@@ -288,8 +288,8 @@ function SummaryRow({ label, value, bold = false, color = "var(--brand-text)" }:
 }) {
   return (
     <div className="flex items-center justify-between">
-      <span style={{ fontSize: bold ? 20 : 16, fontWeight: bold ? 700 : 400, color: "var(--brand-hint)" }}>{label}</span>
-      <span style={{ fontSize: bold ? 24 : 16, fontWeight: bold ? 700 : 400, color }}>{value}</span>
+      <span className={bold ? "text-title" : "text-small"} style={{ fontWeight: bold ? 700 : 400, color: "var(--brand-hint)" }}>{label}</span>
+      <span className={bold ? "text-subhead" : "text-small"} style={{ fontWeight: bold ? 700 : 400, color }}>{value}</span>
     </div>
   );
 }

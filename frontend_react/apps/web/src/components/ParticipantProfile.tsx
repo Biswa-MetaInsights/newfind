@@ -24,10 +24,10 @@ export function ParticipantProfile() {
   if (!profile.data) return <p role="alert">Your profile could not be loaded. Please sign in again.</p>;
   const data = profile.data;
   return <section className="max-w-2xl space-y-6">
-    <h2 className="text-[26px] font-bold">Your profile</h2>
-    <p className="text-[18px]">Save your name and interests for more relevant event suggestions. Your profile picture is private to your account.</p>
+    <h2 className="text-heading font-bold">Your profile</h2>
+    <p className="text-body">Save your name and interests for more relevant event suggestions. Your profile picture is private to your account.</p>
     {avatar.data && <img src={avatar.data} alt="Your profile picture" className="w-28 h-28 rounded-full object-cover" /> /* eslint-disable-line @next/next/no-img-element -- authenticated image loaded as a data URL */}
-    <label className="block text-[17px] font-semibold">Profile picture
+    <label className="block text-small font-semibold">Profile picture
       <input type="file" accept="image/png,image/jpeg,image/webp" disabled={save.isPending} className="block mt-2 max-w-full" onChange={async (event) => {
         const file = event.target.files?.[0]; if (!file) return;
         setMessage('Uploading picture…');
@@ -39,17 +39,17 @@ export function ParticipantProfile() {
       event.preventDefault(); const form = new FormData(event.currentTarget);
       save.mutate({ full_name: String(form.get('name')).trim(), bio: String(form.get('bio')).trim(), interests: String(form.get('interests')).split(',').map(s=>s.trim()).filter(Boolean).slice(0,30) });
     }}>
-      <label className="block text-[17px] font-semibold">Full name<input name="name" defaultValue={data.full_name} required maxLength={200} className={`${inputCls(false)} mt-2 w-full`} /></label>
-      <label className="block text-[17px] font-semibold">About you<textarea name="bio" defaultValue={data.bio ?? ''} maxLength={4000} rows={3} className={`${inputCls(false)} mt-2 w-full`} /></label>
-      <label className="block text-[17px] font-semibold">Interests<input name="interests" defaultValue={data.interests.join(', ')} maxLength={1000} placeholder="Music, technology, family activities" className={`${inputCls(false)} mt-2 w-full`} /></label>
+      <label className="block text-small font-semibold">Full name<input name="name" defaultValue={data.full_name} required maxLength={200} className={`${inputCls(false)} mt-2 w-full`} /></label>
+      <label className="block text-small font-semibold">About you<textarea name="bio" defaultValue={data.bio ?? ''} maxLength={4000} rows={3} className={`${inputCls(false)} mt-2 w-full`} /></label>
+      <label className="block text-small font-semibold">Interests<input name="interests" defaultValue={data.interests.join(', ')} maxLength={1000} placeholder="Music, technology, family activities" className={`${inputCls(false)} mt-2 w-full`} /></label>
       <p>Separate interests with commas.</p>
       <button type="submit" disabled={save.isPending} className="px-6 py-3 rounded-lg bg-[var(--brand-green)] text-[var(--brand-on-green)] font-bold">{save.isPending ? 'Saving…' : 'Save profile'}</button>
     </form>
     <button className={`px-5 py-3 rounded-lg ${OUTLINE_BUTTON}`} onClick={async () => { try { await apiClient.post('/auth/request-verification'); setMessage('Verification email requested.'); } catch {setMessage('Email verification is not available yet.');} }}>Verify email address</button>
     {message && <p role="status">{message}</p>}
     <section className="space-y-4 border-t border-[var(--brand-border)] pt-6">
-      <h3 className="text-[20px] font-bold leading-snug">Connected sign-in accounts</h3>
-      <p className="text-[15px]">Connect a provider here to sign in to this same NewFind account. Your events and tickets stay together.</p>
+      <h3 className="text-title font-bold leading-snug">Connected sign-in accounts</h3>
+      <p className="text-meta">Connect a provider here to sign in to this same NewFind account. Your events and tickets stay together.</p>
       <SocialSignIn mode="link" />
     </section>
   </section>;

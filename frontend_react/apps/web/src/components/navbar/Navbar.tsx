@@ -65,7 +65,7 @@ function DropdownItem({ emoji, label, onTap }: NavItem) {
   return (
     <button
       onClick={onTap}
-      className="w-full text-left px-4 py-3 text-base font-medium whitespace-nowrap"
+      className="w-full text-left px-4 py-3 text-control font-medium whitespace-nowrap"
       style={{ ...hover.style, color: hover.style.color }}
       onMouseEnter={hover.onMouseEnter}
       onMouseLeave={hover.onMouseLeave}
@@ -101,7 +101,7 @@ function NavDropdown({ label, items, isOpen, onOpen, onClose }: NavDropdownProps
       {/* Tap toggles as well: the desktop row shows from 1024px, which is an
           iPad, and a hover-only menu cannot be opened there at all. */}
       <button
-        className="flex items-center gap-0.5 px-3 py-1.5 rounded-lg text-[16px] font-medium"
+        className="flex items-center gap-0.5 px-3 py-1.5 rounded-lg text-control font-medium"
         style={hover.style}
         aria-haspopup="menu"
         aria-expanded={isOpen}
@@ -173,7 +173,7 @@ function AvatarMenu({ name, photo, isOpen, onOpen, onClose, onLogout, isOrganize
         onClick={() => (isOpen ? onClose() : onOpen())}
       >
         <div
-          className="w-9 h-9 rounded-full overflow-hidden flex items-center justify-center text-[16px] font-semibold leading-none select-none"
+          className="w-9 h-9 rounded-full overflow-hidden flex items-center justify-center text-small font-semibold leading-none select-none"
           style={{
             backgroundColor: GREEN,
             color: ON_GREEN,
@@ -222,7 +222,7 @@ function LogoutItem({ onLogout }: { onLogout: () => void }) {
   return (
     <button
       onClick={onLogout}
-      className="w-full text-left px-4 py-3 text-base font-medium whitespace-nowrap"
+      className="w-full text-left px-4 py-3 text-control font-medium whitespace-nowrap"
       style={{
         backgroundColor: hovered ? GREEN : "transparent",
         color: hovered ? ON_GREEN : GREEN,
@@ -258,7 +258,7 @@ function ChatButton({ hasUnread }: { hasUnread: boolean }) {
     >
       {/* One drawing, two callers — the organiser console's "Unread chats"
           group uses the same glyph. See ConsoleIcons' note on ChatIcon. */}
-      <ChatIcon className="w-[21px] h-[21px]" />
+      <ChatIcon className="w-5 h-5" />
       {hasUnread && (
         <span
           className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full"
@@ -289,11 +289,11 @@ function ThemeToggle() {
       aria-label={isDark ? "Switch to light theme" : "Switch to dark theme"}
     >
       {isDark ? (
-        <svg className="w-[21px] h-[21px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M12 3v2.25m6.364.386-1.591 1.591M21 12h-2.25m-.386 6.364-1.591-1.591M12 18.75V21m-4.773-4.227-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z" />
         </svg>
       ) : (
-        <svg className="w-[21px] h-[21px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M21.752 15.002A9.72 9.72 0 0 1 18 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 0 0 3 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 0 0 9.002-5.998Z" />
         </svg>
       )}
@@ -305,7 +305,7 @@ function ThemeToggle() {
 function Toast({ message }: { message: string }) {
   return (
     <div
-      className="fixed bottom-6 left-1/2 -translate-x-1/2 px-5 py-3 rounded-lg text-base font-medium shadow-lg z-[100]"
+      className="fixed bottom-6 left-1/2 -translate-x-1/2 px-5 py-3 rounded-lg text-body font-medium shadow-lg z-[100]"
       style={{ backgroundColor: GREEN, color: ON_GREEN }}
     >
       {message}
@@ -476,13 +476,13 @@ export function Navbar() {
         className="sticky top-0 z-40"
         style={{ backgroundColor: LINEN, borderBottom: `1px solid ${NAV_BORDER}` }}
       >
-        <nav className="flex items-center h-[72px] px-4 sm:px-6 lg:px-12">
+        <nav className="flex items-center h-14 lg:h-16 px-4 sm:px-6 lg:px-12">
           {/* ── Logo + wordmark (always visible; tints via --brand-logo per theme) ── */}
           <div className="flex items-center shrink-0" onMouseEnter={closeOnHover}>
             <Link href="/" className="no-underline" aria-label="NewFind — home">
-              {/* markSize 55 → wordmark ~32px (55 × 0.58); visible mark circle
-                  ~45px, so it sits comfortably in the 72px navbar. */}
-              <BrandLogo markSize={55} gap={16} style={{ color: BRAND.logo }} />
+              {/* markSize 46 → wordmark ~27px (46 × 0.58); visible mark circle
+                  ~38px, so it sits comfortably in the 56–64px navbar. */}
+              <BrandLogo markSize={46} gap={14} style={{ color: BRAND.logo }} />
             </Link>
           </div>
 
@@ -554,7 +554,7 @@ export function Navbar() {
                   aria-label="Find events"
                   enterKeyHint="search"
                   placeholder={searchPlaceholder}
-                  className="flex-1 text-base bg-transparent outline-none min-w-0"
+                  className="flex-1 text-control bg-transparent outline-none min-w-0"
                   style={{ color: TEXT }}
                 />
                 <div className="w-px self-stretch shrink-0" style={{ backgroundColor: NAV_BORDER }} />
@@ -662,7 +662,7 @@ export function Navbar() {
             id={mobilePanelId}
             role="region"
             aria-label="Mobile navigation"
-            className="lg:hidden px-4 sm:px-6 pb-5 pt-1 flex flex-col gap-4 max-h-[calc(100dvh-72px)] overflow-y-auto"
+            className="lg:hidden px-4 sm:px-6 pb-5 pt-1 flex flex-col gap-4 max-h-[calc(100dvh-56px)] overflow-y-auto"
             style={{ backgroundColor: LINEN, borderTop: `1px solid ${BORDER}` }}
           >
             {/* Search + inline city picker — one row, mirrors the desktop bar */}
@@ -692,7 +692,7 @@ export function Navbar() {
                 aria-label="Find events"
                 enterKeyHint="search"
                 placeholder={searchPlaceholder}
-                className="flex-1 text-base bg-transparent outline-none min-w-0"
+                className="flex-1 text-control bg-transparent outline-none min-w-0"
                 style={{ color: TEXT }}
               />
               <div className="w-px self-stretch shrink-0" style={{ backgroundColor: NAV_BORDER }} />
@@ -720,7 +720,7 @@ export function Navbar() {
               <Link
                 href="/auth"
                 onClick={() => setMobileOpen(false)}
-                className="w-full text-center px-5 py-3 rounded-lg text-base font-semibold no-underline"
+                className="w-full text-center px-5 py-3 rounded-lg text-control font-semibold no-underline"
                 style={{ backgroundColor: GREEN, color: ON_GREEN }}
               >
                 Sign In
@@ -751,7 +751,7 @@ export function Navbar() {
 function MobileNavSection({ title, items, onNavigate }: { title: string; items: NavItem[]; onNavigate: () => void }) {
   return (
     <div className="flex flex-col gap-0.5">
-      <p className="px-2 text-xs font-bold uppercase tracking-wide" style={{ color: HINT }}>{title}</p>
+      <p className="px-2 text-meta font-bold uppercase tracking-wide" style={{ color: HINT }}>{title}</p>
       {items.map((item) => (
         <MobileNavButton
           key={item.label}
@@ -770,11 +770,11 @@ function MobileThemeRow() {
   return (
     <button
       onClick={toggleTheme}
-      className="flex items-center gap-3 px-2 py-3 text-base font-medium text-left rounded-lg"
+      className="flex items-center gap-3 px-2 py-3 text-control font-medium text-left rounded-lg"
       style={{ color: TEXT }}
       aria-label={isDark ? "Switch to light theme" : "Switch to dark theme"}
     >
-      <span className="text-lg leading-none">{isDark ? "☀️" : "🌙"}</span>
+      <span className="text-body leading-none">{isDark ? "☀️" : "🌙"}</span>
       {isDark ? "Light theme" : "Dark theme"}
     </button>
   );
@@ -784,10 +784,10 @@ function MobileNavButton({ emoji, label, onTap, showDot }: { emoji: string; labe
   return (
     <button
       onClick={onTap}
-      className="flex items-center gap-3 px-2 py-3 text-base font-medium text-left rounded-lg"
+      className="flex items-center gap-3 px-2 py-3 text-control font-medium text-left rounded-lg"
       style={{ color: TEXT }}
     >
-      <span className="text-lg leading-none">{emoji}</span>
+      <span className="text-body leading-none">{emoji}</span>
       {label}
       {showDot && (
         <span
@@ -806,7 +806,7 @@ function HelpButton({ onMouseEnter }: { onMouseEnter: () => void }) {
   const hover = useHoverStyle();
   return (
     <button
-      className="px-4 py-1.5 rounded-lg text-[16px] font-medium"
+      className="px-4 py-1.5 rounded-lg text-control font-medium"
       style={hover.style}
       onMouseEnter={() => { hover.onMouseEnter(); onMouseEnter(); }}
       onMouseLeave={hover.onMouseLeave}
@@ -822,7 +822,7 @@ function SignInButton() {
   return (
     <Link
       href="/auth"
-      className="px-[22px] py-[10px] rounded-lg text-base font-semibold no-underline"
+      className="px-[22px] py-[10px] rounded-lg text-control font-semibold no-underline"
       style={{ backgroundColor: GREEN, color: ON_GREEN }}
     >
       Sign In

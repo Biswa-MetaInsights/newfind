@@ -10,8 +10,11 @@ import { LocationSelector } from "./LocationSelector";
 /** Uncontrolled by default: reads and writes the global location store. Pass
  *  `value` + `onChange` to drive it from local state instead (Explore's `city`
  *  is page state seeded from the URL, and must not overwrite the navbar's city). */
-export function CityPicker({ variant = "pill", label, value, onChange, outlined = false }: {
+export function CityPicker({ variant = "pill", label, value, onChange, outlined = false, showName = false }: {
   variant?: "pill" | "icon" | "inline"; label?: string; value?: City; onChange?: (city: City) => void;
+  /** Icon variant only: prints the city name (green, underlined) inside the trigger, so the name
+   *  opens the picker as well as the caret. Home's "Happening in {city}" heading uses it. */
+  showName?: boolean;
   /** Wears the 2px control outline. Explore's top bar only, where its neighbours (search, sort) are outlined. */
   outlined?: boolean;
 } = {}) {
@@ -50,11 +53,14 @@ export function CityPicker({ variant = "pill", label, value, onChange, outlined 
     <div className="group relative min-w-0" ref={ref}>
       <button ref={trigger} type="button" onClick={() => setOpen(value => !value)}
         aria-label={label || `Select city, currently ${city.name}`} aria-expanded={open} aria-controls={open ? popupId : undefined}
-        className={`flex min-h-11 items-center justify-center rounded-lg py-2 max-w-[180px] ${variant === "icon" ? "px-1 [@media(pointer:coarse)]:min-w-11 [@media(pointer:coarse)]:px-3 [@media(pointer:coarse)]:-ml-3" : "min-w-11 gap-2 px-3"} ${outlined ? "border-2 border-[var(--brand-control-border)] bg-[var(--brand-bg)]" : ""} focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--brand-text)]`}>
+        className={`flex min-h-11 items-center justify-center rounded-lg py-2 max-w-[180px] ${variant === "icon" && showName ? "gap-1.5 px-1 max-w-[70vw]" : variant === "icon" ? "px-1 [@media(pointer:coarse)]:min-w-11 [@media(pointer:coarse)]:px-3 [@media(pointer:coarse)]:-ml-3" : "min-w-11 gap-2 px-3"} ${outlined ? "border-2 border-[var(--brand-control-border)] bg-[var(--brand-bg)] max-sm:w-full max-sm:px-2 max-sm:gap-1.5" : ""} focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--brand-text)]`}>
         {/* The icon variant sits beside a city name that is already printed
             (the home heading), so it is the caret alone. */}
         {variant !== "icon" && <LocationPinIcon className="w-4 h-4 shrink-0" />}
         {variant !== "icon" && <span className="truncate">{label || city.name}</span>}
+        {variant === "icon" && showName && (
+          <span className="truncate underline decoration-[3px] underline-offset-[6px] decoration-[var(--brand-green)] text-[var(--brand-green)]">{city.name}</span>
+        )}
         {/* Icon variant: sized and weighted from the caller's type (1em, heavier stroke) so it
             reads as part of the heading it follows. */}
         <CaretIcon className={variant === "icon" ? "w-[1em] h-[1em] shrink-0 [stroke-width:2.8]" : "w-4 h-4 shrink-0"} />
@@ -63,15 +69,15 @@ export function CityPicker({ variant = "pill", label, value, onChange, outlined 
           would clip beside the other triggers. Laptop/desktop only (Gautham, 2026-11-17): `lg+` and a
           hovering pointer, so phones and tablets never see it. */}
       {variant === "inline" && !open && (
-        <span role="tooltip" className="hidden lg:group-hover:block [@media(hover:none)]:hidden absolute left-full top-1/2 -translate-y-1/2 ml-2 whitespace-nowrap text-sm font-medium px-3 py-1.5 rounded-lg shadow-lg z-50 pointer-events-none border border-[var(--brand-border)] bg-[var(--brand-surface)] text-[var(--brand-text)]">
+        <span role="tooltip" className="hidden lg:group-hover:block [@media(hover:none)]:hidden absolute left-full top-1/2 -translate-y-1/2 ml-2 whitespace-nowrap text-meta font-medium px-3 py-1.5 rounded-lg shadow-lg z-50 pointer-events-none border border-[var(--brand-border)] bg-[var(--brand-surface)] text-[var(--brand-text)]">
           Click here to change your location
         </span>
       )}
       {open && (
         <div id={popupId} role="region" aria-label="Choose search location"
-          className="fixed inset-x-4 top-4 p-4 text-base font-normal text-[var(--brand-text)] max-h-[calc(100dvh-32px)] overflow-y-auto overscroll-contain rounded-lg shadow-xl z-[90] border border-[var(--brand-border)] bg-[var(--brand-surface)] lg:absolute lg:inset-x-auto lg:right-0 lg:top-full lg:mt-2 lg:w-[320px] lg:max-h-[70dvh]">
+          className="fixed inset-x-4 top-4 p-4 text-body font-normal text-[var(--brand-text)] max-h-[calc(100dvh-32px)] overflow-y-auto overscroll-contain rounded-lg shadow-xl z-[90] border border-[var(--brand-border)] bg-[var(--brand-surface)] lg:absolute lg:inset-x-auto lg:right-0 lg:top-full lg:mt-2 lg:w-[320px] lg:max-h-[70dvh]">
           <div className="flex items-center justify-between gap-3 mb-3 lg:hidden">
-            <h2 className="text-[18px] font-bold">Choose location</h2>
+            <h2 className="text-body font-bold">Choose location</h2>
             <button type="button" className="min-h-11 px-3 rounded-lg border border-[var(--brand-control-border)]"
               onClick={() => { setOpen(false); trigger.current?.focus(); }}>Close</button>
           </div>

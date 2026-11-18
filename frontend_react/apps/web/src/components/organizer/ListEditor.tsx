@@ -290,7 +290,7 @@ export function ListEditor({
 
   return (
     <div className="space-y-5">
-      <p className="text-[15px] leading-relaxed text-[var(--brand-hint)]">
+      <p className="text-meta leading-relaxed text-[var(--brand-hint)]">
         {disabled && disabledNote ? disabledNote : spec.intro}
       </p>
 
@@ -298,7 +298,7 @@ export function ListEditor({
           otherwise it points at nothing. Without the button an empty editor is
           the organiser having removed every row, and Save is what commits it. */}
       {rows.length === 0 && !disabled && showAdd && (
-        <p className="text-[16px] text-[var(--brand-hint)]">
+        <p className="text-small text-[var(--brand-hint)]">
           Nothing here yet. Add the first one below.
         </p>
       )}
@@ -315,7 +315,7 @@ export function ListEditor({
           {/* flex-wrap: inside the dialog a 320px phone gives this row ~220px,
               less than the label plus the three controls. */}
           <div className="flex flex-wrap items-center justify-between gap-2">
-            <span className="text-[15px] font-bold text-[var(--brand-text)]">
+            <span className="text-meta font-bold text-[var(--brand-text)]">
               {spec.noun} {i + 1}
             </span>
             <div className="flex items-center gap-1">
@@ -344,7 +344,7 @@ export function ListEditor({
                 type="button"
                 disabled={disabled}
                 onClick={() => onChange(rows.filter((r) => r.id !== row.id))}
-                className={`px-2.5 py-1 rounded-lg text-[15px] font-bold ${REMOVE_BUTTON}`}
+                className={`px-2.5 py-1 rounded-lg text-meta font-bold ${REMOVE_BUTTON}`}
               >
                 Remove
               </button>
@@ -402,7 +402,7 @@ export function ListEditor({
              hover fill, which is what the Remove control beside it does too.
              The edge and both colours are the shared `OUTLINE_BUTTON`; only the
              geometry is this button's own. */
-          className={`w-full py-3 rounded-lg text-[16px] font-bold ${OUTLINE_BUTTON}`}
+          className={`w-full py-3 rounded-lg text-small font-bold ${OUTLINE_BUTTON}`}
         >
           {/* ⚠️ "Add more", NOT `spec.addLabel` (Gautham, 2026-09-11) — the
               control that opened this dialog already said "Add an item", and
@@ -437,7 +437,7 @@ export function ListSummary({ kind, rows }: { kind: ListKind; rows: Row[] }) {
           key={row.id}
           className={`py-3 ${i > 0 ? "border-t border-[var(--brand-border)]" : "pt-0"}`}
         >
-          <p className="text-[16px] font-bold text-[var(--brand-text)]">
+          <p className="text-small font-bold text-[var(--brand-text)]">
             {heading
               .map((f) => row.values[f.key]?.trim())
               .filter(Boolean)
@@ -449,7 +449,7 @@ export function ListSummary({ kind, rows }: { kind: ListKind; rows: Row[] }) {
               // textarea and meant them, same as the event page.
               <p
                 key={f.key}
-                className="text-[15px] leading-relaxed text-[var(--brand-hint)] mt-1 whitespace-pre-line"
+                className="text-meta leading-relaxed text-[var(--brand-hint)] mt-1 whitespace-pre-line"
               >
                 {row.values[f.key]}
               </p>

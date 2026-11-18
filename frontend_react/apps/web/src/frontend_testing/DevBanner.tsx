@@ -24,7 +24,7 @@ export function DevBanner() {
   return (
     <div
       data-dev-banner
-      className={`py-1.5 flex flex-wrap gap-x-4 gap-y-1 text-[15px] ${GUTTERS}`}
+      className={`py-1.5 flex flex-wrap gap-x-4 gap-y-1 text-meta ${GUTTERS}`}
       style={{
         borderBottom: "2px solid var(--brand-terracotta)",
         backgroundColor: "var(--brand-surface)",

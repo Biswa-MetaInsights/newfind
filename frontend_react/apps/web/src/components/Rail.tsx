@@ -17,7 +17,7 @@
 
 import { useEffect, useRef, useState, type RefObject } from "react";
 import { BRAND } from "@/lib/theme";
-import { GUTTERS } from "@/lib/layout";
+import { GUTTERS, PAGE_MAX_WIDTH } from "@/lib/layout";
 
 /** Matches the gap-5 the event grids use. */
 export const RAIL_GAP = 20;
@@ -26,10 +26,11 @@ export const RAIL_GAP = 20;
  * Each card is sized to the EXACT width a home-page grid cell renders at, so a
  * card here and a card on home are the same size, and a row of four fills the
  * rail with nothing to scroll. The home grid is `grid-cols-1 sm:grid-cols-2
- * xl:grid-cols-4` with `gap-5`, i.e. a cell is (container − gaps) / cols — so
- * these percentages, resolved against this rail's own inner width, reproduce it
- * exactly. That works ONLY because the section is full-bleed with the same
- * gutters as home; both containers are then the same width.
+ * lg:grid-cols-3 xl:grid-cols-4` with `gap-5`, i.e. a cell is (container − gaps)
+ * / cols — so these percentages, resolved against this rail's own inner width,
+ * reproduce it exactly. That works ONLY because the rail's content sits in the
+ * same column as home's (GUTTERS inside PAGE_MAX_WIDTH); both containers are
+ * then the same width.
  *
  * ⚠️ Percentages, NOT `100vw`. An earlier version used viewport math and it was
  * wrong twice over: it double-counted the padding (needing a 4th `lg` breakpoint
@@ -42,6 +43,7 @@ export const RAIL_CARD_BASIS =
   "grow-0 shrink-0 " +
   "basis-full " +
   "sm:basis-[calc((100%-20px)/2)] " +
+  "lg:basis-[calc((100%-40px)/3)] " +
   "xl:basis-[calc((100%-60px)/4)]";
 
 /** Wrapper every card in a rail needs: the width basis, snap point and equal height. */
@@ -68,14 +70,18 @@ export function Rail({
   return (
     <section
       aria-label={ariaLabel ?? title}
-      className={`mt-14 pt-12 pb-4 ${GUTTERS}`}
+      className="mt-14 pt-12 pb-4"
       style={{ textAlign: "left", borderTop: "1px solid var(--brand-border)" }}
     >
+      {/* The divider above stays full-bleed; the content sits in home's own
+          column — GUTTERS inside PAGE_MAX_WIDTH — so the cards are home's cards
+          at every width, the 1920px case included. */}
+      <div className={GUTTERS} style={{ maxWidth: PAGE_MAX_WIDTH, margin: "0 auto" }}>
       {/* flex-wrap so a long heading plus a toggle drops to two rows on a phone
           rather than crushing either one. */}
       <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-3 mb-5">
         <div className="flex flex-wrap items-center gap-x-4 gap-y-3 min-w-0">
-          <h2 className="text-[22px] font-bold text-[var(--brand-text)]">{title}</h2>
+          <h2 className="text-subhead font-bold text-[var(--brand-text)]">{title}</h2>
           {headerExtra}
         </div>
         <Arrows rail={rail} deps={itemCount} />
@@ -101,6 +107,7 @@ export function Rail({
         style={{ gap: RAIL_GAP, paddingTop: 24, paddingBottom: 40 }}
       >
         {children}
+      </div>
       </div>
     </section>
   );
@@ -230,7 +237,7 @@ export function RailToggle<T extends string>({
             type="button"
             onClick={() => onChange(opt.value)}
             aria-pressed={active}
-            className="px-3.5 py-1.5 rounded-md text-[15px] font-semibold transition-colors"
+            className="px-3.5 py-1.5 rounded-md text-meta font-semibold transition-colors"
             style={{
               backgroundColor: active ? BRAND.green : "transparent",
               color: active ? BRAND.onGreen : BRAND.text,

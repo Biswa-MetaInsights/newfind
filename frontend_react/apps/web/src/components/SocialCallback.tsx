@@ -42,8 +42,8 @@ export function SocialCallback({ provider }: { provider: "google" | "facebook" }
 
   return <main className="min-h-[100dvh] flex items-center justify-center px-5 py-12 bg-[var(--brand-bg)] text-[var(--brand-text)]">
     <section className="w-full max-w-lg space-y-5">
-      <h1 className="text-[28px] font-extrabold tracking-[-0.5px]">{error ? "Sign-in needs attention" : "Completing secure sign-in…"}</h1>
-      <p role={error ? "alert" : "status"} className="text-[18px] leading-relaxed">{error || "Please keep this page open while we verify your account."}</p>
+      <h1 className="text-heading font-extrabold tracking-[-0.5px]">{error ? "Sign-in needs attention" : "Completing secure sign-in…"}</h1>
+      <p role={error ? "alert" : "status"} className="text-body leading-relaxed">{error || "Please keep this page open while we verify your account."}</p>
       {error && <Link href="/auth" className="inline-block py-3 underline">Return to sign in</Link>}
     </section>
   </main>;

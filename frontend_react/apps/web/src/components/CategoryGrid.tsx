@@ -139,15 +139,16 @@ const GAP = 20 // matches the gap-5 the event grids use
 const COLUMNS =
   'auto-cols-[100%] ' +
   'sm:auto-cols-[calc((100%-20px)/2)] ' +
+  'lg:auto-cols-[calc((100%-40px)/3)] ' +
   'xl:auto-cols-[calc((100%-60px)/4)]'
 
 // Identical to the event cards', so a tile in this rail asks the browser for the
 // same image widths its neighbours above do.
-// Keyed to the grid's real breakpoints: 1-up below sm (px-4 gutters), 2-up to
-// xl, 4-up from xl. The old string under-asked below 640px (blurry) and
+// Keyed to the grid's real breakpoints: 1-up below sm (px-4 gutters), 2-up to lg,
+// 3-up to xl, 4-up from xl (311px cap). The old string under-asked below 640px (blurry) and
 // over-asked ~2x between 640 and 768.
 const IMAGE_SIZES =
-  '(max-width: 639px) calc(100vw - 32px), (max-width: 1279px) calc(50vw - 34px), calc(25vw - 39px)'
+  '(max-width: 639px) calc(100vw - 32px), (max-width: 1023px) calc(50vw - 34px), (max-width: 1279px) calc(33vw - 46px), (max-width: 1399px) calc(25vw - 39px), 311px'
 
 // Where a scroll arrow sits: hard against the page edge (Gautham's call — "as
 // close to the edges of the browser as possible", so they stop covering tiles).
@@ -328,7 +329,7 @@ export function CategoryGrid() {
       <div className={`flex items-center justify-between ${GUTTERS} mb-5`}>
         <h2
           className="font-extrabold tracking-[-0.5px]"
-          style={{ fontSize: 'clamp(22px, 4vw, 30px)', color: TEXT }}
+          style={{ fontSize: 'clamp(20px, 3vw, 26px)', color: TEXT }}
         >
           What are you in the mood for
         </h2>
@@ -336,7 +337,7 @@ export function CategoryGrid() {
         <Link
           href={EXPLORE_ALL}
           aria-label="View all events"
-          className="flex items-center gap-1.5 text-lg font-semibold transition-opacity hover:opacity-70"
+          className="flex items-center gap-1.5 text-body font-semibold transition-opacity hover:opacity-70"
           style={{ color: GREEN }}
         >
           View all

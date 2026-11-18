@@ -356,7 +356,7 @@ Communities are active in the professional-QA candidate, with persisted membersh
 
 | File | What it is |
 |---|---|
-| `components/navbar/Navbar.tsx` | Sticky top nav, 72px — split by audience (Participants / Organisers) |
+| `components/navbar/Navbar.tsx` | Sticky top nav, 56px (64px from `lg`) — split by audience (Participants / Organisers) |
 | `components/ChatPresence.tsx` | Invisible app-wide listener that lights the navbar chat glow |
 | `components/EventChatWidget.tsx` | AI chat widget on `/event/[id]` |
 | `components/CityPicker.tsx` | City selector — `CITIES[0]` is the Online pseudo-city |

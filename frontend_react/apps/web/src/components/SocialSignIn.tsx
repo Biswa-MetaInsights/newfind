@@ -50,7 +50,7 @@ export function SocialSignIn({ mode = "signin", disabled = false }: { mode?: "si
 
   return <div className="space-y-4">
     {error && <div ref={errorRef} role="alert" tabIndex={-1}
-      className="text-[15px] rounded-lg border-2 border-red-500 p-4 text-[var(--brand-text)] focus:outline-2 focus:outline-offset-2 focus:outline-red-500">
+      className="text-meta rounded-lg border-2 border-red-500 p-4 text-[var(--brand-text)] focus:outline-2 focus:outline-offset-2 focus:outline-red-500">
       <p className="font-semibold mb-1">Sign-in could not start</p>
       <p>{error}</p>
     </div>}
@@ -63,11 +63,11 @@ export function SocialSignIn({ mode = "signin", disabled = false }: { mode?: "si
         title={linked ? `${provider.name} is connected` : available ? undefined : `${provider.name} sign-in is not configured yet`}
         onClick={() => void start(provider)}
         className="w-full flex items-center justify-center gap-3 py-4 rounded-lg border-2 border-[var(--brand-control-border)] bg-[var(--brand-bg)] text-[var(--brand-text)] font-semibold hover:bg-[var(--brand-surface)] transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
-        <span aria-hidden="true" className="w-6 h-6 rounded-full flex items-center justify-center text-white text-sm font-bold" style={{ backgroundColor: provider.color }}>{provider.initial}</span>
+        <span aria-hidden="true" className="w-6 h-6 rounded-full flex items-center justify-center text-white text-meta font-bold" style={{ backgroundColor: provider.color }}>{provider.initial}</span>
         {busy === provider.id ? "Opening secure sign-in…" : linked ? `${provider.name} connected` : `${mode === "link" ? "Connect" : "Continue with"} ${provider.name}`}
       </button>;
     })}
-    {capabilities.isError && <p role="alert" className="text-[15px]">Sign-in options could not be loaded. Refresh the page to try again.</p>}
-    {mode === "link" && connected.isError && <p role="alert" className="text-[15px]">Connected accounts could not be loaded. Please sign in again.</p>}
+    {capabilities.isError && <p role="alert" className="text-meta">Sign-in options could not be loaded. Refresh the page to try again.</p>}
+    {mode === "link" && connected.isError && <p role="alert" className="text-meta">Connected accounts could not be loaded. Please sign in again.</p>}
   </div>;
 }

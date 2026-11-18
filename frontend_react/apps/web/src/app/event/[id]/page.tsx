@@ -164,7 +164,7 @@ export default function EventDetailPage({
       <div className="min-h-screen flex flex-col" style={{ backgroundColor: "var(--brand-bg)" }}>
         <Navbar />
         <div className="flex-1 flex items-center justify-center">
-          <p className="text-lg font-medium text-[var(--brand-hint)]">Event not found.</p>
+          <p className="text-body font-medium text-[var(--brand-hint)]">Event not found.</p>
         </div>
       </div>
     );
@@ -247,7 +247,7 @@ export default function EventDetailPage({
       {cancelled && <CancelledBanner />}
 
       {/* ── Hero: full-bleed photo + title overlay ── */}
-      <section className="relative flex flex-col justify-end overflow-hidden min-h-[420px] sm:min-h-[520px] lg:min-h-[600px]">
+      <section className="relative flex flex-col justify-end overflow-hidden min-h-[360px] sm:min-h-[440px] lg:min-h-[520px]">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={eventImageUrl(event, 1920, 1080)}
@@ -403,7 +403,7 @@ export default function EventDetailPage({
                 `mb-4` below stays the heading's — a wrapper row would need its
                 own margin and would drift from the three authored sections'
                 heading spacing underneath. */}
-            <h2 className="text-[22px] font-bold text-[var(--brand-text)] mb-4 flex items-center gap-1">
+            <h2 className="text-subhead font-bold text-[var(--brand-text)] mb-4 flex items-center gap-1">
               About this event
               {organiserView && (
                 <EditPencil
@@ -413,7 +413,7 @@ export default function EventDetailPage({
                 />
               )}
             </h2>
-            <p className="text-[18px] leading-relaxed whitespace-pre-line text-[var(--brand-hint)]">
+            <p className="text-body leading-relaxed whitespace-pre-line text-[var(--brand-hint)]">
               {event.description ?? "No description provided."}
             </p>
 
@@ -615,10 +615,10 @@ function CancelledBanner() {
       }}
     >
       <div className={`py-3 ${GUTTERS}`}>
-        <p className="text-[16px] font-bold text-[var(--brand-text)]">
+        <p className="text-small font-bold text-[var(--brand-text)]">
           This event has been cancelled.
         </p>
-        <p className="text-[16px] text-[var(--brand-hint)]">
+        <p className="text-small text-[var(--brand-hint)]">
           It can no longer be booked. If you were holding a ticket, contact the organiser.
         </p>
       </div>
@@ -719,7 +719,7 @@ function BookingCard({
           {!soldOut && !registrationClosed && !bookingDisabled && <DetailAccentChip text={unlimited ? "Open registration" : `${left} spots left`} />}
         </div>}
 
-        {external && <p className="mt-6 text-[16px]">Check {providerName} for admission details and availability. NewFind does not issue tickets for this listing.</p>}
+        {external && <p className="mt-6 text-small">Check {providerName} for admission details and availability. NewFind does not issue tickets for this listing.</p>}
         <DetailDivider />
 
         <DetailPriceRow

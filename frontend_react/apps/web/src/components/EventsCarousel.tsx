@@ -101,12 +101,13 @@ const TOUCH_REVEAL = 'opacity-0 [@media(pointer:coarse)]:opacity-100'
 // THE card grid — 1-up below sm, 2-up to xl, 4-up from xl. Exported so every
 // surface that lays out EventCardItems (/dashboard's three list tabs) sits on
 // the same columns as home; a card is "the same size" only if its grid is too.
-export const CARD_GRID = 'grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5'
+export const CARD_GRID = 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5'
 
-// Keyed to CARD_GRID's breakpoints: 1-up below sm (px-4 gutters), 2-up to
-// xl, 4-up from xl. Identical string in CategoryGrid — change both together.
+// Keyed to CARD_GRID's breakpoints: 1-up below sm (px-4 gutters), 2-up to lg,
+// 3-up to xl, 4-up from xl, capped at 311px by the home page's 1400px column.
+// Identical string in CategoryGrid — change both together.
 const IMAGE_SIZES =
-  '(max-width: 639px) calc(100vw - 32px), (max-width: 1279px) calc(50vw - 34px), calc(25vw - 39px)'
+  '(max-width: 639px) calc(100vw - 32px), (max-width: 1023px) calc(50vw - 34px), (max-width: 1279px) calc(33vw - 46px), (max-width: 1399px) calc(25vw - 39px), 311px'
 
 const FILTER_TABS = ['All', 'This Week', 'Free', 'Music', 'Food']
 const SUGGESTED_TAB = 'Suggested for you'
@@ -168,7 +169,7 @@ function FilterTabs({
               key={tab}
               onClick={() => onChange(tab)}
               aria-pressed={on}
-              className="flex-none px-4 py-1.5 rounded-lg text-[20px] font-semibold whitespace-nowrap transition-all duration-150"
+              className="flex-none px-4 py-1.5 rounded-lg text-control font-semibold whitespace-nowrap transition-all duration-150"
               style={
                 on
                   ? { backgroundColor: GREEN, color: ON_GREEN, border: `2px solid ${GREEN}` }
@@ -189,7 +190,7 @@ function FilterTabs({
           aria-label={label}
           value={active}
           onChange={(e) => onChange(e.target.value)}
-          className="appearance-none pl-4 pr-11 py-1.5 rounded-lg text-[20px] leading-normal font-semibold cursor-pointer focus:outline-none"
+          className="appearance-none pl-4 pr-11 py-1.5 rounded-lg text-control leading-normal font-semibold cursor-pointer focus:outline-none"
           style={{ backgroundColor: GREEN, color: ON_GREEN, border: `2px solid ${GREEN}` }}
         >
           {tabs.map((tab) => (
@@ -260,7 +261,7 @@ function EditLocationButton() {
       </button>
       {hovered && (
         <span
-          className="absolute left-full ml-2 whitespace-nowrap text-[16px] font-semibold px-3 py-1 rounded-lg z-10"
+          className="absolute left-full ml-2 whitespace-nowrap text-small font-semibold px-3 py-1 rounded-lg z-10"
           style={{ backgroundColor: LINEN, color: GREEN, boxShadow: '0 2px 8px rgba(0,0,0,0.12)' }}
         >
           Click here to edit location
@@ -275,7 +276,7 @@ function EditLocationButton() {
 /** The CTA every card carries by default — exported so a caller filling the
  *  `action` slot can put a differently-labelled button in the SAME silhouette
  *  (the dashboard's Remove / Manage / Join Chat). Colours are the caller's. */
-export const CARD_CTA = 'shrink-0 px-4 py-1.5 rounded-lg text-[20px] font-bold transition-all duration-150 active:scale-[0.98]'
+export const CARD_CTA = 'shrink-0 px-4 py-1.5 rounded-lg text-control font-bold transition-all duration-150 active:scale-[0.98]'
 
 /**
  * THE event card — home, /explore, the /event/[id] rail AND /dashboard's three
@@ -362,7 +363,7 @@ export function EventCardItem({
       <div className="px-4 pt-3.5 pb-4 flex flex-col gap-1.5 flex-1">
 
         {/* Title */}
-        <h3 className="text-[20px] font-bold leading-snug line-clamp-2" style={{ color: TEXT }}>
+        <h3 className="text-title font-bold leading-snug line-clamp-2" style={{ color: TEXT }}>
           {event.title}
         </h3>
 
@@ -372,20 +373,20 @@ export function EventCardItem({
         <div className="flex items-center gap-3.5 min-w-0 max-sm:flex-wrap">
           <span className="flex items-center gap-[3px] shrink-0">
             <CalendarIcon color={TEXT} />
-            <span className="text-[18px]" style={{ color: TEXT }}>
+            <span className="text-body" style={{ color: TEXT }}>
               {event.date}
             </span>
           </span>
           <span className="flex items-center gap-[3px] shrink-0">
             <ClockIcon color={TEXT} />
-            <span className="text-[18px]" style={{ color: TEXT }}>
+            <span className="text-body" style={{ color: TEXT }}>
               {event.time}
             </span>
           </span>
           {event.venue && (
             <span className="flex items-center gap-[3px] min-w-0">
               <LocationPinIcon color={TEXT} />
-              <span className="text-[18px] line-clamp-1 min-w-0" style={{ color: TEXT }}>
+              <span className="text-body truncate min-w-0" style={{ color: TEXT }}>
                 {event.venue}
               </span>
             </span>
@@ -398,14 +399,14 @@ export function EventCardItem({
         <div className="flex items-center justify-between mt-auto pt-1.5 gap-2 max-sm:flex-wrap">
           <span style={{ color: priceFg }}>
             {event.isSoldOut ? (
-              <span className="text-[20px] font-bold">Sold Out</span>
+              <span className="text-title font-bold">Sold Out</span>
             ) : event.price.includes('onwards') ? (
               <>
-                <span className="text-[20px] font-bold">{event.price.replace(' onwards', '')}</span>
-                <span className="text-[18px] font-normal"> onwards</span>
+                <span className="text-title font-bold">{event.price.replace(' onwards', '')}</span>
+                <span className="text-body font-normal"> onwards</span>
               </>
             ) : (
-              <span className="text-[20px] font-bold">{event.price}</span>
+              <span className="text-title font-bold">{event.price}</span>
             )}
           </span>
           {action ?? (
@@ -485,7 +486,7 @@ function OnlineEventCard({
       <div className="p-3 flex flex-col gap-1.5 flex-1">
 
         {/* Title */}
-        <h3 className="text-[20px] font-bold leading-snug line-clamp-2" style={{ color: TEXT }}>
+        <h3 className="text-title font-bold leading-snug line-clamp-2" style={{ color: TEXT }}>
           {event.title}
         </h3>
 
@@ -493,20 +494,20 @@ function OnlineEventCard({
         <div className="flex items-center gap-3.5 min-w-0 max-sm:flex-wrap">
           <span className="flex items-center gap-[3px] shrink-0">
             <CalendarIcon color={TEXT} />
-            <span className="text-[18px]" style={{ color: TEXT }}>
+            <span className="text-body" style={{ color: TEXT }}>
               {event.date}
             </span>
           </span>
           <span className="flex items-center gap-[3px] shrink-0">
             <ClockIcon color={TEXT} />
-            <span className="text-[18px]" style={{ color: TEXT }}>
+            <span className="text-body" style={{ color: TEXT }}>
               {event.time}
             </span>
           </span>
           {event.venue && (
             <span className="flex items-center gap-[3px] min-w-0">
               <VideoCallIcon color={TEXT} />
-              <span className="text-[18px] line-clamp-1 min-w-0" style={{ color: TEXT }}>
+              <span className="text-body truncate min-w-0" style={{ color: TEXT }}>
                 {event.venue}
               </span>
             </span>
@@ -517,21 +518,21 @@ function OnlineEventCard({
         <div className="flex items-center justify-between mt-auto pt-1.5 gap-2 max-sm:flex-wrap">
           <span style={{ color: priceFg }}>
             {event.isSoldOut ? (
-              <span className="text-[20px] font-bold">Sold Out</span>
+              <span className="text-title font-bold">Sold Out</span>
             ) : event.price.includes('onwards') ? (
               <>
-                <span className="text-[20px] font-bold">{event.price.replace(' onwards', '')}</span>
-                <span className="text-[18px] font-normal"> onwards</span>
+                <span className="text-title font-bold">{event.price.replace(' onwards', '')}</span>
+                <span className="text-body font-normal"> onwards</span>
               </>
             ) : (
-              <span className="text-[20px] font-bold">{event.price}</span>
+              <span className="text-title font-bold">{event.price}</span>
             )}
           </span>
           <button
             onClick={(e) => { e.preventDefault(); e.stopPropagation(); onBookNow?.(event.id) }}
             aria-label={`View details for ${event.title}`}
             disabled={event.isSoldOut}
-            className="shrink-0 px-4 py-1.5 rounded-lg text-[20px] font-bold transition-all duration-150 active:scale-[0.98]"
+            className="shrink-0 px-4 py-1.5 rounded-lg text-control font-bold transition-all duration-150 active:scale-[0.98]"
             style={{
               backgroundColor: event.isSoldOut ? MUTED_FILL : GREEN,
               color: ON_GREEN,
@@ -587,13 +588,13 @@ function OnlineEventsRow({
     <section aria-label="Online Events" className="pb-10">
       {/* Header */}
       <div className="flex items-center justify-between px-4 sm:px-6 lg:px-12 mb-4">
-        <h2 className="font-extrabold tracking-[-0.5px]" style={{ fontSize: "clamp(18px, 4vw, 30px)", color: TEXT }}>
+        <h2 className="font-extrabold tracking-[-0.5px]" style={{ fontSize: "clamp(20px, 3vw, 26px)", color: TEXT }}>
           Online Events
         </h2>
         <Link
           href={seeAllHref}
           aria-label="View all online events"
-          className="hidden sm:flex items-center gap-1.5 text-lg font-semibold transition-opacity hover:opacity-70"
+          className="hidden sm:flex items-center gap-1.5 text-body font-semibold transition-opacity hover:opacity-70"
           style={{ color: GREEN }}
         >
           View all
@@ -609,23 +610,27 @@ function OnlineEventsRow({
 
       <div className="px-4 sm:px-6 lg:px-12 pb-3">
         {isLoading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
-            {Array.from({ length: GRID_LIMIT }).map((_, i) => <SkeletonCard key={i} />)}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+            {Array.from({ length: GRID_LIMIT }).map((_, i) => (
+              <div key={i} className={lgTrim(true, i, GRID_LIMIT)}><SkeletonCard /></div>
+            ))}
           </div>
         ) : onlineEvents.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-20 gap-3" style={{ color: MUTED }}>
+          <div className="flex flex-col items-center justify-center py-14 gap-3" style={{ color: MUTED }}>
             <VideoCallIcon color={MUTED} />
-            <p className="text-lg">No online events right now. Check back soon.</p>
+            <p className="text-body">No online events right now. Check back soon.</p>
           </div>
         ) : filteredOnline.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-20 gap-3" style={{ color: MUTED }}>
+          <div className="flex flex-col items-center justify-center py-14 gap-3" style={{ color: MUTED }}>
             <VideoCallIcon color={MUTED} />
-            <p className="text-lg">No online events in this category yet.</p>
+            <p className="text-body">No online events in this category yet.</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
-            {visibleOnlineEvents.map((event) => (
-              <OnlineEventCard key={event.id} event={event} onBookNow={onBookNow} />
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+            {visibleOnlineEvents.map((event, i) => (
+              <div key={event.id} className={lgTrim(showSeeAll, i, visibleOnlineEvents.length)}>
+                <OnlineEventCard event={event} onBookNow={onBookNow} />
+              </div>
             ))}
             {showSeeAll && <SeeAllTile events={onlineEvents} href={seeAllHref} />}
           </div>
@@ -680,14 +685,14 @@ function SeeAllTile({ events, href }: { events: CarouselEvent[]; href: string })
       </div>
 
       {/* Label — uses the same card-title role as event cards
-          and date/venue line (text-[15px]) so they stay in sync when those change.
-          ⚠️ FeatureBand's tiles copy the same 20/18 pair for the same reason (they
+          and date/venue line (text-body) so they stay in sync when those change.
+          ⚠️ FeatureBand's tiles copy the same title/body pair for the same reason (they
           sit on this page too) — move those with these. */}
       <div className="flex flex-col items-center gap-1 text-center">
-        <span className="text-[20px] font-bold" style={{ color: labelFg, transition: 'color 0.15s ease' }}>
+        <span className="text-title font-bold" style={{ color: labelFg, transition: 'color 0.15s ease' }}>
           View all
         </span>
-        <span className="text-[18px] flex items-center gap-1"
+        <span className="text-body flex items-center gap-1"
           style={{ color: labelFg, transition: 'color 0.15s ease' }}>
           Browse all events
           <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -720,6 +725,17 @@ function VideoCallIcon({ color = TEXT }: { color?: string }) {
 // ─── Main component ────────────────────────────────────────────────────────────
 
 const GRID_LIMIT = 4 // max cells before the See All tile takes the last slot (keeps grid to one row at XL)
+
+/**
+ * The grid is 3-up between lg and xl, so the four cells that make one row at xl
+ * would leave an orphan on a second row there. When the last cell is the See All
+ * tile (or a skeleton row), drop the cell before it at lg–xl: the row reads as two
+ * cards + See All. `contents` keeps the card a direct grid child at every other
+ * width, where the wrapper does not exist as far as layout is concerned.
+ */
+function lgTrim(trailingTile: boolean, i: number, count: number) {
+  return trailingTile && i === count - 1 ? 'contents lg:max-xl:hidden' : 'contents'
+}
 
 export function EventsCarousel({
   events,
@@ -764,21 +780,25 @@ export function EventsCarousel({
       {/* ── Section header ── */}
       <div className="flex items-center justify-between px-4 sm:px-6 lg:px-12 mb-5">
         <div className="flex min-w-0 items-center">
-          <h2 className="font-extrabold tracking-[-0.5px]" style={{ fontSize: "clamp(18px, 4vw, 30px)", color: TEXT }}>
+          <h2 className={`font-extrabold tracking-[-0.5px] ${locationSlot ? "mr-[0.25em]" : ""}`} style={{ fontSize: "clamp(20px, 3vw, 26px)", color: TEXT }}>
             Happening in{' '}
-            <span className="underline decoration-[3px] underline-offset-[6px]" style={{ color: GREEN, textDecorationColor: GREEN }}>{location}</span>
+            {/* With a locationSlot the picker's own trigger prints the city (so the name
+                opens it too); without one the name is plain text beside EditLocationButton. */}
+            {!locationSlot && (
+              <span className="underline decoration-[3px] underline-offset-[6px]" style={{ color: GREEN, textDecorationColor: GREEN }}>{location}</span>
+            )}
           </h2>
           {/* The picker is a sibling of the heading, not inside it: its dropdown
               would otherwise inherit the heading's large extrabold type. The city
               name above keeps the title style; the control and menu stay ordinary. */}
-          <span className="relative inline-flex items-center font-extrabold" style={{ fontSize: "clamp(18px, 4vw, 30px)", color: GREEN }}>
+          <span className="relative inline-flex items-center font-extrabold" style={{ fontSize: "clamp(20px, 3vw, 26px)", color: GREEN }}>
             {locationSlot ?? <EditLocationButton />}
           </span>
         </div>
         <Link
           href={seeAllHref}
           aria-label={`View all events in ${location}`}
-          className="hidden sm:flex items-center gap-1.5 text-lg font-semibold transition-opacity hover:opacity-70"
+          className="hidden sm:flex items-center gap-1.5 text-body font-semibold transition-opacity hover:opacity-70"
           style={{ color: GREEN }}
         >
           View all
@@ -795,23 +815,27 @@ export function EventsCarousel({
       {/* ── Event grid ── */}
       <div className="px-4 sm:px-6 lg:px-12 pb-8">
         {isLoading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
-            {Array.from({ length: GRID_LIMIT }).map((_, i) => <SkeletonCard key={i} />)}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+            {Array.from({ length: GRID_LIMIT }).map((_, i) => (
+              <div key={i} className={lgTrim(true, i, GRID_LIMIT)}><SkeletonCard /></div>
+            ))}
           </div>
         ) : filteredEvents.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-20 gap-3" style={{ color: MUTED }}>
+          <div className="flex flex-col items-center justify-center py-14 gap-3" style={{ color: MUTED }}>
             <svg className="w-10 h-10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} role="img" aria-label="Sad face">
               <circle cx="12" cy="12" r="9" />
               <circle cx="9" cy="10" r="1" fill="currentColor" stroke="none" />
               <circle cx="15" cy="10" r="1" fill="currentColor" stroke="none" />
               <path strokeLinecap="round" d="M8.5 16c.9-1.2 2.1-1.8 3.5-1.8s2.6.6 3.5 1.8" />
             </svg>
-            <p className="text-lg">No events in this category yet.</p>
+            <p className="text-body">No events in this category yet.</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
-            {visibleEvents.map((event) => (
-              <EventCardItem key={event.id} event={event} onBookNow={onBookNow} />
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+            {visibleEvents.map((event, i) => (
+              <div key={event.id} className={lgTrim(showSeeAll, i, visibleEvents.length)}>
+                <EventCardItem event={event} onBookNow={onBookNow} />
+              </div>
             ))}
             {showSeeAll && <SeeAllTile events={events} href={seeAllHref} />}
           </div>

@@ -209,6 +209,68 @@
 
   /* The `band:` breakpoint is declared in the plain @theme block below — see the
      note there. It cannot live in this `inline` block. */
+
+  /* The type scale as Tailwind classes — `text-meta`, `text-body`, … — each
+     backed by a responsive --fs-* value defined in the block below. */
+  --text-meta: var(--fs-meta);
+  --text-small: var(--fs-small);
+  --text-body: var(--fs-body);
+  --text-control: var(--fs-control);
+  --text-title: var(--fs-title);
+  --text-subhead: var(--fs-subhead);
+  --text-heading: var(--fs-heading);
+  --text-figure: var(--fs-figure);
+  --text-display: var(--fs-display);
+}
+
+/* ── Type scale — ONE place, every width ──────────────────────────────────────
+   Every font size in the app comes from these roles, used as the Tailwind
+   classes above (`text-body`, `text-title`, …). Do NOT write `text-[18px]` —
+   pick the role. To make the whole site bigger or smaller, edit the numbers
+   here; nothing else needs touching.
+
+   Set 2026-11-18 to the common web scale (body 15–16px, controls 15–16px,
+   card titles 17–18px) after the site read as oversized: it previously ran
+   body 18px, controls 18–20px bold, titles 20px, a 15px floor.
+
+     meta      labels, counts, sub-lines, captions — also the site-wide floor
+     small     secondary copy, helper lines, console cells
+     body      body text, card meta rows (date, venue)
+     control   buttons, CTAs, filter tabs, nav links
+     title     card / row / panel titles
+     subhead   sub-headings, modal titles
+     heading   small page headings
+     figure    StatTile figures
+     display   the largest non-hero type
+
+   Phone first; 640px (sm) and 1024px (lg) step up. Section headings and hero
+   titles use their own fluid clamp()s at the call sites. */
+:root {
+  --fs-meta: 14px;
+  --fs-small: 15px;
+  --fs-body: 15px;
+  --fs-control: 15px;
+  --fs-title: 17px;
+  --fs-subhead: 18px;
+  --fs-heading: 22px;
+  --fs-figure: 24px;
+  --fs-display: 28px;
+}
+@media (min-width: 640px) {
+  :root {
+    --fs-body: 16px;
+    --fs-title: 18px;
+    --fs-subhead: 20px;
+    --fs-heading: 24px;
+    --fs-figure: 28px;
+    --fs-display: 32px;
+  }
+}
+@media (min-width: 1024px) {
+  :root {
+    --fs-control: 16px;
+    --fs-display: 34px;
+  }
 }
 
 /* ── Extra breakpoint: `band:` = 1400px ───────────────────────────────────────
@@ -279,16 +341,16 @@ optgroup {
 }
 
 /* ── Font-size floor ──────────────────────────────────────────────────────────
-   No text on the site renders below 15px. Any Tailwind class that would be
-   smaller — `text-xs` (12px), `text-sm` (14px), and arbitrary `text-[9px]`…
-   `text-[14px]` — is raised to the floor. Sizes already ≥15px are untouched.
+   No text on the site renders below --fs-meta (14px). Any Tailwind class that
+   would be smaller — `text-xs` (12px), and arbitrary `text-[9px]`…`text-[13px]`
+   — is raised to the floor. `text-sm` is 14px already and stays in the list so
+   the floor still holds if --fs-meta is raised.
 
    Opt-out: elements marked `data-keep-type` (and their descendants) are exempt,
    so components with deliberately small, hand-tuned type keep it. Currently used
-   by the event card (EventCard.tsx). The community/event carousels use no
-   sub-15px type, so they need no marker.
+   by the event card (EventCard.tsx).
 
-   To change the minimum site-wide, edit the single value below. */
+   To change the minimum site-wide, edit --fs-meta in the type scale above. */
 :is(
   .text-xs,
   .text-sm,
@@ -299,16 +361,17 @@ optgroup {
   .text-\[13px\],
   .text-\[14px\]
 ):not([data-keep-type], [data-keep-type] *) {
-  font-size: 15px !important;
+  font-size: var(--fs-meta) !important;
 }
 
 /* ── Form-control floor on TOUCH: 16px ────────────────────────────────────────
    iOS Safari zooms the whole page when a focused <input>/<select>/<textarea>
-   is under 16px, and the 15px floor above is one pixel short of that. Every
+   is under 16px, and the 14px floor above is short of that. Every
    form in the app goes through `text-sm` (FormControls' inputCls, /explore's
    search + selects, the chat composers, checkout), so rather than touch 30
-   call sites this lifts the same class list one more pixel — on a coarse
-   pointer only, so a desktop form renders exactly as before.
+   call sites this lifts the same class list to 16px — on a coarse pointer
+   only, so a desktop form keeps the floor. Inputs sized with the type-scale
+   classes (`text-small`/`text-body`) are covered too.
 
    Specificity note: the floor rule above is (0,2,0) with !important; this one
    repeats its `:not()` so it lands at (0,2,1) and wins the tie. Keep the
@@ -322,7 +385,11 @@ optgroup {
     .text-\[11px\],
     .text-\[12px\],
     .text-\[13px\],
-    .text-\[14px\]
+    .text-\[14px\],
+    .text-meta,
+    .text-small,
+    .text-body,
+    .text-control
   ):not([data-keep-type], [data-keep-type] *) {
     font-size: 16px !important;
   }
@@ -338,7 +405,7 @@ optgroup {
    for the desktop case. */
 @media (max-width: 1023.98px) {
   .hero-title {
-    font-size: clamp(26px, 6.5vw, 40px) !important;
+    font-size: clamp(24px, 6vw, 34px) !important;
     white-space: normal !important;
     display: -webkit-box;
     -webkit-line-clamp: 3;

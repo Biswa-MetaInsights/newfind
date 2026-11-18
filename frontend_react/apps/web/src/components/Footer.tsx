@@ -33,7 +33,7 @@ function FooterLink({ href, label }: { href: string; label: string }) {
   return (
     <Link
       href={href}
-      className="text-[15px] no-underline transition-opacity hover:opacity-70"
+      className="text-meta no-underline transition-opacity hover:opacity-70"
       style={{ color: LINEN }}
     >
       {label}
@@ -49,11 +49,11 @@ export function Footer() {
           {/* Brand — footer is a fixed deep-green block, so the logo stays linen. */}
           <div className="max-w-sm">
             <BrandLogo markSize={55} gap={16} style={{ color: LINEN }} />
-            <p className="mt-3 text-[15px] leading-relaxed" style={{ color: "rgba(242,239,234,0.75)" }}>
+            <p className="mt-3 text-meta leading-relaxed" style={{ color: "rgba(242,239,234,0.75)" }}>
               {/* PARKED 2026-08-14 (MVP) — was "…find events, communities, and experiences near you." */}
               Find events and experiences near you.
             </p>
-            <p className="mt-3 text-[15px] leading-relaxed" style={{ color: "rgba(242,239,234,0.75)" }}>
+            <p className="mt-3 text-meta leading-relaxed" style={{ color: "rgba(242,239,234,0.75)" }}>
               Developed and powered by MetaInsights BV.
             </p>
           </div>
@@ -64,7 +64,7 @@ export function Footer() {
           <div className="grid grid-cols-1 min-[420px]:grid-cols-2 sm:grid-cols-3 gap-8 sm:gap-14">
             {COLUMNS.map((col) => (
               <div key={col.title} className="flex flex-col gap-3">
-                <p className="text-xs font-bold uppercase tracking-wide" style={{ color: "rgba(242,239,234,0.6)" }}>
+                <p className="text-meta font-bold uppercase tracking-wide" style={{ color: "rgba(242,239,234,0.6)" }}>
                   {col.title}
                 </p>
                 {col.links.map((l) => (
@@ -80,7 +80,7 @@ export function Footer() {
           className="mt-10 pt-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3"
           style={{ borderTop: "1px solid rgba(242,239,234,0.18)" }}
         >
-          <p className="text-sm" style={{ color: "rgba(242,239,234,0.7)" }}>
+          <p className="text-meta" style={{ color: "rgba(242,239,234,0.7)" }}>
             © {new Date().getFullYear()} MetaInsights BV. All rights reserved.
           </p>
           <div className="flex items-center gap-4">
