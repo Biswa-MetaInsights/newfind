@@ -128,7 +128,7 @@ function DiscoveryPage() {
         onlineSeeAllHref={exploreHref("events", "Online")}
         isLoading={eventsLoading || onlineLoading}
         onBookNow={(id) => router.push(`/event/${id}`)}
-        locationSlot={<CityPicker />}
+        locationSlot={<CityPicker variant="icon" />}
         suggestedEvents={signedIn ? recommendations.data?.map(toCarouselEvent) : undefined}
       />
 

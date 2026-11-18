@@ -50,10 +50,14 @@ export function CityPicker({ variant = "pill", label, value, onChange, outlined 
     <div className="group relative min-w-0" ref={ref}>
       <button ref={trigger} type="button" onClick={() => setOpen(value => !value)}
         aria-label={label || `Select city, currently ${city.name}`} aria-expanded={open} aria-controls={open ? popupId : undefined}
-        className={`flex min-h-11 min-w-11 items-center justify-center gap-2 rounded-lg px-3 py-2 max-w-[180px] ${outlined ? "border-2 border-[var(--brand-control-border)] bg-[var(--brand-bg)]" : ""} focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--brand-text)]`}>
-        <LocationPinIcon className="w-4 h-4 shrink-0" />
+        className={`flex min-h-11 items-center justify-center rounded-lg py-2 max-w-[180px] ${variant === "icon" ? "px-1 [@media(pointer:coarse)]:min-w-11 [@media(pointer:coarse)]:px-3 [@media(pointer:coarse)]:-ml-3" : "min-w-11 gap-2 px-3"} ${outlined ? "border-2 border-[var(--brand-control-border)] bg-[var(--brand-bg)]" : ""} focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--brand-text)]`}>
+        {/* The icon variant sits beside a city name that is already printed
+            (the home heading), so it is the caret alone. */}
+        {variant !== "icon" && <LocationPinIcon className="w-4 h-4 shrink-0" />}
         {variant !== "icon" && <span className="truncate">{label || city.name}</span>}
-        {variant !== "icon" && <CaretIcon className="w-4 h-4 shrink-0" />}
+        {/* Icon variant: sized and weighted from the caller's type (1em, heavier stroke) so it
+            reads as part of the heading it follows. */}
+        <CaretIcon className={variant === "icon" ? "w-[1em] h-[1em] shrink-0 [stroke-width:2.8]" : "w-4 h-4 shrink-0"} />
       </button>
       {/* Old page's tooltip (Gautham 2026-11-17). Navbar trigger only: it opens rightward, so it
           would clip beside the other triggers. Laptop/desktop only (Gautham, 2026-11-17): `lg+` and a
@@ -65,7 +69,7 @@ export function CityPicker({ variant = "pill", label, value, onChange, outlined 
       )}
       {open && (
         <div id={popupId} role="region" aria-label="Choose search location"
-          className="fixed inset-x-4 top-4 p-4 max-h-[calc(100dvh-32px)] overflow-y-auto overscroll-contain rounded-lg shadow-xl z-[90] border border-[var(--brand-border)] bg-[var(--brand-surface)] lg:absolute lg:inset-x-auto lg:right-0 lg:top-full lg:mt-2 lg:w-[320px] lg:max-h-[70dvh]">
+          className="fixed inset-x-4 top-4 p-4 text-base font-normal text-[var(--brand-text)] max-h-[calc(100dvh-32px)] overflow-y-auto overscroll-contain rounded-lg shadow-xl z-[90] border border-[var(--brand-border)] bg-[var(--brand-surface)] lg:absolute lg:inset-x-auto lg:right-0 lg:top-full lg:mt-2 lg:w-[320px] lg:max-h-[70dvh]">
           <div className="flex items-center justify-between gap-3 mb-3 lg:hidden">
             <h2 className="text-[18px] font-bold">Choose location</h2>
             <button type="button" className="min-h-11 px-3 rounded-lg border border-[var(--brand-control-border)]"

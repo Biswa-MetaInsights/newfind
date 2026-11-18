@@ -763,13 +763,15 @@ export function EventsCarousel({
 
       {/* ── Section header ── */}
       <div className="flex items-center justify-between px-4 sm:px-6 lg:px-12 mb-5">
-        <div className="flex min-w-0 items-center gap-1">
+        <div className="flex min-w-0 items-center">
           <h2 className="font-extrabold tracking-[-0.5px]" style={{ fontSize: "clamp(18px, 4vw, 30px)", color: TEXT }}>
-            Happening in
+            Happening in{' '}
+            <span className="underline decoration-[3px] underline-offset-[6px]" style={{ color: GREEN, textDecorationColor: GREEN }}>{location}</span>
           </h2>
-          {/* The picker is a sibling of the heading, not part of it, so it keeps
-              ordinary control type (small, regular) like every other city picker. */}
-          <span className="relative inline-flex items-center">
+          {/* The picker is a sibling of the heading, not inside it: its dropdown
+              would otherwise inherit the heading's large extrabold type. The city
+              name above keeps the title style; the control and menu stay ordinary. */}
+          <span className="relative inline-flex items-center font-extrabold" style={{ fontSize: "clamp(18px, 4vw, 30px)", color: GREEN }}>
             {locationSlot ?? <EditLocationButton />}
           </span>
         </div>
