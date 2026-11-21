@@ -62,7 +62,7 @@ export function ShareModal({ fallback, onClose }: Props) {
         style={{ backgroundColor: "var(--brand-surface)", border: "1px solid var(--brand-border)" }}
       >
         <div className="flex items-center justify-between px-6 pt-5 pb-4">
-          <h2 className="text-[18px] font-bold text-[var(--brand-text)]">
+          <h2 className="text-body font-bold text-[var(--brand-text)]">
             Share this {fallback.kind}
           </h2>
           <button
@@ -92,14 +92,14 @@ export function ShareModal({ fallback, onClose }: Props) {
           <a
             href={fallback.storyUrl}
             download={`${fallback.title}-newfind.png`}
-            className="w-full py-3.5 rounded-lg text-[16px] font-bold text-center text-[var(--brand-on-green)] transition-colors"
+            className="w-full py-3 rounded-lg text-small font-bold text-center text-[var(--brand-on-green)] transition-colors"
             style={{ backgroundColor: GREEN }}
           >
             Download image
           </a>
           <button
             onClick={copyLink}
-            className="w-full py-3.5 rounded-lg text-[16px] font-bold transition-colors"
+            className="w-full py-3 rounded-lg text-small font-bold transition-colors"
             style={{ border: "2px solid var(--brand-control-border)", color: "var(--brand-text)" }}
           >
             {copied ? "Link copied ✓" : "Copy link"}

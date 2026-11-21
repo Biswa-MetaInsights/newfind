@@ -496,7 +496,7 @@ function StatusSelect({
                               ? "bg-[var(--brand-green)] text-[var(--brand-on-green)]"
                               : "text-[var(--brand-text)]"}`}
               >
-                <span className="block text-[17px] font-semibold">{COPY[option].label}</span>
+                <span className="block text-small font-semibold">{COPY[option].label}</span>
                 {/* ⚠️ ON HOVER ONLY (Gautham, 2026-09-01) — the menu is four
                     words at rest, and the sentence is there when you ask for it.
                     It is ALSO the row's only pointer feedback now that the green
@@ -523,7 +523,7 @@ function StatusSelect({
                     shown: a finger cannot hover, so the menu would otherwise be
                     four bare words, and a row that grows under the finger that
                     tapped it is worse than a taller menu. */}
-                <span className="hidden group-hover:block [@media(hover:none)]:block text-[15px] leading-snug opacity-80">
+                <span className="hidden group-hover:block [@media(hover:none)]:block text-meta leading-snug opacity-80">
                   {reason ?? COPY[option].organiser}
                 </span>
               </button>

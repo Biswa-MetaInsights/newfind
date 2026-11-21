@@ -35,7 +35,7 @@ export function AudienceChip({
         type="button"
         onClick={onToggle}
         aria-pressed={selected}
-        className={`cursor-pointer px-3 py-1.5 rounded-lg text-xs font-medium border-2 transition-colors hover:bg-[var(--brand-green)] hover:border-[var(--brand-green)] hover:text-[var(--brand-on-green)] ${
+        className={`cursor-pointer px-3 py-1.5 rounded-lg text-meta font-medium border-2 transition-colors hover:bg-[var(--brand-green)] hover:border-[var(--brand-green)] hover:text-[var(--brand-on-green)] ${
           selected
             ? "bg-[var(--brand-green)] border-[var(--brand-green)] text-[var(--brand-on-green)]"
             : "bg-[var(--brand-surface)] border-[var(--brand-control-border)] text-[var(--brand-text)]"
@@ -58,7 +58,7 @@ export function AudienceChip({
           Tailwind wraps `group-hover:` in `@media (hover: hover)`, so a finger
           never pins this open; the second guard is the house belt-and-braces
           every hover tooltip in the app carries. */}
-      <span className="hidden group-hover:block [@media(hover:none)]:hidden absolute bottom-full left-1/2 -translate-x-1/2 mb-2 whitespace-nowrap text-sm font-medium px-3 py-1.5 rounded-lg shadow-lg z-50 pointer-events-none bg-[var(--brand-surface)] text-[var(--brand-green)] border border-[var(--brand-border)]">
+      <span className="hidden group-hover:block [@media(hover:none)]:hidden absolute bottom-full left-1/2 -translate-x-1/2 mb-2 whitespace-nowrap text-meta font-medium px-3 py-1.5 rounded-lg shadow-lg z-50 pointer-events-none bg-[var(--brand-surface)] text-[var(--brand-green)] border border-[var(--brand-border)]">
         {selected ? "Click to deselect" : "Click to select"}
       </span>
     </span>

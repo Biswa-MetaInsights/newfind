@@ -135,7 +135,7 @@ function DashboardContent() {
 
       {/* ── Page header ── */}
       <div className={`pt-10 pb-0 ${GUTTERS}`}>
-        <h1 className="text-[28px] font-bold text-[var(--brand-text)]">My Dashboard</h1>
+        <h1 className="text-heading font-bold text-[var(--brand-text)]">My Dashboard</h1>
       </div>
 
       {/* ── Tabs ── */}
@@ -146,13 +146,13 @@ function DashboardContent() {
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
-            className="px-5 py-3 text-sm font-semibold transition-colors relative whitespace-nowrap shrink-0"
+            className="px-5 py-3 text-meta font-semibold transition-colors relative whitespace-nowrap shrink-0"
             style={{ color: activeTab === tab ? GREEN : "var(--brand-hint)" }}
           >
             {TAB_LABELS[tab]}
             {tab === "wishlist" && wishlistItems.length > 0 && (
               <span
-                className="ml-1.5 px-1.5 py-0.5 rounded-full text-[11px] font-bold"
+                className="ml-1.5 px-1.5 py-0.5 rounded-full text-meta font-bold"
                 style={{ backgroundColor: GREEN, color: "var(--brand-on-green)" }}
               >
                 {wishlistItems.length}
@@ -199,15 +199,15 @@ function WishlistTab({ items: allItems }: { items: WishlistItem[] }) {
 
   if (items.length === 0) {
     return (
-      <div className="flex flex-col items-center py-24 gap-4">
+      <div className="flex flex-col items-center py-16 gap-4">
         <svg className="w-16 h-16 text-[var(--brand-hint)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
           <path strokeLinecap="round" strokeLinejoin="round"
             d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
         </svg>
-        <p className="text-[18px] text-[var(--brand-hint)]">Your wishlist is empty.</p>
+        <p className="text-body text-[var(--brand-hint)]">Your wishlist is empty.</p>
         <button
           onClick={() => router.push("/")}
-          className="px-6 py-3 rounded-lg text-[var(--brand-on-green)] text-sm font-semibold"
+          className="px-6 py-3 rounded-lg text-[var(--brand-on-green)] text-meta font-semibold"
           style={{ backgroundColor: GREEN }}
         >
           Explore Events
@@ -293,12 +293,12 @@ function MyEventsTab({ organiserId }: { organiserId: string }) {
 
   if (!events || events.length === 0) {
     return (
-      <div className="flex flex-col items-center py-24 gap-4">
+      <div className="flex flex-col items-center py-16 gap-4">
         <CalendarEmptyIcon />
-        <p className="text-[18px] text-[var(--brand-hint)]">You have not created any events yet.</p>
+        <p className="text-body text-[var(--brand-hint)]">You have not created any events yet.</p>
         <button
           onClick={() => router.push("/organizer/create")}
-          className="px-6 py-3 rounded-lg text-[var(--brand-on-green)] text-sm font-semibold"
+          className="px-6 py-3 rounded-lg text-[var(--brand-on-green)] text-meta font-semibold"
           style={{ backgroundColor: GREEN }}
         >
           Create your first event
@@ -319,7 +319,7 @@ function MyEventsTab({ organiserId }: { organiserId: string }) {
           <EventCardItem
             key={ev.id}
             event={toCarouselEvent(ev)}
-            lines={note && <p className="text-[18px] font-semibold" style={{ color: GREEN }}>{note}</p>}
+            lines={note && <p className="text-body font-semibold" style={{ color: GREEN }}>{note}</p>}
             action={
               <button
                 onClick={(e) => stop(e, () => router.push("/organizer/events"))}
@@ -343,12 +343,12 @@ function TicketsTab({ tickets }: { tickets: StoredTicket[] }) {
 
   if (tickets.length === 0) {
     return (
-      <div className="flex flex-col items-center py-24 gap-4">
+      <div className="flex flex-col items-center py-16 gap-4">
         <TicketIcon />
-        <p className="text-[18px] text-[var(--brand-hint)]">No tickets found.</p>
+        <p className="text-body text-[var(--brand-hint)]">No tickets found.</p>
         <button
           onClick={() => router.push("/")}
-          className="px-6 py-3 rounded-lg text-[var(--brand-on-green)] text-sm font-semibold"
+          className="px-6 py-3 rounded-lg text-[var(--brand-on-green)] text-meta font-semibold"
           style={{ backgroundColor: GREEN }}
         >
           Browse Events
@@ -412,8 +412,8 @@ function TicketCard({ ticket }: { ticket: StoredTicket }) {
       }
       lines={
         <>
-          <p className="text-[18px] font-semibold" style={{ color: GREEN }}>✓ Confirmed · #{number}</p>
-          <p className="text-[18px] line-clamp-1" style={{ color: "var(--brand-text)" }}>{ticket.seat_info}</p>
+          <p className="text-body font-semibold" style={{ color: GREEN }}>✓ Confirmed · #{number}</p>
+          <p className="text-body line-clamp-1" style={{ color: "var(--brand-text)" }}>{ticket.seat_info}</p>
         </>
       }
       action={(
@@ -484,8 +484,8 @@ function ProfileTab({ name, email, interests }: { name: string; email: string; i
         </div>
 
         <div className="min-w-0">
-          <h2 className="text-[26px] sm:text-[32px] font-bold text-[var(--brand-text)]">{name}</h2>
-          <p className="text-[18px] text-[var(--brand-hint)] truncate">{email}</p>
+          <h2 className="text-heading sm:text-figure font-bold text-[var(--brand-text)]">{name}</h2>
+          <p className="text-body text-[var(--brand-hint)] truncate">{email}</p>
         </div>
       </div>
 
@@ -505,7 +505,7 @@ function ProfileTab({ name, email, interests }: { name: string; email: string; i
 
       <div className="h-px bg-[var(--brand-border)] mb-8" />
 
-      <h3 className="text-[24px] font-bold text-[var(--brand-text)] mb-2">My Networking Interests</h3>
+      <h3 className="text-subhead font-bold text-[var(--brand-text)] mb-2">My Networking Interests</h3>
       <p className="text-[var(--brand-hint)] mb-8">
         These interests power our AI Agent to match you with suitable event discovery and networking sessions.
       </p>
@@ -513,7 +513,7 @@ function ProfileTab({ name, email, interests }: { name: string; email: string; i
       <div className="flex flex-wrap gap-3 mb-12">
         {interests.map((interest) => (
           <span key={interest}
-            className="px-4 py-2 rounded-lg text-sm font-semibold bg-[var(--brand-bg)]"
+            className="px-4 py-2 rounded-lg text-meta font-semibold bg-[var(--brand-bg)]"
             style={{ border: `1px solid ${GREEN}33`, color: GREEN }}>
             {interest}
           </span>

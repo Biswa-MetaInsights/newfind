@@ -40,13 +40,13 @@ export function ReviewsSection({
     <>
       <div className="flex items-start justify-between gap-4 mb-8">
         <div className="min-w-0">
-          <h2 className="text-[22px] font-bold text-[var(--brand-text)]">{title}</h2>
-          {subtitle && <p className="text-[16px] mt-1 text-[var(--brand-hint)]">{subtitle}</p>}
+          <h2 className="text-subhead font-bold text-[var(--brand-text)]">{title}</h2>
+          {subtitle && <p className="text-small mt-1 text-[var(--brand-hint)]">{subtitle}</p>}
         </div>
         {hasAggregate && (
           <div className="flex items-center gap-1.5 shrink-0">
             <RatingStar className="w-6 h-6" />
-            <span className="text-[18px] font-bold text-[var(--brand-text)]">
+            <span className="text-body font-bold text-[var(--brand-text)]">
               {Number(average).toFixed(1)}
             </span>
             <span className="text-[var(--brand-hint)]">({count})</span>
@@ -55,7 +55,7 @@ export function ReviewsSection({
       </div>
 
       {reviews.length === 0 ? (
-        <p className="text-[var(--brand-hint)] text-[16px]">{emptyText}</p>
+        <p className="text-[var(--brand-hint)] text-small">{emptyText}</p>
       ) : (
         <div className="space-y-8">
           {reviews.map((r) => (
@@ -92,7 +92,7 @@ export function ReviewCard({ review }: { review: Review }) {
           ))}
         </div>
       </div>
-      <p className="text-[16px] leading-relaxed text-[var(--brand-hint)]">{review.content}</p>
+      <p className="text-small leading-relaxed text-[var(--brand-hint)]">{review.content}</p>
     </div>
   );
 }

@@ -77,7 +77,7 @@ export default function AuthPage() {
     <div className="relative flex min-h-[100dvh] flex-col" style={{ backgroundColor: "var(--brand-bg)" }}>
       {/* Top bar and panel photo removed 2026-11-17 (Gautham): a page used for ~10 s should be simple
           and reliable. "Back to home" floats top-right; the logo stays the way home. */}
-      <Link href="/" className="absolute right-4 top-4 z-20 inline-flex min-h-11 items-center rounded-lg px-2 text-[18px] font-bold text-[var(--brand-text)] hover:underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--brand-green)] sm:right-6 lg:right-20">
+      <Link href="/" className="absolute right-4 top-4 z-20 inline-flex min-h-11 items-center rounded-lg px-2 text-body font-bold text-[var(--brand-text)] hover:underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--brand-green)] sm:right-6 lg:right-20">
         Back to home
       </Link>
       <div className="flex flex-1">
@@ -87,10 +87,10 @@ export default function AuthPage() {
           <Link href="/" aria-label="NewFind — home" className="inline-block rounded-lg focus-visible:outline-2 focus-visible:outline-offset-4">
             <BrandLogo markSize={70} gap={14} className="mb-10" />
           </Link>
-          <h1 className="text-[42px] font-extrabold leading-tight mb-6">
+          <h1 className="text-display font-extrabold leading-tight mb-6">
             Unlock Your Next<br />Great Experience.
           </h1>
-          <p className="text-xl leading-relaxed">
+          <p className="text-title leading-relaxed">
             Discover AI summits, tech workshops, and networking events near you.
           </p>
         </div>
@@ -102,7 +102,7 @@ export default function AuthPage() {
           <Link href="/" aria-label="NewFind — home" className="mb-8 inline-flex rounded-lg focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--brand-green)] lg:hidden">
             <BrandLogo markSize={44} gap={12} style={{ color: "var(--brand-logo)" }} />
           </Link>
-          <h2 className="text-3xl font-bold text-[var(--brand-text)] mb-3">
+          <h2 className="text-heading font-bold text-[var(--brand-text)] mb-3">
             {isLogin ? "Welcome Back" : "Create Account"}
           </h2>
           <p className="text-[var(--brand-hint)] mb-10">
@@ -166,19 +166,19 @@ export default function AuthPage() {
             </Field>
 
             {error && (
-              <p role="alert" className="text-red-500 text-sm">{error}</p>
+              <p role="alert" className="text-red-500 text-meta">{error}</p>
             )}
 
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full py-4 rounded-lg bg-[var(--brand-green)] text-[var(--brand-on-green)] text-lg font-bold
+              className="w-full py-3 rounded-lg bg-[var(--brand-green)] text-[var(--brand-on-green)] text-control font-bold
                          hover:bg-[var(--brand-green-hover)] transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
             >
               {isLoading ? "Please wait…" : isLogin ? "Sign In" : "Sign Up"}
             </button>
           </form>
-          {isLogin&&<Link href="/forgot-password" className="block mt-5 text-[15px] underline">Forgot your password?</Link>}
+          {isLogin&&<Link href="/forgot-password" className="block mt-5 text-meta underline">Forgot your password?</Link>}
 
           <div className="mt-8 text-center">
             <button
@@ -193,7 +193,7 @@ export default function AuthPage() {
 
           <div className="my-8 flex items-center gap-4">
             <div className="flex-1 h-px bg-[var(--brand-border)]" />
-            <span className="text-[var(--brand-hint)] font-semibold text-sm">OR</span>
+            <span className="text-[var(--brand-hint)] font-semibold text-meta">OR</span>
             <div className="flex-1 h-px bg-[var(--brand-border)]" />
           </div>
 
@@ -206,14 +206,14 @@ export default function AuthPage() {
 }
 
 const inputCls =
-  "w-full text-base px-4 py-3 rounded-lg border border-[var(--brand-border)] bg-[var(--brand-bg)] text-[var(--brand-text)] " +
+  "w-full text-control px-4 py-3 rounded-lg border border-[var(--brand-border)] bg-[var(--brand-bg)] text-[var(--brand-text)] " +
   "placeholder:text-[var(--brand-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--brand-green)]/30 " +
   "focus:border-[var(--brand-green)] transition-colors";
 
 function Field({ label, htmlFor, children }: { label: string; htmlFor: string; children: React.ReactNode }) {
   return (
     <div className="space-y-2">
-      <label htmlFor={htmlFor} className="text-sm font-bold text-[var(--brand-text)]">{label}</label>
+      <label htmlFor={htmlFor} className="text-meta font-bold text-[var(--brand-text)]">{label}</label>
       {children}
     </div>
   );

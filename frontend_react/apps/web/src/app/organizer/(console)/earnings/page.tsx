@@ -225,7 +225,7 @@ function EarningsInner() {
           className="flex items-center justify-between gap-4 flex-wrap px-5 py-4"
           style={{ borderBottom: "1px solid var(--brand-border)" }}
         >
-          <h2 className="text-[20px] font-bold" style={{ color: "var(--brand-text)" }}>Per event</h2>
+          <h2 className="text-title font-bold" style={{ color: "var(--brand-text)" }}>Per event</h2>
           <div className="flex gap-2 flex-wrap">
             {/* The rows are already in memory, so this one WORKS — the rule in
                 ConsoleUI's FilterSelect note. The date range still waits on a
@@ -255,29 +255,29 @@ function EarningsInner() {
           {rows.map((r) => (
             <TableRow key={r.id} template={TEMPLATE}>
               <div className="flex flex-col gap-1 min-w-0">
-                <span className="text-[18px] font-bold" style={{ color: "var(--brand-text)" }}>{r.title}</span>
-                <span className="text-[15px]" style={{ color: "var(--brand-hint)", opacity: 0.8 }}>
+                <span className="text-body font-bold" style={{ color: "var(--brand-text)" }}>{r.title}</span>
+                <span className="text-meta" style={{ color: "var(--brand-hint)", opacity: 0.8 }}>
                   {formatEventMoment(r.when, events.find((e) => String(e.id) === String(r.id))?.timezone)}
                 </span>
               </div>
-              <div className="text-[17px]" style={{ color: "var(--brand-hint)" }}>{r.tickets}</div>
-              <div className="text-[17px]" style={{ color: "var(--brand-hint)" }}>{money(r.gross)}</div>
+              <div className="text-small" style={{ color: "var(--brand-hint)" }}>{r.tickets}</div>
+              <div className="text-small" style={{ color: "var(--brand-hint)" }}>{money(r.gross)}</div>
               {/* Not deducted below — the buyer paid it. See the header note. */}
-              <div className="text-[17px]" style={{ color: "var(--brand-hint)", opacity: 0.75 }}>{money(r.buyerFee)}</div>
+              <div className="text-small" style={{ color: "var(--brand-hint)", opacity: 0.75 }}>{money(r.buyerFee)}</div>
               <div
-                className="text-[17px]"
+                className="text-small"
                 style={{ color: r.refunds > 0 ? "var(--brand-terracotta)" : "var(--brand-hint)", opacity: r.refunds > 0 ? 1 : 0.6 }}
               >
                 {money(r.refunds)}
               </div>
-              <div className="text-[18px] font-bold text-right" style={{ color: "var(--brand-text)" }}>
+              <div className="text-body font-bold text-right" style={{ color: "var(--brand-text)" }}>
                 {money(r.net)}
               </div>
             </TableRow>
           ))}
 
           <div
-            className="grid gap-3.5 px-5 py-4 text-[17px] font-bold"
+            className="grid gap-3.5 px-5 py-4 text-small font-bold"
             style={{
               gridTemplateColumns: TEMPLATE,
               backgroundColor: "color-mix(in srgb, var(--brand-nav-border) 25%, transparent)",
@@ -317,8 +317,8 @@ function PaymentTerms({ rows }: { rows: DummyPaymentTerm[] }) {
 
   return (
     <Card>
-      <h2 className="text-[20px] font-bold" style={{ color: "var(--brand-text)" }}>Payments</h2>
-      <p className="text-[17px] mt-1 leading-relaxed" style={{ color: "var(--brand-hint)", textWrap: "pretty" }}>
+      <h2 className="text-title font-bold" style={{ color: "var(--brand-text)" }}>Payments</h2>
+      <p className="text-small mt-1 leading-relaxed" style={{ color: "var(--brand-hint)", textWrap: "pretty" }}>
         Where the money lands and the terms attached to it. Attendees pay you directly at
         checkout — NewFind never holds it.
       </p>
@@ -330,9 +330,9 @@ function PaymentTerms({ rows }: { rows: DummyPaymentTerm[] }) {
             className="flex items-center justify-between gap-4 py-2.5"
             style={{ borderTop: "1px solid var(--brand-border)" }}
           >
-            <dt className="text-[17px]" style={{ color: "var(--brand-hint)" }}>{r.label}</dt>
+            <dt className="text-small" style={{ color: "var(--brand-hint)" }}>{r.label}</dt>
             <dd
-              className="text-[17px] font-semibold text-right"
+              className="text-small font-semibold text-right"
               style={{ color: r.good ? "var(--brand-green)" : "var(--brand-text)" }}
             >
               {r.value}
@@ -341,7 +341,7 @@ function PaymentTerms({ rows }: { rows: DummyPaymentTerm[] }) {
         ))}
       </dl>
 
-      <p className="text-[17px] mt-3.5" style={{ color: "var(--brand-hint)", textWrap: "pretty" }}>
+      <p className="text-small mt-3.5" style={{ color: "var(--brand-hint)", textWrap: "pretty" }}>
         These are read-only for now — changing them needs the organiser preferences endpoint. Your
         company details are editable today on the{" "}
         <Link href="/organizer/onboarding" className="font-semibold underline" style={{ color: "var(--brand-green)" }}>

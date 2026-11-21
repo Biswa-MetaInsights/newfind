@@ -42,19 +42,19 @@ export function EventRooms({roomId}: {roomId?: string}) {
   // Never a blank page: the navbar and heading stay while the saved sign-in loads, or while a signed-out
   // visitor is redirected to /auth.
   if(!ready||!authenticated) return <div className="min-h-screen bg-[var(--brand-bg)] text-[var(--brand-text)]"><Navbar/><main className={`py-8 ${GUTTERS}`}>
-    <h1 className="text-[28px] font-bold mb-6">Event conversations</h1>
+    <h1 className="text-heading font-bold mb-6">Event conversations</h1>
     <p>{!ready?'Loading…':'Redirecting to sign in…'}</p>
   </main></div>;
   const room = rooms.data?.find(r=>r.id===roomId);
   return <div className="min-h-screen bg-[var(--brand-bg)] text-[var(--brand-text)]"><Navbar/><main className={`py-8 ${GUTTERS}`}>
-    <h1 className="text-[28px] font-bold mb-6">Event conversations</h1>
+    <h1 className="text-heading font-bold mb-6">Event conversations</h1>
     <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-6">
       <nav aria-label="Event rooms" className="border border-[var(--brand-border)] rounded-lg p-4 space-y-3">
         {rooms.isPending?<p>Loading conversations…</p>:rooms.isError?<p role="alert">Conversations could not be loaded.</p>:rooms.data?.length?rooms.data.map(r=><Link key={r.id} href={`/chat/${r.id}`} className={`block p-3 rounded-lg hover:bg-[var(--brand-green)] hover:text-[var(--brand-on-green)] ${r.id===roomId?'font-bold':''}`}>{r.name}{r.unread_count>0&&<span className="ml-2">({r.unread_count} unread)</span>}</Link>):<p>Your booked and organised events will appear here.</p>}
       </nav>
       <section className="border border-[var(--brand-border)] rounded-lg p-4 sm:p-6 min-w-0">
         {!roomId?<p>Choose an event to open its conversation.</p>:<>
-          <h2 className="text-[22px] font-bold">{room?.name ?? 'Event room'}</h2>
+          <h2 className="text-subhead font-bold">{room?.name ?? 'Event room'}</h2>
           <p className="my-3">Only ticket holders and the organiser can read or post here.</p>
           {messages.isPending?<p>Loading messages…</p>:messages.isError?<p role="alert">This conversation is unavailable. You need a ticket or organiser access.</p>:<>
             {/* Only the NEWEST message is announced, so older ones added at the top are not read out. */}
@@ -64,8 +64,8 @@ export function EventRooms({roomId}: {roomId?: string}) {
               {!history?.length&&<p>No messages yet. Start the conversation.</p>}
               {history?.map(message=><article key={message.id} className="rounded-lg border border-[var(--brand-border)] p-4 break-words">
                 <p className="font-bold">{message.name}{message.is_organizer?' · Organiser':''}</p>
-                <time className="text-[15px]" dateTime={message.created_at}>{new Date(message.created_at.endsWith('Z')?message.created_at:message.created_at+'Z').toLocaleString()}</time>
-                <p className="mt-2 whitespace-pre-wrap text-[18px]">{message.content}</p>
+                <time className="text-meta" dateTime={message.created_at}>{new Date(message.created_at.endsWith('Z')?message.created_at:message.created_at+'Z').toLocaleString()}</time>
+                <p className="mt-2 whitespace-pre-wrap text-body">{message.content}</p>
               </article>)}
             </div>
             <form onSubmit={e=>{e.preventDefault();if(text.trim())post.mutate();}} className="space-y-3">

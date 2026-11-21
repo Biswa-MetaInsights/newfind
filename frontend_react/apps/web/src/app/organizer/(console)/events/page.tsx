@@ -59,7 +59,7 @@ import {
 import { EarningsIcon, EditIcon, ChatIcon } from "@/components/organizer/ConsoleIcons";
 
 /** Wider first column + minWidth than before: the rows carry a 56px thumbnail
- *  and the type sits on the site's scale rather than at the 15px floor. */
+ *  and the type sits on the site's scale rather than at the floor. */
 const TEMPLATE = "2.5fr 1fr 1fr 1fr 1fr 0.8fr 116px";
 
 export default function ConsoleEventsPage() {
@@ -202,7 +202,7 @@ export default function ConsoleEventsPage() {
                 <div className="flex items-center gap-3 min-w-0">
                   <EventThumb src={r.image} alt="" />
                   <div className="flex flex-col gap-1.5 min-w-0">
-                    <span className="text-[20px] font-bold leading-snug" style={{ color: "var(--brand-text)" }}>
+                    <span className="text-title font-bold leading-snug" style={{ color: "var(--brand-text)" }}>
                       {r.title}
                     </span>
                     <span className="flex items-center gap-1.5 flex-wrap">
@@ -215,17 +215,17 @@ export default function ConsoleEventsPage() {
                     </span>
                   </div>
                 </div>
-                <div className="text-[17px]" style={{ color: "var(--brand-hint)" }}>
+                <div className="text-small" style={{ color: "var(--brand-hint)" }}>
                   {r.when}
-                  <div className="text-[15px] opacity-80">{r.whenSub}</div>
+                  <div className="text-meta opacity-80">{r.whenSub}</div>
                 </div>
-                <div className="text-[17px]" style={{ color: "var(--brand-hint)" }}>{r.place}</div>
+                <div className="text-small" style={{ color: "var(--brand-hint)" }}>{r.place}</div>
                 <div className="flex flex-col gap-1.5">
-                  <span className="text-[17px] font-semibold" style={{ color: "var(--brand-text)" }}>{r.sold}</span>
+                  <span className="text-small font-semibold" style={{ color: "var(--brand-text)" }}>{r.sold}</span>
                   <ProgressBar pct={r.pct} muted={r.finished} />
                 </div>
-                <div className="text-[17px] font-semibold" style={{ color: "var(--brand-text)" }}>{r.revenue}</div>
-                <div className="text-[17px]" style={{ color: "var(--brand-hint)" }}>{r.checkins}</div>
+                <div className="text-small font-semibold" style={{ color: "var(--brand-text)" }}>{r.revenue}</div>
+                <div className="text-small" style={{ color: "var(--brand-hint)" }}>{r.checkins}</div>
                 <div className="flex justify-end items-center gap-1.5">
                   <RowAction href={`/event/${r.id}`}>Manage</RowAction>
                   {/* Inert until the row actions below have somewhere to post to. */}
@@ -236,7 +236,7 @@ export default function ConsoleEventsPage() {
           </TableScroller>
 
           {!isLoading && visible.length === 0 && (
-            <p className="px-5 py-10 text-center text-[17px]" style={{ color: "var(--brand-hint)" }}>
+            <p className="px-5 py-10 text-center text-small" style={{ color: "var(--brand-hint)" }}>
               {/* A filtered-to-nothing tab must say so — otherwise an organiser
                   reads "Nothing in this tab" as their events being gone. */}
               {inTab.length > 0
@@ -250,7 +250,7 @@ export default function ConsoleEventsPage() {
           <TableFooter note={`${visible.length} of ${rows.length} events`} />
         </Card>
 
-        <p className="text-[17px]" style={{ color: "var(--brand-hint)", textWrap: "pretty" }}>
+        <p className="text-small" style={{ color: "var(--brand-hint)", textWrap: "pretty" }}>
           Row actions (⋯) will cover duplicate, unpublish, cancel &amp; refund all, download the
           attendee list, and copy the shareable link.
         </p>
@@ -284,7 +284,7 @@ function HeroHeading({ title }: { title: string }) {
   return (
     <h2
       className="font-extrabold leading-tight tracking-[-0.5px]"
-      style={{ fontSize: "clamp(24px, 3.4vw, 32px)", color: "var(--brand-text)" }}
+      style={{ fontSize: "clamp(22px, 3vw, 28px)", color: "var(--brand-text)" }}
     >
       <span style={{ color: "var(--brand-hint)" }}>Upcoming event: </span>
       {title}
@@ -317,7 +317,7 @@ function NextUpHero({
   zone?: string;
 }) {
   const { next } = overview;
-  if (!next) return <p className="text-[18px] py-6">No upcoming published events. Your saved events are listed below.</p>;
+  if (!next) return <p className="text-body py-6">No upcoming published events. Your saved events are listed below.</p>;
   const pct = next.capacity > 0 ? Math.round((next.sold / next.capacity) * 100) : 0;
 
   return (
@@ -343,21 +343,21 @@ function NextUpHero({
             <div className="flex items-center gap-3 flex-wrap">
               <HeroHeading title={next.title} />
               <span
-                className={`${TAG_SHAPE} gap-1.5 font-bold leading-5 px-2.5 py-1.5 text-[16px]`}
+                className={`${TAG_SHAPE} gap-1.5 font-bold leading-5 px-2.5 py-1.5 text-small`}
                 style={{ color: "var(--brand-green)", border: "1px solid var(--brand-green)" }}
               >
                 {inDaysLabel(next.inDays)}
               </span>
             </div>
-            <p className="text-[17px] mt-1.5" style={{ color: "var(--brand-hint)" }}>
+            <p className="text-small mt-1.5" style={{ color: "var(--brand-hint)" }}>
               {formatEventMoment(next.when, zone)}
             </p>
           </div>
 
           <div className="flex flex-col gap-2">
             <div className="flex items-baseline justify-between gap-3">
-              <span className="text-[17px]" style={{ color: "var(--brand-hint)" }}>Tickets sold</span>
-              <span className="text-[17px] font-semibold" style={{ color: "var(--brand-green)" }}>
+              <span className="text-small" style={{ color: "var(--brand-hint)" }}>Tickets sold</span>
+              <span className="text-small font-semibold" style={{ color: "var(--brand-green)" }}>
                 {next.sold} of {next.capacity} · {pct}%
               </span>
             </div>
@@ -419,7 +419,7 @@ function NextUpHero({
             <WaitingCard key={t.title} href={t.href} Icon={t.Icon} title={t.title} sub={t.sub} />
           ))}
           {todos.length === 0 ? (
-            <p className="text-[15px]" style={{ color: "var(--brand-hint)" }}>
+            <p className="text-meta" style={{ color: "var(--brand-hint)" }}>
               Nothing is waiting on you.
             </p>
           ) : null}
@@ -439,7 +439,7 @@ function NextUpHero({
             />
           ))}
           {unreadChats.length === 0 ? (
-            <p className="text-[15px]" style={{ color: "var(--brand-hint)" }}>
+            <p className="text-meta" style={{ color: "var(--brand-hint)" }}>
               No unread messages.
             </p>
           ) : null}
@@ -467,14 +467,14 @@ function RealNextUpHero({ row }: { row: ConsoleRow }) {
                 no overview, and a figure this page worked out from the browser's
                 own clock is exactly what TODO.md §19.13 says not to ship. */}
             <HeroHeading title={row.title} />
-            <p className="text-[17px] mt-1.5" style={{ color: "var(--brand-hint)" }}>
+            <p className="text-small mt-1.5" style={{ color: "var(--brand-hint)" }}>
               {row.when} · {row.whenSub} · {row.place}
             </p>
           </div>
           <div className="flex flex-col gap-2 max-w-[420px]">
             <div className="flex items-baseline justify-between gap-3">
-              <span className="text-[17px]" style={{ color: "var(--brand-hint)" }}>Tickets sold</span>
-              <span className="text-[17px] font-semibold" style={{ color: "var(--brand-green)" }}>{row.sold} · {row.pct}%</span>
+              <span className="text-small" style={{ color: "var(--brand-hint)" }}>Tickets sold</span>
+              <span className="text-small font-semibold" style={{ color: "var(--brand-green)" }}>{row.sold} · {row.pct}%</span>
             </div>
             <ProgressBar pct={row.pct} hero />
           </div>
@@ -487,7 +487,7 @@ function RealNextUpHero({ row }: { row: ConsoleRow }) {
               <ConsoleButton tone="outline">Open event page</ConsoleButton>
             </Link>
           </div>
-          <p className="text-[15px]" style={{ color: "var(--brand-hint)" }}>
+          <p className="text-meta" style={{ color: "var(--brand-hint)" }}>
             Check-ins and refunds appear here once the organiser backend serves them — TODO.md §19.
           </p>
         </div>
@@ -541,10 +541,10 @@ function WaitingCard({
         <Icon className="w-3.5 h-3.5" />
       </span>
       <span className="flex flex-col gap-1 min-w-0">
-        <span className="text-[17px] font-semibold leading-snug transition-colors text-[var(--brand-text)] group-hover:text-[var(--brand-on-green)]">
+        <span className="text-small font-semibold leading-snug transition-colors text-[var(--brand-text)] group-hover:text-[var(--brand-on-green)]">
           {title}
         </span>
-        <span className="text-[15px] leading-snug transition-colors text-[var(--brand-hint)] group-hover:text-[var(--brand-on-green)]">
+        <span className="text-meta leading-snug transition-colors text-[var(--brand-hint)] group-hover:text-[var(--brand-on-green)]">
           {sub}
         </span>
       </span>

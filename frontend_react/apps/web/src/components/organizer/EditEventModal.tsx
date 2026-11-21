@@ -91,7 +91,7 @@ function Group({ title, children }: { title: string; children: React.ReactNode }
   return (
     <section className="space-y-4">
       <h3
-        className="text-[15px] font-bold pb-2"
+        className="text-meta font-bold pb-2"
         style={{ color: "var(--brand-text)", borderBottom: "1px solid var(--brand-border)" }}
       >
         {title}
@@ -114,7 +114,7 @@ function ReadOnly({ label, value, why }: { label: string; value: string; why: st
   return (
     <FormField label={label} hint="cannot be changed">
       <div
-        className="w-full px-4 py-3 rounded-lg text-sm font-medium"
+        className="w-full px-4 py-3 rounded-lg text-meta font-medium"
         style={{
           border: "1px solid var(--brand-border)",
           backgroundColor: "color-mix(in srgb, var(--brand-hint) 6%, transparent)",
@@ -123,7 +123,7 @@ function ReadOnly({ label, value, why }: { label: string; value: string; why: st
       >
         {value}
       </div>
-      <p className="text-[15px] leading-relaxed" style={{ color: "var(--brand-hint)" }}>{why}</p>
+      <p className="text-meta leading-relaxed" style={{ color: "var(--brand-hint)" }}>{why}</p>
     </FormField>
   );
 }
@@ -394,7 +394,7 @@ export function EditEventModal({
           <button
             type="button"
             onClick={onClose}
-            className="flex-1 py-3.5 rounded-lg text-[16px] font-bold transition-colors"
+            className="flex-1 py-3 rounded-lg text-small font-bold transition-colors"
             style={{ border: "2px solid var(--brand-control-border)", color: "var(--brand-text)" }}
           >
             Discard
@@ -403,7 +403,7 @@ export function EditEventModal({
             type="button"
             onClick={submit}
             disabled={save.isPending}
-            className="flex-[2] py-3.5 rounded-lg text-[16px] font-bold text-[var(--brand-on-green)] transition-colors disabled:opacity-60"
+            className="flex-[2] py-3 rounded-lg text-small font-bold text-[var(--brand-on-green)] transition-colors disabled:opacity-60"
             style={{ backgroundColor: "var(--brand-green)" }}
           >
             {save.isPending ? "Saving…" : "Save changes"}
@@ -663,7 +663,7 @@ export function EditEventModal({
         </Group>
 
         {error && (
-          <p className="text-sm px-4 py-3 rounded-lg bg-red-50 text-red-600 border border-red-200">{error}</p>
+          <p className="text-meta px-4 py-3 rounded-lg bg-red-50 text-red-600 border border-red-200">{error}</p>
         )}
       </div>
     </ModalShell>
@@ -682,7 +682,7 @@ export function EditEventModal({
 function Notice({ children }: { children: React.ReactNode }) {
   return (
     <p
-      className="text-[15px] leading-relaxed rounded-lg px-4 py-3"
+      className="text-meta leading-relaxed rounded-lg px-4 py-3"
       style={{ border: "1px solid var(--brand-border)", color: "var(--brand-text)" }}
     >
       {children}

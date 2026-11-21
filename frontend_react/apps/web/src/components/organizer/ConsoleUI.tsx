@@ -27,17 +27,18 @@
 //  reason the console read as a different product from home. The scale below is
 //  the PUBLIC one (EventsCarousel's card, /event/[id]'s body), one step quieter:
 //
-//    section / page heading  clamp(24px,4vw,32px) extrabold, tracking -0.5px
-//    card + row title        20px bold      (== an event card's title)
-//    figure on a stat tile   32px extrabold (a tile's whole point)
-//    body, table cells       17px           (card meta is 18px; a 7-column
-//                                            table is the "quieter room")
-//    controls: buttons       18px bold, tabs 20px semibold (== the home
-//                            page's filter tabs, byte for byte)
-//    labels, counts, subs    15px — the floor, not a hair under it
+//    section / page heading  clamp(22px,3vw,28px) extrabold, tracking -0.5px
+//    card + row title        text-title     (== an event card's title)
+//    figure on a stat tile   text-figure    extrabold (a tile's whole point)
+//    body, table cells       text-small     (card meta is text-body; a
+//                                            7-column table is the "quieter room")
+//    controls: buttons, tabs text-control   (== the home page's filter tabs)
+//    labels, counts, subs    text-meta — the floor, not a hair under it
+//
+//  The px values behind each role live in the type scale in globals.css.
 //
 //  Consequence: `data-keep-type` is GONE from the console. The console was the
-//  only region of the app breaking the 15px floor (24 of the app's 29 opt-outs
+//  only region of the app breaking the old 15px floor (24 of the app's 29 opt-outs
 //  lived here). **Do not reintroduce one to squeeze a label in** — if a label
 //  competes with its figure, the figure is too small, not the label too big.
 // ─────────────────────────────────────────────────────────────────────────────
@@ -259,16 +260,16 @@ export function InkPanel({
  * The label above a figure, and every table column head.
  *
  * ⚠️ **NOT uppercase, and not 11px** (Gautham, 2026-08-22). It was
- * `text-[11px] uppercase tracking-[0.1em]` + `data-keep-type` — the generic
+ * `text-meta uppercase tracking-[0.1em]` + `data-keep-type` — the generic
  * admin-dashboard micro-label, an idiom that exists nowhere else in NewFind and
  * one of the loudest tells that the console was designed by somebody else. It is
- * now sentence case at the site's 15px floor, carrying its hierarchy the way the
+ * now sentence case at the site's floor (`text-meta`), carrying its hierarchy the way the
  * rest of the app does: by size, weight and position, never by shouting. See the
  * `--brand-hint` note in globals.css, which is the same principle for colour.
  */
 export function MicroLabel({ children, color }: { children: ReactNode; color?: string }) {
   return (
-    <div className="text-[15px] font-semibold" style={{ color: color ?? "var(--brand-hint)" }}>
+    <div className="text-meta font-semibold" style={{ color: color ?? "var(--brand-hint)" }}>
       {children}
     </div>
   );
@@ -321,7 +322,7 @@ export type PillType = EventBucket | "free" | "paid";
  *
  * ⚠️ **This is an `EventBadge`** (Gautham, 2026-08-22 for the shape, 2026-09-02
  * for the fill): `TAG_SHAPE` + `gap-1.5 font-bold leading-5 px-2.5 py-1.5
- * text-[16px]`, which is exactly what `EventBadge` renders, and — given `type` —
+ * text-small`, which is exactly what `EventBadge` renders, and — given `type` —
  * a solid palette fill with a linen label too. An "On sale" chip in the console
  * and a "This Week" tag on an event card are the same object.
  *
@@ -348,7 +349,7 @@ export function Pill({
   const fill = type ? PILL_FILL[type] : null;
   return (
     <span
-      className={`${TAG_SHAPE} gap-1.5 font-bold leading-5 px-2.5 py-1.5 text-[16px]`}
+      className={`${TAG_SHAPE} gap-1.5 font-bold leading-5 px-2.5 py-1.5 text-small`}
       style={
         fill
           ? { color: fill.text, backgroundColor: fill.bg }
@@ -386,7 +387,7 @@ export function Pill({
 export function CountBadge({ children, active = false }: { children: ReactNode; active?: boolean }) {
   return (
     <span
-      className={`text-[15px] font-bold shrink-0 transition-colors ${
+      className={`text-meta font-bold shrink-0 transition-colors ${
         active
           ? "text-[var(--brand-on-green)]"
           : "text-[var(--brand-terracotta)] group-hover:text-[var(--brand-on-green)]"
@@ -400,7 +401,7 @@ export function CountBadge({ children, active = false }: { children: ReactNode; 
 // ── Stat tiles ───────────────────────────────────────────────────────────────
 
 /**
- * The figure is `text-[32px] font-extrabold tracking-[-0.5px]` — the weight and
+ * The figure is `text-figure font-extrabold tracking-[-0.5px]` — the weight and
  * the letter-spacing of the site's section headings (`EventsCarousel`'s "Events
  * in {city}"), because on this page the figure IS the heading. It was 26px
  * semibold-ish `font-bold`, close enough to the label above it that the tile had
@@ -418,13 +419,13 @@ export function StatTile({
     <Card>
       <MicroLabel>{label}</MicroLabel>
       <div
-        className="text-[32px] font-extrabold leading-none mt-2.5 tracking-[-0.5px]"
+        className="text-figure font-extrabold leading-none mt-2.5 tracking-[-0.5px]"
         style={{ color: "var(--brand-text)" }}
       >
         {value}
       </div>
       {sub && (
-        <div className="text-[15px] mt-2.5" style={{ color: toneColor(tone) }}>
+        <div className="text-meta mt-2.5" style={{ color: toneColor(tone) }}>
           {sub}
         </div>
       )}
@@ -460,13 +461,13 @@ export function InkStatTile({
     >
       <MicroLabel color={box ? ON_BOX_SOFT : ON_INK_SOFT}>{label}</MicroLabel>
       <div
-        className="text-[26px] font-extrabold leading-tight mt-1.5 tracking-[-0.5px]"
+        className="text-heading font-extrabold leading-tight mt-1.5 tracking-[-0.5px]"
         style={{ color: box ? ON_BOX : ON_INK }}
       >
         {value}
       </div>
       {sub && (
-        <div className="text-[15px] mt-1" style={{ color: box ? ON_BOX_SOFT : ON_INK_SOFT }}>
+        <div className="text-meta mt-1" style={{ color: box ? ON_BOX_SOFT : ON_INK_SOFT }}>
           {sub}
         </div>
       )}
@@ -580,7 +581,7 @@ export function Tabs({
             aria-pressed={on}
             /* 2px on BOTH states so the control cannot resize when picked. */
             className={`group inline-flex items-center gap-2 rounded-lg font-semibold border-2 transition-colors ${
-              size === "sm" ? "px-3.5 py-1.5 text-[18px]" : "px-4 py-1.5 text-[20px]"
+              size === "sm" ? "px-3.5 py-1.5 text-small" : "px-4 py-1.5 text-control"
             } ${
               on
                 ? "bg-[var(--brand-green)] text-[var(--brand-on-green)] border-[var(--brand-green)]"
@@ -617,7 +618,7 @@ export function FilterButton({ children }: { children: ReactNode }) {
       type="button"
       disabled
       title="Filtering arrives with the organiser backend"
-      className="inline-flex items-center gap-2 rounded-lg px-3.5 py-2 text-[18px] font-semibold cursor-not-allowed"
+      className="inline-flex items-center gap-2 rounded-lg px-3.5 py-2 text-control font-semibold cursor-not-allowed"
       style={{
         border: "2px solid var(--brand-control-border)",
         backgroundColor: "var(--brand-surface)",
@@ -643,7 +644,7 @@ export interface FilterOption<T extends string = string> {
  * point of the row.
  */
 const MENU_ITEM =
-  "w-full min-w-0 text-left flex items-center justify-between gap-4 px-4 py-2.5 text-[17px] font-semibold transition-colors hover:bg-[var(--brand-green)] hover:text-[var(--brand-on-green)]";
+  "w-full min-w-0 text-left flex items-center justify-between gap-4 px-4 py-2.5 text-small font-semibold transition-colors hover:bg-[var(--brand-green)] hover:text-[var(--brand-on-green)]";
 
 /**
  * The WORKING filter dropdown — same silhouette as `FilterButton`, but it opens
@@ -722,7 +723,7 @@ export function FilterSelect<T extends string>({
         aria-haspopup="listbox"
         aria-expanded={open}
         onClick={() => setOpen((o) => !o)}
-        className="nf-chip inline-flex items-center gap-2 rounded-lg px-3.5 py-2 text-[18px] font-semibold"
+        className="nf-chip inline-flex items-center gap-2 rounded-lg px-3.5 py-2 text-control font-semibold"
         style={{
           border: `2px solid ${applied ? "var(--brand-green)" : "var(--brand-control-border)"}`,
           backgroundColor: applied
@@ -777,7 +778,7 @@ export function FilterSelect<T extends string>({
 type ButtonTone = "accent" | "green" | "outline" | "onInk";
 
 /**
- * 18px bold, taken from the event card's "View details" CTA (`EventsCarousel`).
+ * `text-control` bold, taken from the event card's "View details" CTA (`EventsCarousel`).
  * It was 15px — the same shape as the public CTA at two thirds the size, which
  * is the kind of near-miss that reads as a different design rather than as a
  * deliberate variation. 18px rather than the card's 20px is the console's one
@@ -802,7 +803,7 @@ type ButtonTone = "accent" | "green" | "outline" | "onInk";
  * `CategoryBadge` sizes follow: never declare a utility twice.
  */
 const BUTTON_BASE =
-  "inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-[18px] whitespace-nowrap transition-colors";
+  "inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-control whitespace-nowrap transition-colors";
 
 /**
  * ⚠️ TONES ARE CLASSES, NOT AN INLINE `style` — every colour, fill and border.
@@ -919,7 +920,7 @@ export function RowAction({
   // Colours are classes for the reason BUTTON_TONE records: an inline colour
   // beats `hover:`, which is what left every row control in the console inert.
   const shape =
-    "inline-flex items-center rounded-lg px-3.5 py-1.5 text-[17px] font-semibold whitespace-nowrap transition-colors border-2";
+    "inline-flex items-center rounded-lg px-3.5 py-1.5 text-small font-semibold whitespace-nowrap transition-colors border-2";
 
   if (disabled || (!href && !onClick)) {
     return (
@@ -1137,7 +1138,7 @@ export function TableRow({ template, children }: { template: string; children: R
 export function TableFooter({ children, note }: { children?: ReactNode; note: ReactNode }) {
   return (
     <div className="flex items-center justify-between gap-4 px-5 py-3.5 flex-wrap">
-      <span className="text-[15px]" style={{ color: "var(--brand-hint)" }}>{note}</span>
+      <span className="text-meta" style={{ color: "var(--brand-hint)" }}>{note}</span>
       <div className="flex items-center gap-3">
         {children}
         <div className="flex gap-1.5">
@@ -1209,10 +1210,10 @@ export function NotBuiltYet({ what, todo }: { what: string; todo: string }) {
   return (
     <Card className="text-center" >
       <div className="py-12 px-4 flex flex-col items-center gap-3">
-        <p className="text-[20px] font-bold" style={{ color: "var(--brand-text)" }}>
+        <p className="text-title font-bold" style={{ color: "var(--brand-text)" }}>
           {what} needs the organiser backend
         </p>
-        <p className="text-[17px] max-w-[520px]" style={{ color: "var(--brand-hint)" }}>
+        <p className="text-small max-w-[520px]" style={{ color: "var(--brand-hint)" }}>
           There is no endpoint serving this yet, so nothing is shown rather than a
           figure that would not be true. Set{" "}
           <code
@@ -1223,7 +1224,7 @@ export function NotBuiltYet({ what, todo }: { what: string; todo: string }) {
           </code>{" "}
           in <code>apps/web/.env.local</code> to see the full design against sample data.
         </p>
-        <p className="text-[15px]" style={{ color: "var(--brand-hint)", opacity: 0.8 }}>
+        <p className="text-meta" style={{ color: "var(--brand-hint)", opacity: 0.8 }}>
           Tracked as {todo}
         </p>
       </div>
@@ -1236,8 +1237,8 @@ export function EmptyState({ title, body, action }: { title: string; body: strin
   return (
     <Card>
       <div className="py-12 px-4 flex flex-col items-center gap-3 text-center">
-        <p className="text-[20px] font-bold" style={{ color: "var(--brand-text)" }}>{title}</p>
-        <p className="text-[17px] max-w-[460px]" style={{ color: "var(--brand-hint)" }}>{body}</p>
+        <p className="text-title font-bold" style={{ color: "var(--brand-text)" }}>{title}</p>
+        <p className="text-small max-w-[460px]" style={{ color: "var(--brand-hint)" }}>{body}</p>
         {action}
       </div>
     </Card>

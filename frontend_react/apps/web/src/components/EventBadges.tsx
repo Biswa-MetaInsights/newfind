@@ -140,7 +140,7 @@ export function EventBadge({ type }: { type: BadgeType }) {
   const Icon = cfg.icon
   return (
     <span
-      className={`${TAG} px-2.5 py-1.5 text-[16px]`}
+      className={`${TAG} px-2.5 py-1.5 text-small`}
       style={{ backgroundColor: cfg.bg, color: cfg.text }}
     >
       <Icon color={cfg.text} className={GLYPH} />
@@ -332,8 +332,8 @@ export function CategoryBadge({
   // do not read that history as a verdict on 18px itself.)
   // **Re-measure from Roboto Bold's advance widths before enlarging this.**
   const sizing = large
-    ? 'gap-[7px] px-3.5 py-[9px] text-[18px] leading-[22px]'
-    : 'gap-1.5 px-3.5 py-1.5 text-[15px] leading-5'
+    ? 'gap-[7px] px-3.5 py-[9px] text-body leading-[22px]'
+    : 'gap-1.5 px-3.5 py-1.5 text-meta leading-5'
 
   return (
     <span

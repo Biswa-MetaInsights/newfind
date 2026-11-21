@@ -125,18 +125,18 @@ export default function ConsoleLayout({ children }: { children: React.ReactNode 
                     (Gautham, 2026-08-22): `font-extrabold` + `-0.5px` tracking +
                     a clamp, exactly as EventsCarousel sets "Events in {city}"
                     and one step larger because this is an h1 over a whole
-                    section rather than a row. It was `text-[28px] font-bold
+                    section rather than a row. It was `text-heading font-bold
                     tracking-[-0.01em]` — near enough to the public heading to
                     look like a mistake rather than a difference. */}
                 <h1
                   className="font-extrabold tracking-[-0.5px]"
-                  style={{ fontSize: "clamp(24px, 4vw, 32px)", color: "var(--brand-text)" }}
+                  style={{ fontSize: "clamp(22px, 3vw, 28px)", color: "var(--brand-text)" }}
                 >
                   {title}
                 </h1>
                 {section.sub && (
                   <p
-                    className="text-[17px] mt-1.5 max-w-[680px]"
+                    className="text-small mt-1.5 max-w-[680px]"
                     style={{ color: "var(--brand-hint)", textWrap: "pretty" }}
                   >
                     {section.sub}
@@ -166,7 +166,7 @@ export default function ConsoleLayout({ children }: { children: React.ReactNode 
                   title="Console search arrives with the organiser backend"
                 >
                   <SearchIcon className="w-[18px] h-[18px] shrink-0" />
-                  <span className="text-[17px]">Search events, attendees…</span>
+                  <span className="text-small">Search events, attendees…</span>
                 </div>
 
                 {/* ⚠️ No "N need you" pill here — removed 2026-09-02 (Gautham).
@@ -182,7 +182,7 @@ export default function ConsoleLayout({ children }: { children: React.ReactNode 
             {children}
 
             {isDummyMode && (
-              <p className="text-[15px]" style={{ color: "var(--brand-hint)", opacity: 0.75 }}>
+              <p className="text-meta" style={{ color: "var(--brand-hint)", opacity: 0.75 }}>
                 Sample data — <code>NEXT_PUBLIC_DATA_MODE=dummy</code>. Figures here are made up.
               </p>
             )}

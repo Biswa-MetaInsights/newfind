@@ -21,6 +21,7 @@ import { Footer } from "@/components/Footer";
 // PARKED 2026-08-14 (MVP) â€” `toCommunityItem` dropped from this import.
 import { toCarouselEvent } from "@/lib/card-adapters";
 import { exploreHref } from "@/lib/explore-href";
+import { PAGE_MAX_WIDTH } from "@/lib/layout";
 
 const RADIUS_KM = 200;
 
@@ -121,6 +122,11 @@ function DiscoveryPage() {
       <Navbar />
       <HeroChatCollage />
 
+      {/* Capped at PAGE_MAX_WIDTH like /event/[id]: each section keeps its own
+          GUTTERS inside, so content lines up with the event page at every width
+          and a 1920px screen no longer stretches four cards to ~440px each.
+          The hero sits outside it — HeroChatCollage caps its own width. */}
+      <main style={{ maxWidth: PAGE_MAX_WIDTH, margin: "0 auto" }}>
       <EventsCarousel
         events={carouselEvents}
         location={selectedCity.name}
@@ -128,7 +134,7 @@ function DiscoveryPage() {
         onlineSeeAllHref={exploreHref("events", "Online")}
         isLoading={eventsLoading || onlineLoading}
         onBookNow={(id) => router.push(`/event/${id}`)}
-        locationSlot={<CityPicker />}
+        locationSlot={<CityPicker variant="icon" showName />}
         suggestedEvents={signedIn ? recommendations.data?.map(toCarouselEvent) : undefined}
       />
 
@@ -154,6 +160,7 @@ function DiscoveryPage() {
       <FeatureBand />
 
       <CategoryGrid />
+      </main>
 
       <Footer />
     </div>

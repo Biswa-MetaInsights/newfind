@@ -100,7 +100,7 @@ export function ListEditorModal({
           type="button"
           onClick={submit}
           disabled={saving}
-          className="w-full py-3.5 rounded-lg text-[16px] font-bold text-[var(--brand-on-green)] transition-colors disabled:opacity-60"
+          className="w-full py-3 rounded-lg text-small font-bold text-[var(--brand-on-green)] transition-colors disabled:opacity-60"
           style={{ backgroundColor: "var(--brand-green)" }}
         >
           {saving ? "Saving…" : "Save changes"}
@@ -111,7 +111,7 @@ export function ListEditorModal({
         <ListEditor kind={kind} rows={rows} onChange={setRows} errors={errors} showAdd={showAdd} />
 
         {error && (
-          <p className="text-sm px-4 py-3 rounded-lg bg-red-50 text-red-600 border border-red-200">{error}</p>
+          <p className="text-meta px-4 py-3 rounded-lg bg-red-50 text-red-600 border border-red-200">{error}</p>
         )}
       </div>
     </ModalShell>

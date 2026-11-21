@@ -71,7 +71,7 @@ export function ModalShell({
         {/* px-4 below sm: on a 320px phone the panel is 288px wide, and 48px of
             side padding left the form only 240px. */}
         <div className="flex items-center justify-between gap-3 px-4 sm:px-6 pt-5 pb-4 shrink-0">
-          <h2 className="text-[18px] font-bold text-[var(--brand-text)]">{title}</h2>
+          <h2 className="text-body font-bold text-[var(--brand-text)]">{title}</h2>
           <button
             onClick={onClose}
             className="w-9 h-9 shrink-0 rounded-full flex items-center justify-center hover:bg-[color-mix(in_srgb,var(--brand-green)_8%,transparent)] transition-colors"

@@ -60,7 +60,7 @@ export default function CommunityDetailPage({ params }: { params: Promise<{ slug
       <div className="min-h-screen" style={{ backgroundColor: BG }}>
         <Navbar />
       {joinError&&<p role="alert" className="p-4">{joinError}</p>}
-        <div className="flex justify-center py-24">
+        <div className="flex justify-center py-16">
           <div className="w-10 h-10 rounded-full border-4 border-t-transparent animate-spin"
             style={{ borderColor: `${GREEN} transparent transparent transparent` }} />
         </div>
@@ -72,11 +72,11 @@ export default function CommunityDetailPage({ params }: { params: Promise<{ slug
     return (
       <div className="min-h-screen" style={{ backgroundColor: BG }}>
         <Navbar />
-        <div className="flex flex-col items-center py-24 gap-4">
-          <p className="text-[18px] font-semibold" style={{ color: HINT }}>Community not found</p>
+        <div className="flex flex-col items-center py-16 gap-4">
+          <p className="text-body font-semibold" style={{ color: HINT }}>Community not found</p>
           <button
             onClick={() => router.push("/communities")}
-            className="text-sm font-semibold px-4 py-2 rounded-lg text-[var(--brand-on-green)]"
+            className="text-meta font-semibold px-4 py-2 rounded-lg text-[var(--brand-on-green)]"
             style={{ backgroundColor: GREEN }}
           >
             Explore Communities
@@ -111,7 +111,7 @@ export default function CommunityDetailPage({ params }: { params: Promise<{ slug
       {/* ── Hero: full-bleed photo + title overlay ──
           Mirrors /event/[id] exactly — same scrim, same control set and sizes,
           same one-line centred title, same category + status tag row. */}
-      <section className="relative flex flex-col justify-end overflow-hidden min-h-[420px] sm:min-h-[520px] lg:min-h-[600px]">
+      <section className="relative flex flex-col justify-end overflow-hidden min-h-[360px] sm:min-h-[440px] lg:min-h-[520px]">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={communityImageUrl(community, 1920, 1080)}
@@ -157,10 +157,10 @@ export default function CommunityDetailPage({ params }: { params: Promise<{ slug
 
           {/* ── Left column ── */}
           <div className="order-2 lg:order-1" style={{ textAlign: "left" }}>
-            <h2 className="text-[22px] font-bold mb-4" style={{ color: TEXT }}>
+            <h2 className="text-subhead font-bold mb-4" style={{ color: TEXT }}>
               About this community
             </h2>
-            <p className="text-[18px] leading-relaxed" style={{ color: HINT }}>
+            <p className="text-body leading-relaxed" style={{ color: HINT }}>
               {community.description ?? "No description provided."}
             </p>
             {community.website && (
@@ -168,7 +168,7 @@ export default function CommunityDetailPage({ params }: { params: Promise<{ slug
                 href={community.website}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 mt-4 text-[16px] font-semibold"
+                className="inline-flex items-center gap-1.5 mt-4 text-small font-semibold"
                 style={{ color: GREEN }}
               >
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>

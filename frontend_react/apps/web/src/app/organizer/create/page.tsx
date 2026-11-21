@@ -211,7 +211,7 @@ function DurationInput({
       <div
         onClick={() => { if (hoverCapable()) setOpen(true); }}
         className={
-          `${GLYPH_PAD} w-full px-4 py-3 rounded-lg text-sm transition-colors border-2 flex items-center ` +
+          `${GLYPH_PAD} w-full px-4 py-3 rounded-lg text-meta transition-colors border-2 flex items-center ` +
           (hasError
             ? "border-red-400 bg-red-50 focus-within:ring-2 focus-within:ring-red-200"
             : "border-[var(--brand-control-border)] bg-[var(--brand-bg)] text-[var(--brand-text)] focus-within:ring-2 focus-within:ring-[var(--brand-green)]/20 focus-within:border-[var(--brand-green)]")
@@ -281,7 +281,7 @@ function DurationInput({
  * and a card whose type is a step off the dialog it opens reads as two products.
  */
 function ExtraNote({ children }: { children: React.ReactNode }) {
-  return <p className="text-[15px] leading-relaxed text-[var(--brand-hint)]">{children}</p>;
+  return <p className="text-meta leading-relaxed text-[var(--brand-hint)]">{children}</p>;
 }
 
 /**
@@ -311,7 +311,7 @@ function OpenDialogButton({
       onClick={onClick}
       disabled={disabled}
       title={title}
-      className={`w-full py-3 rounded-lg text-[16px] font-bold ${OUTLINE_BUTTON}`}
+      className={`w-full py-3 rounded-lg text-small font-bold ${OUTLINE_BUTTON}`}
     >
       {label}
     </button>
@@ -676,11 +676,11 @@ export default function CreateEventPage() {
             </svg>
           </button>
           <div className="min-w-0">
-            <h1 className="text-[28px] font-bold" style={{ color: "var(--brand-text)" }}>Create New Event</h1>
+            <h1 className="text-heading font-bold" style={{ color: "var(--brand-text)" }}>Create New Event</h1>
             {/* No legend about the marking any more: the fields say "(required)"
                 in words, and a key at the top of a page only ever existed to
                 translate a symbol. */}
-            <p className="text-[18px]" style={{ color: "var(--brand-hint)" }}>
+            <p className="text-body" style={{ color: "var(--brand-hint)" }}>
               Fill in the details below to publish or save as draft.
             </p>
           </div>
@@ -1092,7 +1092,7 @@ export default function CreateEventPage() {
 
               <FormField label="Ticket Price" required inline width="xs" error={fieldErrors.price}>
                 <div className="relative">
-                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm font-medium" style={{ color: "var(--brand-hint)" }}>
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-meta font-medium" style={{ color: "var(--brand-hint)" }}>
                     {currencySymbol(currency)}
                   </span>
                   <input
@@ -1106,7 +1106,7 @@ export default function CreateEventPage() {
                   />
                 </div>
                 {parseFloat(price) === 0 && (
-                  <p className="text-xs font-medium mt-1" style={{ color: "var(--brand-terracotta)" }}>Free event</p>
+                  <p className="text-meta font-medium mt-1" style={{ color: "var(--brand-terracotta)" }}>Free event</p>
                 )}
               </FormField>
             </div>
@@ -1213,7 +1213,7 @@ export default function CreateEventPage() {
                   organiser; `break-all` because a pasted URL has no spaces to
                   wrap at and would otherwise widen its card. */}
               {!!imageUrl.trim() && (
-                <p className="text-[15px] break-all" style={{ color: "var(--brand-hint)" }}>
+                <p className="text-meta break-all" style={{ color: "var(--brand-hint)" }}>
                   {isUploadedImage(imageUrl)
                     ? "A picture from this device is attached."
                     : imageUrl.trim()}
@@ -1230,7 +1230,7 @@ export default function CreateEventPage() {
           </div>
 
           {/* PARKED 2026-11-17 — the Community section; see the parked state block near the top.
-          {community&&<Section title="Community"><label className="flex items-center gap-3 text-[18px]"><input type="checkbox" checked={!!communityId} onChange={e=>setCommunityId(e.target.checked?community.id:'')}/>Add this event to {community.name}</label></Section>}
+          {community&&<Section title="Community"><label className="flex items-center gap-3 text-body"><input type="checkbox" checked={!!communityId} onChange={e=>setCommunityId(e.target.checked?community.id:'')}/>Add this event to {community.name}</label></Section>}
           */}
 
 
@@ -1242,11 +1242,11 @@ export default function CreateEventPage() {
               they have to look down for. They land where the buttons were, which
               is where the eye already is after pressing one. */}
           {error && (
-            <p className="text-sm px-4 py-3 rounded-lg bg-red-50 text-red-600 border border-red-200">{error}</p>
+            <p className="text-meta px-4 py-3 rounded-lg bg-red-50 text-red-600 border border-red-200">{error}</p>
           )}
 
           {success && (
-            <div className="flex items-center gap-2 text-sm font-semibold px-4 py-3 rounded-lg" style={{ color: GREEN, backgroundColor: "color-mix(in srgb, var(--brand-green) 10%, transparent)" }}>
+            <div className="flex items-center gap-2 text-meta font-semibold px-4 py-3 rounded-lg" style={{ color: GREEN, backgroundColor: "color-mix(in srgb, var(--brand-green) 10%, transparent)" }}>
               <svg className="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
               </svg>

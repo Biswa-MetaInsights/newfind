@@ -192,8 +192,8 @@ export default function OrganizerOnboardingPage() {
             </svg>
           </button>
           <div className="min-w-0">
-            <h1 className="text-[28px] font-bold" style={{ color: "var(--brand-text)" }}>Set up your organisation</h1>
-            <p className="text-[18px]" style={{ color: "var(--brand-hint)" }}>
+            <h1 className="text-heading font-bold" style={{ color: "var(--brand-text)" }}>Set up your organisation</h1>
+            <p className="text-body" style={{ color: "var(--brand-hint)" }}>
               Add your organisation details to publish events. Your organisation name appears publicly.
               Contact details, company address and bank details stay private.
             </p>
@@ -354,7 +354,7 @@ export default function OrganizerOnboardingPage() {
             </div>
           </Section>
 
-          <p className="text-sm leading-relaxed" style={{ color: "var(--brand-hint)" }}>
+          <p className="text-meta leading-relaxed" style={{ color: "var(--brand-hint)" }}>
             By submitting, you confirm that the information provided is accurate and belongs to a legally
             registered entity. NewFind reserves the right to suspend accounts where false information is provided.
           </p>
@@ -362,11 +362,11 @@ export default function OrganizerOnboardingPage() {
           {/* Whatever the submit had to say, last in the sequence — the same
               two messages, in the same two skins, as the create page. */}
           {error && (
-            <p className="text-sm px-4 py-3 rounded-lg bg-red-50 text-red-600 border border-red-200">{error}</p>
+            <p className="text-meta px-4 py-3 rounded-lg bg-red-50 text-red-600 border border-red-200">{error}</p>
           )}
 
           {success && (
-            <div className="flex items-center gap-2 text-sm font-semibold px-4 py-3 rounded-lg" style={{ color: GREEN, backgroundColor: "color-mix(in srgb, var(--brand-green) 10%, transparent)" }}>
+            <div className="flex items-center gap-2 text-meta font-semibold px-4 py-3 rounded-lg" style={{ color: GREEN, backgroundColor: "color-mix(in srgb, var(--brand-green) 10%, transparent)" }}>
               <svg className="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
               </svg>

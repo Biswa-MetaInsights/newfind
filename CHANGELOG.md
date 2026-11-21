@@ -9,6 +9,10 @@
 
 ---
 
+## 2026-11-18
+
+- Site-wide type scale brought down ~10–15% to common web sizes and moved onto nine role classes in `globals.css`; navbar 72→56/64px; card grids 3-up at `lg`; home, `/explore` and event rails capped at 1400px.
+
 ## 2026-11-17
 
 - Review follow-ups (3): event chat page scrolls to the newest message, announces only the newest to screen readers, Send looks disabled when it is, no blank page while loading; deployment is recorded as a question for Biswajith (`backend_to-do.md` §9).

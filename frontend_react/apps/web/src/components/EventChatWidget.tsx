@@ -141,8 +141,8 @@ export function EventChatWidget({ event }: Props) {
                 </svg>
               </div>
               <div>
-                <p className="text-[13px] font-bold text-[var(--brand-on-green)] leading-none">Event Assistant</p>
-                <p className="text-[11px] text-[var(--brand-on-green)]/70 truncate mt-0.5" style={{ maxWidth: 180 }}>
+                <p className="text-meta font-bold text-[var(--brand-on-green)] leading-none">Event Assistant</p>
+                <p className="text-meta text-[var(--brand-on-green)]/70 truncate mt-0.5" style={{ maxWidth: 180 }}>
                   {event.title}
                 </p>
               </div>
@@ -172,8 +172,8 @@ export function EventChatWidget({ event }: Props) {
                   </svg>
                 </div>
                 <div>
-                  <p className="font-bold text-[14px]" style={{ color: "var(--brand-text)" }}>Sign in to chat</p>
-                  <p className="text-[12px] mt-1 leading-relaxed" style={{ color: "var(--brand-hint)" }}>
+                  <p className="font-bold text-meta" style={{ color: "var(--brand-text)" }}>Sign in to chat</p>
+                  <p className="text-meta mt-1 leading-relaxed" style={{ color: "var(--brand-hint)" }}>
                     The event assistant is available to registered attendees and the event organiser.
                   </p>
                 </div>
@@ -189,8 +189,8 @@ export function EventChatWidget({ event }: Props) {
                   </svg>
                 </div>
                 <div>
-                  <p className="font-bold text-[14px]" style={{ color: "var(--brand-text)" }}>Attendees only</p>
-                  <p className="text-[12px] mt-1 leading-relaxed" style={{ color: "var(--brand-hint)" }}>
+                  <p className="font-bold text-meta" style={{ color: "var(--brand-text)" }}>Attendees only</p>
+                  <p className="text-meta mt-1 leading-relaxed" style={{ color: "var(--brand-hint)" }}>
                     Register for this event to unlock the AI event assistant.
                   </p>
                 </div>
@@ -202,7 +202,7 @@ export function EventChatWidget({ event }: Props) {
               <>
                 {/* Access badge */}
                 <div className="flex justify-center pt-3 pb-1 shrink-0">
-                  <span className="text-[10px] font-bold px-2.5 py-1 rounded-lg" style={{ backgroundColor: `color-mix(in srgb, var(--brand-green) 8%, transparent)`, color: GREEN }}>
+                  <span className="text-meta font-bold px-2.5 py-1 rounded-lg" style={{ backgroundColor: `color-mix(in srgb, var(--brand-green) 8%, transparent)`, color: GREEN }}>
                     {badgeLabel} · Event Assistant
                   </span>
                 </div>
@@ -216,7 +216,7 @@ export function EventChatWidget({ event }: Props) {
                   {loading && <TypingIndicator />}
 
                   {error && (
-                    <p className="text-[11px] text-center px-2 py-1 rounded-lg text-red-500 bg-red-50">
+                    <p className="text-meta text-center px-2 py-1 rounded-lg text-red-500 bg-red-50">
                       {error}
                     </p>
                   )}
@@ -234,7 +234,7 @@ export function EventChatWidget({ event }: Props) {
                       onChange={(e) => setInput(e.target.value)}
                       onKeyDown={handleKeyDown}
                       placeholder="Ask about this event…"
-                      className="flex-1 text-[13px] bg-transparent outline-none"
+                      className="flex-1 text-meta bg-transparent outline-none"
                       style={{ color: "var(--brand-text)" }}
                       disabled={loading}
                     />
@@ -251,7 +251,7 @@ export function EventChatWidget({ event }: Props) {
                       </svg>
                     </button>
                   </div>
-                  <p className="text-[10px] text-center mt-1.5" style={{ color: "var(--brand-hint)" }}>
+                  <p className="text-meta text-center mt-1.5" style={{ color: "var(--brand-hint)" }}>
                     AI-powered · Responses may not reflect live updates
                   </p>
                 </div>
@@ -307,7 +307,7 @@ function MessageBubble({ message }: { message: ChatMessage }) {
         </div>
       )}
       <div
-        className="max-w-[85%] px-3 py-2 rounded-lg text-[13px] leading-relaxed"
+        className="max-w-[85%] px-3 py-2 rounded-lg text-meta leading-relaxed"
         style={{
           backgroundColor: isUser ? GREEN : "var(--brand-surface)",
           color: isUser ? "var(--brand-on-green)" : "var(--brand-text)",

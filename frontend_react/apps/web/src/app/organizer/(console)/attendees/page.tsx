@@ -376,36 +376,36 @@ function AttendeeRow({
     <TableRow template={TEMPLATE}>
       <div className="flex items-center gap-2.5 min-w-0">
         <span
-          className="inline-flex items-center justify-center w-9 h-9 rounded-full shrink-0 text-[15px] font-bold"
+          className="inline-flex items-center justify-center w-9 h-9 rounded-full shrink-0 text-meta font-bold"
           style={{ backgroundColor: "color-mix(in srgb, var(--brand-green) 14%, transparent)", color: "var(--brand-green)" }}
         >
           {a.initials}
         </span>
         <span className="flex flex-col min-w-0">
-          <span className="text-[17px] font-semibold truncate" style={{ color: "var(--brand-text)" }}>{a.name}</span>{check.isError&&<span role="alert" className="text-[15px]">Check-in could not be saved. Retry.</span>}
+          <span className="text-small font-semibold truncate" style={{ color: "var(--brand-text)" }}>{a.name}</span>{check.isError&&<span role="alert" className="text-meta">Check-in could not be saved. Retry.</span>}
           {a.repeat && (
-            <span className="text-[15px]" style={{ color: "var(--brand-green)" }}>{a.repeat}</span>
+            <span className="text-meta" style={{ color: "var(--brand-green)" }}>{a.repeat}</span>
           )}
         </span>
       </div>
 
-      <div className="min-w-0 text-[17px]" style={{ color: "var(--brand-hint)" }}>
+      <div className="min-w-0 text-small" style={{ color: "var(--brand-hint)" }}>
         <div className="truncate">{a.email}</div>
-        <div className="text-[15px] opacity-80">{a.phone}</div>
+        <div className="text-meta opacity-80">{a.phone}</div>
       </div>
 
-      <div className="text-[17px]" style={{ color: "var(--brand-hint)" }}>{a.ticket}</div>
+      <div className="text-small" style={{ color: "var(--brand-hint)" }}>{a.ticket}</div>
       {/* The attendee's own currency — the event they bought into priced it.
           Never a literal here; see the rule in lib/currency.ts. */}
-      <div className="text-[17px] font-semibold" style={{ color: "var(--brand-text)" }}>
+      <div className="text-small font-semibold" style={{ color: "var(--brand-text)" }}>
         {formatPrice(a.paid, a.currency, { freeLabel: null })}
       </div>
-      <div className="text-[17px]" style={{ color: "var(--brand-hint)" }}>{formatEventMoment(a.booked, zone)}</div>
+      <div className="text-small" style={{ color: "var(--brand-hint)" }}>{formatEventMoment(a.booked, zone)}</div>
       <div className="flex flex-col items-start gap-1">
         {arrived ? (
           <>
             <Pill tone="good">Checked in</Pill>
-            <span className="text-[15px]" style={{ color: "var(--brand-hint)" }}>at {timeOf(checkedInAt)}</span>
+            <span className="text-meta" style={{ color: "var(--brand-hint)" }}>at {timeOf(checkedInAt)}</span>
           </>
         ) : (
           <Pill tone={confirmed ? "good" : "warn"}>{a.status}</Pill>
