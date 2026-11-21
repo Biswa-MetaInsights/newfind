@@ -62,3 +62,7 @@ newfind-offsite-restore-*/
 
 # Backup encryption passwords (retain a separate recovery copy)
 .secrets/
+
+# Frontend testing (dev only): generated throwaway logins and screenshots
+frontend_testing/accounts.local.json
+frontend_testing/shots/

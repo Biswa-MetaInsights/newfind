@@ -1,8 +1,10 @@
 "use client";
 
-import { use } from "react";
+import { use, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { apiClient } from "@eventmind/api";
+import { useAuthStore } from "@eventmind/store";
 import { communitySource, eventsSource } from "@/lib/data-source";
 import { Navbar } from "@/components/navbar/Navbar";
 import { CategoryBadge, EventBadges } from "@/components/EventBadges";
@@ -47,11 +49,18 @@ export default function CommunityDetailPage({ params }: { params: Promise<{ slug
     enabled: !!communityRes?.id,
   });
 
+  const authenticated = useAuthStore(s=>s.isAuthenticated);
+  const cache = useQueryClient();
+  const [joinError,setJoinError] = useState('');
+  const membership = useQuery({queryKey:['community-membership',communityRes?.id],queryFn:()=>apiClient.get<{joined:boolean;owner:boolean}>(`/community/${communityRes!.id}/members/me`).then(r=>r.data),enabled:authenticated&&!!communityRes});
+  const join = useMutation({mutationFn:()=>membership.data?.joined ? apiClient.delete(`/community/${communityRes!.id}/members`) : apiClient.post(`/community/${communityRes!.id}/members`),onSuccess:()=>{setJoinError('');void cache.invalidateQueries({queryKey:['community-membership',communityRes?.id]});void cache.invalidateQueries({queryKey:['community',slug]});},onError:()=>setJoinError('Membership could not be updated. Please try again. The organiser cannot leave their own community.')});
+  const joinLabel = join.isPending ? 'Saving…' : membership.data?.owner ? 'You organise this community' : membership.data?.joined ? 'Leave community' : 'Join this community';
   if (communityLoading) {
     return (
       <div className="min-h-screen" style={{ backgroundColor: BG }}>
         <Navbar />
-        <div className="flex justify-center py-24">
+      {joinError&&<p role="alert" className="p-4">{joinError}</p>}
+        <div className="flex justify-center py-16">
           <div className="w-10 h-10 rounded-full border-4 border-t-transparent animate-spin"
             style={{ borderColor: `${GREEN} transparent transparent transparent` }} />
         </div>
@@ -63,11 +72,11 @@ export default function CommunityDetailPage({ params }: { params: Promise<{ slug
     return (
       <div className="min-h-screen" style={{ backgroundColor: BG }}>
         <Navbar />
-        <div className="flex flex-col items-center py-24 gap-4">
-          <p className="text-[18px] font-semibold" style={{ color: HINT }}>Community not found</p>
+        <div className="flex flex-col items-center py-16 gap-4">
+          <p className="text-body font-semibold" style={{ color: HINT }}>Community not found</p>
           <button
             onClick={() => router.push("/communities")}
-            className="text-sm font-semibold px-4 py-2 rounded-lg text-[var(--brand-on-green)]"
+            className="text-meta font-semibold px-4 py-2 rounded-lg text-[var(--brand-on-green)]"
             style={{ backgroundColor: GREEN }}
           >
             Explore Communities
@@ -93,7 +102,7 @@ export default function CommunityDetailPage({ params }: { params: Promise<{ slug
   // ⚠️ Joining does nothing yet — there is no membership table, no join endpoint
   // and no notification hook. Gautham asked for the button now and the flow
   // later; the spec lives in TODO.md under "Join a community".
-  function handleJoin() {}
+  function handleJoin() {if(!authenticated){router.push('/auth');return;}if(!join.isPending&&!membership.data?.owner)join.mutate();}
 
   return (
     <div className="min-h-screen text-left" style={{ backgroundColor: BG }}>
@@ -102,7 +111,7 @@ export default function CommunityDetailPage({ params }: { params: Promise<{ slug
       {/* ── Hero: full-bleed photo + title overlay ──
           Mirrors /event/[id] exactly — same scrim, same control set and sizes,
           same one-line centred title, same category + status tag row. */}
-      <section className="relative flex flex-col justify-end overflow-hidden min-h-[420px] sm:min-h-[520px] lg:min-h-[600px]">
+      <section className="relative flex flex-col justify-end overflow-hidden min-h-[360px] sm:min-h-[440px] lg:min-h-[520px]">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={communityImageUrl(community, 1920, 1080)}
@@ -148,10 +157,10 @@ export default function CommunityDetailPage({ params }: { params: Promise<{ slug
 
           {/* ── Left column ── */}
           <div className="order-2 lg:order-1" style={{ textAlign: "left" }}>
-            <h2 className="text-[22px] font-bold mb-4" style={{ color: TEXT }}>
+            <h2 className="text-subhead font-bold mb-4" style={{ color: TEXT }}>
               About this community
             </h2>
-            <p className="text-[18px] leading-relaxed" style={{ color: HINT }}>
+            <p className="text-body leading-relaxed" style={{ color: HINT }}>
               {community.description ?? "No description provided."}
             </p>
             {community.website && (
@@ -159,7 +168,7 @@ export default function CommunityDetailPage({ params }: { params: Promise<{ slug
                 href={community.website}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 mt-4 text-[16px] font-semibold"
+                className="inline-flex items-center gap-1.5 mt-4 text-small font-semibold"
                 style={{ color: GREEN }}
               >
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -173,7 +182,7 @@ export default function CommunityDetailPage({ params }: { params: Promise<{ slug
 
             {/* Reviews. A community has none of its own, so these are aggregated
                 from its past events — see CommunityReviews. */}
-            <CommunityReviews pastEvents={previous} />
+            <CommunityReviews communityId={community.id} />
           </div>
 
           {/* ── Right sidebar: join card ── */}
@@ -183,6 +192,7 @@ export default function CommunityDetailPage({ params }: { params: Promise<{ slug
               nextEvent={upcoming[0]}
               eventCount={eventCount}
               onJoin={handleJoin}
+              joinLabel={joinLabel}
             />
           </div>
         </div>
@@ -203,7 +213,7 @@ export default function CommunityDetailPage({ params }: { params: Promise<{ slug
       <DetailStickyBar
         caption="Membership"
         amount={isFree ? "Free" : formatPrice(price)}
-        cta="Join this community"
+        cta={joinLabel}
         onClick={handleJoin}
         gutters={GUTTERS}
       />

@@ -35,15 +35,17 @@
 
 import { Suspense, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useQuery } from "@tanstack/react-query";
-import { organizerSource } from "@/lib/data-source";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { apiClient } from "@eventmind/api";
+import { organizerSource, isDummyMode } from "@/lib/data-source";
 import { formatPrice } from "@/lib/currency";
 import { csvFilename, downloadCsv } from "@/lib/csv";
 import { useCheckIns, setCheckedIn } from "@/lib/checkin-store";
-import type { DummyAttendee } from "@/lib/fixtures/organizer";
+import type { DummyAttendee } from "@/frontend_testing/fixtures/organizer";
 import { useOrganiser, useOrganiserEvents } from "@/components/organizer/useOrganiser";
+import { formatEventMoment } from "@/lib/event-time";
 import {
-  Card, Pill, StatTile, FilterSelect, ConsoleButton, EmptyState, NotBuiltYet,
+  Card, Pill, StatTile, FilterSelect, ConsoleButton, EmptyState,
   RowAction, RowMenu, TableScroller, TableHead, TableRow, TableFooter,
 } from "@/components/organizer/ConsoleUI";
 import type { FilterOption, RowMenuItem } from "@/components/organizer/ConsoleUI";
@@ -96,13 +98,15 @@ function AttendeesInner() {
 
   const { organiserId } = useOrganiser();
   const { data: events = [] } = useOrganiserEvents(organiserId);
-  const checkIns = useCheckIns();
+  const localCheckIns = useCheckIns();
   const [door, setDoor] = useState(false);
 
-  const { data: attendees = [], isLoading } = useQuery({
+  const { data: attendees = [], isLoading, isError, refetch } = useQuery({
     queryKey: ["organizer-attendees"],
     queryFn: () => organizerSource.attendees().then((r) => r.data),
   });
+
+  const checkIns = useMemo(() => isDummyMode ? localCheckIns : Object.fromEntries(attendees.filter(a=>a.checked_in_at).map(a=>[a.id,a.checked_in_at!])), [attendees,localCheckIns]);
 
   const titleOf = useMemo(() => {
     const m = new Map(events.map((e) => [String(e.id), e.title]));
@@ -211,7 +215,7 @@ function AttendeesInner() {
   // page — one is fixed by clearing the filter, the other by building an
   // endpoint.
   if (!isLoading && attendees.length === 0) {
-    return <NotBuiltYet what="Attendee lists" todo="TODO.md §19" />;
+    return isError ? <div role="alert">Attendees could not be loaded. <button className="underline" onClick={()=>void refetch()}>Retry</button></div> : <EmptyState title="No attendees yet" body="Confirmed bookings will appear here." />;
   }
 
   const narrowed = ticket !== ALL || status !== "any";
@@ -320,7 +324,7 @@ function AttendeesInner() {
                 columns={["Attendee", "Contact", "Ticket", "Paid", "Booked", "Status", <span key="a" className="text-right block">Actions</span>]}
               />
               {rows.map((a) => (
-                <AttendeeRow key={a.id} attendee={a} checkedInAt={checkIns[a.id]} door={door} />
+                <AttendeeRow key={a.id} attendee={a} checkedInAt={checkIns[a.id]} door={door} zone={events.find((e) => e.id === a.eventId)?.timezone} />
               ))}
             </TableScroller>
             <TableFooter
@@ -341,13 +345,18 @@ const timeOf = (iso: string) =>
   new Date(iso).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
 
 function AttendeeRow({
-  attendee: a, checkedInAt, door,
+  attendee: a, checkedInAt, door, zone,
 }: {
   attendee: DummyAttendee;
+  /** The attendee's event zone: "Booked" arrives as a raw ISO string. */
+  zone?: string;
   /** ISO time from the local door record, or undefined if they have not arrived. */
   checkedInAt?: string;
   door: boolean;
 }) {
+  const queryClient = useQueryClient();
+  const check = useMutation({mutationFn: (on: boolean) => on ? apiClient.post(`/ticket/check-in/${a.eventId}/${a.id}`) : apiClient.delete(`/ticket/check-in/${a.eventId}/${a.id}`), onSuccess: () => {void queryClient.invalidateQueries({queryKey: ['organizer-attendees']});void queryClient.invalidateQueries({queryKey: ['organizer-overview']});}});
+  const setCheck = (on: boolean) => isDummyMode ? setCheckedIn(a.id,on) : check.mutate(on);
   const confirmed = a.status === "Confirmed";
   const arrived = confirmed && !!checkedInAt;
   const firstName = a.name.split(" ")[0];
@@ -356,7 +365,7 @@ function AttendeeRow({
     ...(confirmed
       ? [{
           label: arrived ? "Undo check-in" : "Check in",
-          onSelect: () => setCheckedIn(a.id, !arrived),
+          onSelect: () => setCheck(!arrived),
         }]
       : []),
     { label: "Copy email address", onSelect: () => { void navigator.clipboard?.writeText(a.email); } },
@@ -367,36 +376,36 @@ function AttendeeRow({
     <TableRow template={TEMPLATE}>
       <div className="flex items-center gap-2.5 min-w-0">
         <span
-          className="inline-flex items-center justify-center w-9 h-9 rounded-full shrink-0 text-[15px] font-bold"
+          className="inline-flex items-center justify-center w-9 h-9 rounded-full shrink-0 text-meta font-bold"
           style={{ backgroundColor: "color-mix(in srgb, var(--brand-green) 14%, transparent)", color: "var(--brand-green)" }}
         >
           {a.initials}
         </span>
         <span className="flex flex-col min-w-0">
-          <span className="text-[17px] font-semibold truncate" style={{ color: "var(--brand-text)" }}>{a.name}</span>
+          <span className="text-small font-semibold truncate" style={{ color: "var(--brand-text)" }}>{a.name}</span>{check.isError&&<span role="alert" className="text-meta">Check-in could not be saved. Retry.</span>}
           {a.repeat && (
-            <span className="text-[15px]" style={{ color: "var(--brand-green)" }}>{a.repeat}</span>
+            <span className="text-meta" style={{ color: "var(--brand-green)" }}>{a.repeat}</span>
           )}
         </span>
       </div>
 
-      <div className="min-w-0 text-[17px]" style={{ color: "var(--brand-hint)" }}>
+      <div className="min-w-0 text-small" style={{ color: "var(--brand-hint)" }}>
         <div className="truncate">{a.email}</div>
-        <div className="text-[15px] opacity-80">{a.phone}</div>
+        <div className="text-meta opacity-80">{a.phone}</div>
       </div>
 
-      <div className="text-[17px]" style={{ color: "var(--brand-hint)" }}>{a.ticket}</div>
+      <div className="text-small" style={{ color: "var(--brand-hint)" }}>{a.ticket}</div>
       {/* The attendee's own currency — the event they bought into priced it.
           Never a literal here; see the rule in lib/currency.ts. */}
-      <div className="text-[17px] font-semibold" style={{ color: "var(--brand-text)" }}>
+      <div className="text-small font-semibold" style={{ color: "var(--brand-text)" }}>
         {formatPrice(a.paid, a.currency, { freeLabel: null })}
       </div>
-      <div className="text-[17px]" style={{ color: "var(--brand-hint)" }}>{a.booked}</div>
+      <div className="text-small" style={{ color: "var(--brand-hint)" }}>{formatEventMoment(a.booked, zone)}</div>
       <div className="flex flex-col items-start gap-1">
         {arrived ? (
           <>
             <Pill tone="good">Checked in</Pill>
-            <span className="text-[15px]" style={{ color: "var(--brand-hint)" }}>at {timeOf(checkedInAt)}</span>
+            <span className="text-meta" style={{ color: "var(--brand-hint)" }}>at {timeOf(checkedInAt)}</span>
           </>
         ) : (
           <Pill tone={confirmed ? "good" : "warn"}>{a.status}</Pill>
@@ -412,15 +421,16 @@ function AttendeeRow({
         )}
         {confirmed && !arrived && (
           <RowAction
+            disabled={check.isPending}
             tone={door ? "green" : "outline"}
-            onClick={() => setCheckedIn(a.id, true)}
+            onClick={() => setCheck(true)}
             title={`Mark ${firstName} as arrived`}
           >
             Check in
           </RowAction>
         )}
         {arrived && (
-          <RowAction onClick={() => setCheckedIn(a.id, false)} title="Take the check-in back">
+          <RowAction onClick={() => setCheck(false)} title="Take the check-in back">
             Undo
           </RowAction>
         )}

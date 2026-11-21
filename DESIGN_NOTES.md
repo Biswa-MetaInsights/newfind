@@ -29,6 +29,12 @@
 | **`CategoryGrid` has 11 tiles, leaving a hole in the 6th column** | Filling it means a 12th category, and Gautham explicitly chose the 11 Explore categories over adding Music. |
 | **`FeatureBand` is NOT centred** (and, since 2026-08-19, not capped either) | Three layouts were built and dropped before this one. **Full-bleed** (cards to the gutters, like every other home section) — "it doesn't need to be stretched the entire width". **Everything centred** (the reference mockup's look) and **only the card grid narrowed** while the heading kept the gutters — both offered, both turned down. The fourth, **centred block with left-aligned contents**, shipped briefly and was then dropped too: it was the only home section not sharing a left edge with its neighbours, and Gautham's answer was "left align the whole thing". So the cap now only stops the cards stretching — the band starts at the gutter and the spare room falls on the right, which keeps the heading on the same left line as `EventsCarousel` and `CategoryGrid`. 960 was picked over 1100 and 1280; at three-up it put a card near 305px, close to an event card on the same page. ⚠️ **Amended 2026-08-19 — the cap is GONE and the full-width answer above is REVERSED.** The band no longer shows three cards at a time: both audiences are on screen at once, which is **seven tiles on one line**, and Gautham asked for them to "take up the entire width of the website". It went 960 → 1400 → no cap at all in one session, so `BAND_MAX_WIDTH` no longer exists and the band carries only `GUTTERS`, like `EventsCarousel` and `CategoryGrid`. **"It doesn't need to be stretched the entire width" applied to three cards and does not apply to seven — do not re-cap it on the strength of that line.** What still stands is everything about *centring*: the band starts at the gutter, nothing is `margin: 0 auto`, and the text is left-aligned, so the shared left line is intact. |
 | **`FeatureBand` shows both audiences at once, with no switch** | The **For Participants / For Organisers** `RailToggle` shipped 2026-08-17 and was dropped on 2026-08-19: a visitor only ever saw half the pitch, and which half depended on a default. Participants now sit left and organisers right, each tile labelled with a coloured dot, and **each half ends in a CTA tile** — which also retired the outline **Explore events / Publish an event** button pair that used to sit under the grid. Do not re-propose the toggle, and do not move the CTAs back below the grid. |
+| **Home hero is the polaroid mockup, bent to the brand rules** (2026-11-16) | Ported from the "Photos 1 — polaroids" dark + light mockups. Decided with Gautham: **Roboto only** (the mockup's Caveat captions and Bricolage callout became Roboto bold / extrabold), **one `rounded-lg` radius** (a bubble keeps its tail by reducing one corner; the mockup's 22–32px corners and pills were not used), the shared **`CityPicker`** instead of a free-text location, and the **existing `public/hero` photos**. The palette the brand has no tokens for is `--hero-*` in `globals.css`. ⚠️ **Two deviations from the mockup to know about:** the callout carries **dark ink**, not linen (linen on `#45B09E` is ~2.4:1), and the polaroid columns start at **`xl` (1280)**, not the mockup's 1000px — at 1024–1279px the side columns are ~130–260px, narrower than the 200–220px polaroids, so a round-avatar strip stands in. At 1280px the second polaroids still tuck ~55px under the chat card; that is intended, not a bug. The light theme's white chat card, search bar and polaroid frames are the app's only pure-white surfaces. |
+| **Sign-in / sign-up page has no photo and no top bar** (2026-11-17) | The market photo (`hero-3.jpg`) under a green gradient was shown, then removed at Gautham's request. His reason: the version with the photo looks good at full screen, but as soon as the width is reduced the photo becomes awkward; and since customers use this page for maybe 10 seconds, a simple, reliable page is enough, and beautifying it would likely be redundant anyway. The left panel is solid `--brand-green` with the logo linking home; the site navbar is not shown; **Back to home** sits top-right. Do not re-add a photo. |
+| **Event cards show no year** (2026-11-17) | `cardDateTime()` briefly added the year ("Wed, 25 Nov, 2026"). That made the date row long enough to squeeze the venue name out at 1440px, leaving only the pin icon. The year was removed from **cards** to make room for the venue. ⚠️ The **event page keeps** the year — the removal is about the card's width only. Do not put the year back on cards. |
+| **Explore has no map; its location control is the home-page city dropdown** (2026-11-17) | The Leaflet/OpenStreetMap "Show map" was commented out (code kept, see `PARKED_README.md`) to keep city picking simple for users. The location control is the same `CityPicker` the home page and navbar use. |
+| **Create form has no Visibility field** (2026-11-17) | Private **and** Unlisted were commented out. Private events are not part of the MVP / phase 1 of the project and will be added in a later phase if needed; Unlisted went with it. The form still sends `public`, and the backend and types still support all three values. **Do not delete the commented field** (`PARKED_README.md`). |
+| **Communities are hidden from users** (2026-11-17) | Re-parked in full (the nav entry and the create-form section had come back with the PR 9 frontend). `/communities` and `/community/**` redirect to `/`; all the code stays. First parked 2026-08-14; same reason: not part of the MVP. See `PARKED_README.md` for the re-enable steps. |
 
 ---
 
@@ -40,32 +46,26 @@
 is a grid. Both size their cards to **reproduce the home grid's cell exactly**, using percentages:
 
 ```
-basis-full  sm:basis-[calc((100%-20px)/2)]  xl:basis-[calc((100%-60px)/4)]
+basis-full  sm:basis-[calc((100%-20px)/2)]  lg:basis-[calc((100%-40px)/3)]  xl:basis-[calc((100%-60px)/4)]
 ```
 
-mirroring home's `grid-cols-1 sm:grid-cols-2 xl:grid-cols-4` + `gap-5`.
+mirroring home's `grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4` + `gap-5` (the `lg`
+3-up step was added 2026-11-18; before it, a 1024px laptop showed two ~470px cards a row).
 
 **⚠️ Percentages, never `100vw`.** A viewport-based version failed twice:
 
 1. It had to double-count padding, needing a fourth `lg` breakpoint just to track home's px-6 → px-12 step.
 2. **`100vw` includes the vertical scrollbar; a container's width excludes it.** Four cards came out ~15px wider than the row could hold, so the fourth clipped into a scroll.
 
-Percentages have neither problem — but they only work *because* `SimilarEvents` is full-bleed with
-home's own gutters, which makes both containers the same width.
+Percentages have neither problem — but they only work *because* the rail's content box is the same
+width as home's: `GUTTERS` inside a `PAGE_MAX_WIDTH` column in both places.
 
-Verified: **4 cards, zero scroll, arrows hidden, card width 321px @1440 and 441px @1920 — identical
-to home at both.** 6 cards overflow and the arrows appear.
+### Why the rail's divider is full-bleed but its cards are not
 
-### Why `SimilarEvents` is full-bleed
-
-Rendered as a sibling **after** the page's `maxWidth: 1400` column, carrying home's
-`px-4 sm:px-6 lg:px-12` gutters (`GUTTERS`). That is what lets **a row of four fill without
-scrolling at home's card size** — inside the capped column, four cards only fit by shrinking to
-~311px, narrower than home at every width.
-
-**The trade Gautham accepted:** above a 1400px viewport the section's edges sit outside the column
-above it (~260px at 1920). The full-width divider is what makes that read as a section break rather
-than a misalignment.
+Until 2026-11-18 home ran full width (four cards ~441px at 1920), so `SimilarEvents` was rendered
+full-bleed *after* the page's 1400px column to keep home's card size. Home is now capped at 1400px
+too, so the rail's **content** moved into that same column (cards ~311px at 1920, identical to home)
+while its `border-top` divider stays full-bleed as a section break.
 
 ### Clip room — the `-mt-6 -mb-10` trick
 
@@ -299,18 +299,55 @@ token itself fails AA as text on linen.
 
 ## 8. Typography rationale
 
-The owner approved Inter and a more compact Eventbrite-inspired hierarchy on 2026-11-06.
-This uses an independent open font rather than copying Eventbrite's font assets.
-The role tokens and classes in `globals.css` define the scale; `layout.tsx` loads the
-font once. Supporting text is 14px while body and inputs remain 16px. Card titles
-use 18px on mobile and 20px on desktop; headings use tighter leading than body text.
-The logo artwork, green palette, controls' touch areas and specialized dashboard
-figures retain their identities. `data-keep-type` remains an exception for the legacy
-unused EventCard only. Future changes should use the shared roles.
+**Why the scale came down (2026-11-18).** The site read as oversized. Against common web scales
+(Airbnb, Meetup, Eventbrite, Material 3 — approximate, not live-measured) it ran one to two steps
+high on every role:
+
+| Role | Was | Typical | Now (phone / sm / lg) |
+|---|---|---|---|
+| Floor (labels, counts) | 15px | 12–13px | 14 / 14 / 14 |
+| Body, card meta | 18px | 14–16px | 15 / 16 / 16 |
+| Buttons, tabs | 18–20px bold | 14–16px | 15 / 15 / 16 |
+| Card title | 20px | 16–18px | 17 / 18 / 18 |
+| StatTile figure | 32px | 24–28px | 24 / 28 / 28 |
+| Navbar | 72px | 56–64px | 56 / 56 / 64 |
+
+The user chose a **moderate** step (~10–15%), not the densest standard, and the whole site — the
+public pages included. In the same pass the card grid gained a 3-up `lg` step and home / `/explore`
+were capped at 1400px, because the images felt large as much from layout as from type.
+
+**Why roles instead of pixel values:** ~300 hardcoded `text-[Npx]` classes across 48 files meant
+there was no single knob. They were codemodded onto nine role classes (`text-meta` … `text-display`)
+by old pixel value, then every control was moved to `text-control` by hand — the same 20px had been
+both a card title and a filter tab. The numbers now live once, per breakpoint, in `globals.css`.
+
+**The console's scale history:** until 2026-08-22 it ran its own scale (everything at the floor plus
+11px uppercase micro-labels), which more than any colour made it read as a different product. It
+then moved onto the public scale, one step quieter for tables (`text-small` cells).
+
+**An earlier compact scale was reverted.** Commit 81fbb91 (2026-11-06) moved the app to Inter with
+its own role tokens; the PR 9 frontend restore (d72f4b0) took the code back to Roboto and a 15px
+floor, and this section kept describing the reverted version until 2026-11-18. The font is Roboto.
+
+**Fixed-size art keeps pixel sizes:** `HeroChatCollage`'s polaroid caption (22px) and emoji (16px), and its chat
+avatars (26px emoji in a `h-9 w-9` box), are drawn objects sized with their card, so they stay `text-[Npx]` deliberately. The polaroids
+are 176/194/184px wide (photos 164–202px tall) in a 420px column, and the callout headline is `clamp(22px,2.6vw,26px)`.
+
+**The floor rule uses `!important`.** That is safe because the role classes are never combined with
+the floored classes on one element; if you add one that is, check which wins.
+
+**Why `data-keep-type` exists:** `EventCard.tsx`'s 11/12/14px type is intentional and must not
+change. It is dead code; nothing live opts out.
 
 ---
 
 ## 9. `HeroCarousel` mode system
+
+> **⚠️ HISTORICAL — `HeroCarousel.tsx` was deleted 2026-11-15** and the home hero is now
+> `HeroChatCollage` (chat + search + collage; see `COMPONENTS.md`). Nothing below describes live
+> code. It is kept only as the record of the Events/Communities mode design for Phase 2, when the
+> community hero has to be rebuilt on top of the new component, and of why the spoken-exchange copy
+> is shaped the way it is.
 
 **Current homepage layout, owner-approved 2026-11-06:** the original photos rotate
 as a full-width background confined to the hero, ending before discovery content.
@@ -374,7 +411,10 @@ the painting photo better than Education.
 
 ### Panel geometry — the panel matches the photos, 16/9 at every width
 
-Every file in `public/hero/` is 16:9 (1376–1408 × 768). `object-cover` crops exactly as much as the
+Every file in `public/hero/` is 16:9 (2432 × 1368 JPG, cropped from 2752×1536 originals to cut the
+generator's watermark — it sits ~64px in from the bottom-right corner, so the bottom 168px goes; keep
+that crop when regenerating. The uncropped originals live in `Eventmind_files/hero_originals_2752x1536/`
+in the sibling `eventmind` folder). `object-cover` crops exactly as much as the
 panel disagrees with its source, so **the panel's aspect ratio is the crop dial**, and matching the
 photos sets it to ~zero.
 
@@ -441,6 +481,8 @@ Two things fall out of that:
   across that whole band.
 
 ### "About N options" is live, rounded, and degrades to nothing
+
+*(Not currently rendered anywhere — it went with `HeroCarousel`. The pattern is the rule for any future figure.)*
 
 The number is the real catalogue size, not a copywriter's figure. Chain:
 `GET /event/count` → `eventsApi.count()` → `eventsSource.count()` (fixtures in dummy mode) →

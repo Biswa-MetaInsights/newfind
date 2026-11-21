@@ -124,7 +124,7 @@ export function SegmentedControl<T extends string>({
             onClick={() => onChange(option)}
             aria-pressed={active}
             className={
-              "nf-seg-label relative rounded-md text-sm font-bold whitespace-nowrap " +
+              "nf-seg-label relative rounded-md text-meta font-bold whitespace-nowrap " +
               // No horizontal padding when the segments are already equal: at
               // `sm` the Event Type field leaves 73px a segment against a
               // 66.5px "In-Person", and padding is what would spend it. The

@@ -48,9 +48,11 @@ export const manageRevenueHref = (eventId: string) =>
 export function OrganiserEventCard({
   event,
   organiserName,
+  verified = false,
 }: {
   event: Event;
   organiserName: string;
+  verified?: boolean;
 }) {
   const id = String(event.id);
   const state = lifecycleOf(event);
@@ -70,22 +72,11 @@ export function OrganiserEventCard({
 
   return (
     <DetailCardShell>
-      {/* ⚠️ THE SAME HEADER THE PARTICIPANT'S `BookingCard` SHOWS — same eyebrow,
-          same name, same trust line (Gautham, 2026-09-01). The organiser block is
-          the one part of the card that must NOT change when the view toggles;
-          only the body below it is this file's own. Both names come from one
-          `ORGANISER_NAME` in `app/event/[id]/page.tsx`, which is what keeps the
-          two in step — change the eyebrow or the subline in one card and change
-          it in the other.
-
-          ⚠️ `verified` is still a claim nothing backs: there is no real
-          `verification_status` on this page, and "40+ events" is a literal.
-          Logged as TODO.md §1 for BOTH cards now, not just the booking one. */}
       <DetailCardHeader
         eyebrow="Organised by"
         name={organiserName}
-        subline="Verified · 40+ events"
-        verified
+        subline={verified ? "Verified" : undefined}
+        verified={verified}
       />
 
       <DetailCardBody>
@@ -105,7 +96,7 @@ export function OrganiserEventCard({
                 }}
               />
             </div>
-            <p className="text-[15px] mt-2 text-[var(--brand-hint)]">
+            <p className="text-meta mt-2 text-[var(--brand-hint)]">
               {overSold
                 ? `${sold - capacity} more sold than the ${capacity} places allowed.`
                 : left === 0
@@ -142,10 +133,10 @@ export function OrganiserEventCard({
 function Row({ label, value, note }: { label: string; value: string; note?: string }) {
   return (
     <div className="flex items-baseline justify-between gap-3">
-      <p className="text-[16px] font-semibold text-[var(--brand-hint)]">{label}</p>
+      <p className="text-small font-semibold text-[var(--brand-hint)]">{label}</p>
       <div className="text-right min-w-0">
-        <p className="text-[20px] font-bold text-[var(--brand-text)]">{value}</p>
-        {note && <p className="text-[15px] text-[var(--brand-hint)] truncate">{note}</p>}
+        <p className="text-title font-bold text-[var(--brand-text)]">{value}</p>
+        {note && <p className="text-meta text-[var(--brand-hint)] truncate">{note}</p>}
       </div>
     </div>
   );

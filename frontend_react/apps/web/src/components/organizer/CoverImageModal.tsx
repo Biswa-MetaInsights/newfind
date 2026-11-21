@@ -68,7 +68,7 @@ export function CoverImageModal({
         <button
           type="button"
           onClick={submit}
-          className="w-full py-3.5 rounded-lg text-[16px] font-bold text-[var(--brand-on-green)] transition-colors disabled:opacity-60"
+          className="w-full py-3.5 rounded-lg text-small font-bold text-[var(--brand-on-green)] transition-colors disabled:opacity-60"
           style={{ backgroundColor: "var(--brand-green)" }}
         >
           Save changes

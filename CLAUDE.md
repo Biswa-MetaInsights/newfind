@@ -32,6 +32,7 @@
 | Specs for unbuilt work, and what's blocked on a decision | **`TODO.md`** | Index table at the top, then grep `^## N\.`. A `§19.12` reference means heading `## 19.` |
 | Why the design is the way it is — measurements, rejected alternatives | **`DESIGN_NOTES.md`** | Grep `^## N\.` for the § you were sent to |
 | When or why something changed | **`CHANGELOG.md`** | Newest first under `## YYYY-MM-DD`. **Never read it whole** — it only grows. |
+| Backend bugs/questions; frontend to-test; parked code | `Eventmind_files/backend_to-do.md`, `frontend_to_test.md`; `PARKED_README.md` | Only when asked. **Never delete parked code.** |
 | Product direction — PRD, competitor analysis, migration notes | `Eventmind_files/` | **Only when Gautham asks.** Not for fixing a bug or implementing a decided feature. |
 
 **Where new writing goes:** conventions and gotchas still true tomorrow → `HANDOVER.md` (or here, if
@@ -78,7 +79,7 @@ prefix. **NewFind** is the user-facing name.
 
 ## Performance Rules
 
-- **Use `next/image` for images.** The one deliberate exception is `HeroCarousel`, which needs `<img>` because its wipe relies on `clip-path` (eslint-disabled inline). **Do not "fix" it.** Any new `<img>` needs the same kind of justification.
+- **Use `next/image` for images.** Any `<img>` needs a written justification (there is currently no exception).
 - **Use `next/link` for internal navigation.** Never a bare `<a>`.
 - **Always give `<Image>` a meaningful `sizes` prop** — do not leave the default.
 - Lazy-load below-the-fold components with `next/dynamic` where appropriate.
@@ -97,14 +98,14 @@ prefix. **NewFind** is the user-facing name.
 7. **Save new project documents to `Eventmind_files/`**, not inside `eventmind/`.
 8. **Never commit `.env.local`, `.env` or `start.bat`** — all git-ignored, all hold secrets.
 9. **Keep Node at v20+** — `.nvmrc` pins 24.16.0; run `nvm use` inside `frontend_react/`.
-10. **If you delete `platform_dev.db`** — restart all services first (so the community service creates the `communities` table), then re-run `seed_events.py`.
+10. **If you delete `platform_dev.db`** — restart all services first (so the community service creates the `communities` table), then re-run `node frontend_testing/seed/seed.mjs` (`seed_events.py` is replaced and no longer works).
 11. **Always stop the dev server with `Ctrl+C` in its terminal** — never just close the window. Killing the terminal on Windows orphans the Next.js worker processes; they accumulate across runs (we once found 321 zombie `node` processes), eat RAM, and cause heap-allocation crashes on later runs. Clean up orphans after a crash:
     ```powershell
     Get-CimInstance Win32_Process -Filter "Name='node.exe'" | Where-Object { $_.CommandLine -match 'next' } | ForEach-Object { Stop-Process -Id $_.ProcessId -Force }
     ```
     **If it OOMs, delete `.next` and retry BEFORE falling back to `dev:webpack`** — a stale Turbopack cache is the usual culprit, and plain `dev` is ~12x faster. Details: `HANDOVER.md` → *How to Run*.
 12. **Never attribute commits to a tool.** No `Co-Authored-By:` trailers for AI assistants, no "Generated with…" lines, no tool attribution in commit messages or PR descriptions. **Biswajith and Gautham are the only contributors on this repo.**
-13. **Production access:** organiser onboarding is required; no development verification bypass is included.
+13. **`frontend_testing/` (repo root) and `apps/web/src/frontend_testing/` are DEV ONLY: never delete them, never ship them.** Every dev flag (the organiser-setup bypass included) is `NODE_ENV === "development" && <env var>` in `dev-flags.ts`, so production always requires organiser onboarding. `type-check` runs a guard that fails if either folder or that rule goes. See `frontend_testing/README.md`. **Default = real data, every dev flag `false` in `.env.local`; turn them on only when Gautham says "frontend testing", then turn them off.**
 
 ---
 

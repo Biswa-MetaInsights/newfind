@@ -40,7 +40,7 @@ hexes in components**, and do not restate the palette in this file — read `glo
 Tokens: `--brand-green`, `--brand-green-hover`, `--brand-on-green` (text/icons **on** a green fill),
 `--brand-bg` (page), `--brand-surface` (cards/navbar/inputs), `--brand-text`, `--brand-border`,
 `--brand-nav-border`, `--brand-control-border`, `--brand-hint`, `--brand-muted`,
-`--brand-terracotta` (+ `-hover`, `--brand-on-terracotta`), `--brand-logo`, `--brand-hero-frame` (the hero photo's frame — green in dark, **transparent in light**, which is how that border is made dark-only).
+`--brand-terracotta` (+ `-hover`, `--brand-on-terracotta`), `--brand-logo`.
 
 **Naming convention — what Gautham means:**
 - **"green" / "green shade"** → always `#184E4A` (`--brand-green`). Never another green, never Tailwind `green-*`.
@@ -58,7 +58,7 @@ Tailwind arbitrary values (`text-[var(--brand-hint)]`). **Alpha tints need
 `color-mix(in srgb, var(--brand-green) N%, transparent)`** — a CSS var can't take a hex-alpha suffix.
 
 **Intentionally not themed:** `Footer.tsx`, `/auth`'s left panel (green fill in both themes, so its
-logo/heading/blurb all take `--brand-on-green`), the `HeroCarousel` letterbox, and semantic accents
+logo/heading/blurb all take `--brand-on-green`), and semantic accents
 (badge colours, star gold, error red, status green/amber, Google/Facebook brand colours).
 
 Theme plumbing: `providers/theme-provider.tsx`, persisted to `eventmind-theme`, with a no-flash
@@ -74,35 +74,31 @@ Rationale for all of the above: `DESIGN_NOTES.md` §7.
 `--font-sans`. **There are no per-component font declarations** — do not re-import a font in a
 component or set `fontFamily` inline.
 
+**One approved exception (Gautham, 2026-11-16):** the home hero's polaroid captions are handwritten
+(**Caveat**, `--font-hand`, also loaded in `layout.tsx`). Nowhere else — do not extend it.
+
 **To swap the font:** change only the two marked lines in `layout.tsx` (the `next/font/google` import
 and the loader call). Keep `variable: "--font-app"`. Nothing else touches.
 
-**Font-size floor: 15px.** One rule in `globals.css` raises `text-xs`, `text-sm` and arbitrary
-`text-[9px]`…`text-[14px]` to 15px. **Do not add new sub-15px sizes.** Opt out with
-`data-keep-type` on an element (and its subtree) whose small type is deliberate.
+**Font-size floor: `--fs-meta`.** A `globals.css` rule raises `text-xs` and `text-[9…13px]` to it.
+**Nothing goes below it**; `data-keep-type` opts a subtree out. Page subtitles and empty-state
+headings are `text-body`, their helper line `text-small` (`DESIGN_NOTES.md` §8).
 
-**Prominent copy above the floor:** page subtitle 18px; empty-state heading 18px with a 16px helper
-line. Follow this on new pages. See `DESIGN_NOTES.md` §8.
+## ⚠️ The type scale — one scale, whole app, as classes
 
-## ⚠️ The type scale — one scale, whole app
+**Every font size is a ROLE class, never a pixel value.** Each role's px per width lives once, in
+the *Type scale* block of `globals.css`. **Never write `text-[18px]`.** Resizing the site = editing
+that block only.
 
-**The console had its own** until 2026-08-22 (everything at the 15px floor, plus 11px uppercase
-micro-labels), and that — more than any colour — is what made it read as a different product. It is
-now on the scale below, and **so is anything new.** Sizes come from `EventsCarousel`'s card and
-`/event/[id]`'s body; the console runs one step quieter where a table genuinely needs it.
+- Section / page heading: inline `clamp(…)` **extrabold** `tracking-[-0.5px]` (`EventsCarousel`, console `h1`)
+- `text-title` **bold** card/row title · `text-figure` **extrabold** `StatTile` figure
+- `text-body` body + card meta · `text-small` secondary copy, console cells
+- `text-control` buttons, CTAs, tabs, nav links · `text-meta` labels, counts (the floor)
+- `text-subhead` / `text-heading` / `text-display` for sub-headings and larger
 
-| Role | Size | Reference |
-|---|---|---|
-| Section / page heading | `clamp(…)` **extrabold**, `tracking-[-0.5px]` | `EventsCarousel`'s "Events in {city}"; the console `h1` |
-| Card or row title | **20px bold** | the event card's title; a console table row |
-| Big figure | **32px extrabold**, `-0.5px` | `StatTile` — every console figure, the earnings total included |
-| Body, table cells | **17–18px** | card meta row 18px; console cells 17px |
-| Controls | buttons **18px bold**, filter tabs **20px semibold** | the card's "View details" CTA |
-| Labels, counts, sub-lines | **15px** — the floor | `MicroLabel`, `CountBadge` |
-
-**Do not add a `data-keep-type` to squeeze a label in.** If a label competes with its figure, the
-figure is too small — that is the mistake the console's 11px labels were compensating for. The only
-live opt-out left in the app is `EventCard.tsx` (dead code) and one comment in `FeatureBand`.
+**A button is `text-control` even beside a title.** The console is on this scale, as is anything new.
+**Never `data-keep-type` to squeeze a label in** — if it competes with its figure, the figure is too
+small. Live opt-outs: `EventCard.tsx` (dead code) only.
 
 ## Shape
 
@@ -131,7 +127,7 @@ Dark theme is deliberately not lifted — the blending problem is light-only. Se
 
 - **Hover:** background → green, text/icon → linen. Used throughout the navbar, dropdowns and cards. Maintain it for new interactive elements. **Two approved exceptions,** both terracotta: (1) `FeatureBand`'s four **organiser** tiles, because each half of that band is skinned by one accent and terracotta is the organisers' (Gautham, 2026-08-19) — participant tiles still hover green, do not sweep the organiser tiles back; (2) every **Remove** button, via `REMOVE_BUTTON` in `lib/controls.ts` (Gautham, 2026-09-11) — an ordinary outline with `--brand-text` at rest, filling terracotta with a white label on hover **and `active`**, so a finger gets the same answer. Import it, never hand-write the look, and never put terracotta back on the resting label.
   - **⚠️ A TABLE ROW takes an 8% green WASH, not the solid fill** (`.nf-console-row` in `globals.css`) — a row carries status pills and a progress bar, which a solid ground would swallow. Its controls still take the full rule. **The trap that made this necessary: an inline `style` colour BEATS a `hover:` rule**, so the console's every control was inert to the pointer until its tones moved to classes. Third time this has bitten — see also `FeatureBand`'s audience badge and `FilterSelect`'s menu items. **Colour anything that hovers with CLASSES.**
-- **Navbar** 72px tall. **Page content and navbar share the same horizontal padding** — import `GUTTERS`.
+- **Navbar** 56px tall below `lg`, 64px from `lg` (`h-14 lg:h-16`); `ConsoleSidebar`'s `NAVBAR_H` hangs off it. **Page content and navbar share the same horizontal padding** — import `GUTTERS`.
 - **Copy:** conversational but professional. Avoid jargon, keep labels short — "Claim Free Ticket", not "Register for Free Event".
 
 ## Responsiveness
@@ -147,7 +143,8 @@ elements that cross the edge, so an OVERFLOW line points at the culprit.
 
 Standard patterns:
 
-- **Grids:** `grid-cols-1 sm:grid-cols-2 xl:grid-cols-4` — all built-in screens, which do sort by width among themselves; only mixing in a custom or arbitrary breakpoint hits the trap above.
+- **Grids:** `grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4` (`CARD_GRID`) — all built-in screens, which do sort by width among themselves; only mixing in a custom or arbitrary breakpoint hits the trap above. `Rail` and `CategoryGrid` mirror the four steps as percentages; home's one-row grids drop a card at `lg–xl` (`lgTrim()`).
+- **Content width:** home, `/explore`, `/event/[id]` and its rails sit in a `PAGE_MAX_WIDTH` column with `GUTTERS` inside it.
 - **Horizontal padding:** import `GUTTERS`. Never hand-write the trio.
 - **Two-column bodies:** `grid-cols-1 lg:grid-cols-[Nfr_1fr]`, never a bare `gridTemplateColumns` — a hard `fr` ratio has no narrow layout, it just squeezes the sidebar until it overflows.
 - **Form rows:** `grid-cols-1 sm:grid-cols-N`. A bare `grid-cols-3` puts three ~100px cells on a phone.
@@ -156,7 +153,7 @@ Standard patterns:
 - **Hover-revealed controls must also exist on touch.** The card overlay (share, wishlist, tags) uses `EventsCarousel`'s `TOUCH_REVEAL` — `opacity-0 [@media(pointer:coarse)]:opacity-100` — so a phone shows them and a mouse still gets the reveal. A hover-opened menu also needs a tap toggle (the navbar dropdowns and avatar menu do) because 1024px is an iPad — **and its `onMouseEnter`/`onMouseLeave` must be wrapped in `hoverCapable()` (`lib/pointer.ts`)**: a tap synthesises mouseenter before click, so unguarded it opens and closes the menu in one tap. A hover *tooltip* that opens sideways is `hidden lg:block`; every hover tooltip is also `[@media(hover:none)]:hidden` (no mouseleave follows a tap, so it would stick).
 - **Touch targets: 44px under a finger, geometry unchanged under a mouse.** `[@media(pointer:coarse)]:w-11 …` plus a matching negative margin (`EditPencil`, the hero dots, `EventActions`' `sm`). **Never enlarge the mouse render.**
 - **A control row that only fits by scrolling sideways is a dropdown below `lg` and on touch** — `EventsCarousel`'s `FilterTabs` (native `<select>` in the tab's silhouette, gated on `lg:[@media(pointer:fine)]`). A hidden scrollbar does not tell a finger the row scrolls.
-- **Forms on touch render at 16px** via the coarse-pointer rule under the font-size floor in `globals.css` (iOS zooms for less); desktop keeps 15px. `touch-action: manipulation` + no tap highlight on controls live beside it.
+- **Forms on touch render at 16px** via the coarse-pointer rule under the font-size floor in `globals.css` (iOS zooms for less); desktop keeps the role's size. `touch-action: manipulation` + no tap highlight on controls live beside it.
 - **Full-height layouts use `dvh`, not `vh`** (`h-[100dvh]`, `calc(100dvh-…)`): a phone's URL bar makes `100vh` taller than the visible screen, pushing the bottom control (a chat composer, the menu's last item) off it.
 - **Two nowrap chips in one row need `flex-wrap`** — `TAG_SHAPE` is nowrap by design, and a detail card's chip row is wider than a stacked 320–375px card. Without it the overflow-hidden shell clipped the second chip silently, which the scroll-width sweep cannot see.
 - **A back button beside a heading is `shrink-0`, and the heading block `min-w-0`** — otherwise the 36px circle is the thing that squashes.

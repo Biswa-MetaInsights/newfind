@@ -36,6 +36,7 @@ function memberLabel(count: number): string {
 // an early 404; everything below it is intact and still type-checked.
 //
 // PHASE 2 RESTORE: set PARKED to false, or delete it and the `if` below.
+// Re-parked 2026-11-17 (PARKED_README.md).
 const PARKED: boolean = true;
 
 export async function GET(_req: Request, { params }: { params: Promise<{ slug: string }> }) {

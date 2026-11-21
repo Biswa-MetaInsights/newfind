@@ -118,23 +118,34 @@
      grid of event cards outlined at 3.34:1 is a page of boxes, not a page of
      events. The rule is what the border is AROUND, not how big it is. */
   --brand-control-border: #8B8172;
-  /* The 5px frame around HeroCarousel's photo panel. DARK-MODE ONLY, by
-     Gautham's call (2026-08-20) — transparent here, green in the dark block.
-     It is a token rather than a `dark:` class because the theme is driven by
-     `data-theme` on <html>, not by prefers-color-scheme, so Tailwind's stock
-     `dark:` variant would follow the OS instead of the toggle.
-     ⚠️ The border stays 5px in BOTH themes so the panel's geometry — and the
-     photo crop inside it, since `aspect-[16/9]` sizes the border box — never
-     shifts when the theme flips. The panel pairs this with
-     `background-clip: padding-box`, without which its dark letterbox fill would
-     paint through the transparent frame and put a black border back. */
-  --brand-hero-frame: transparent;
   --brand-hint: #111827;   /* == --brand-text; see the token note above */
   --brand-muted: #9CA3AF;  /* placeholders + muted fills ONLY */
   /* Logo/wordmark tint — follows the brand green in BOTH themes (green in light,
      the lighter dark-mode green in dark so it stays readable on the dark ground).
      Defined via var() so it resolves per-theme automatically. */
   --brand-logo: var(--brand-green);
+
+  /* ── Home hero (HeroChatCollage) — scoped tokens, approved by Gautham ─────────
+     The polaroid-hero mockups use a palette the brand system has no tokens for.
+     Everything is prefixed --hero- so nothing else picks it up. Bubbles and the
+     callout are the same in both themes; the card, polaroid frame and shadows
+     follow it. The callout carries DARK ink, not the mockup's linen: linen on
+     #45B09E is ~2.4:1, which fails even the 3:1 large-text bar. */
+  --hero-bubble-a: #E07A55;  /* coral — the "friend" side of the chat */
+  --hero-bubble-b: #C9B3E6;  /* lilac — the "you" side */
+  --hero-bubble-a-ink: #1A0F0A;
+  --hero-bubble-b-ink: #1A140A;
+  --hero-callout: #45B09E;
+  --hero-callout-ink: #0E1A18;
+  --hero-card: #FFFFFF;      /* chat card + search bar (new white surface, light only) */
+  --hero-polaroid: #FFFFFF;
+  --hero-polaroid-ink: #0E1A18;
+  /* Search bar: white in BOTH themes (Gautham, 2026-11-16), so its ink is dark in
+     both. The dark block below swaps the fill to linen. */
+  --hero-search: #FFFFFF;
+  --hero-search-ink: #0E1A18;
+  --hero-shadow-card: 0 24px 60px rgba(14, 26, 24, 0.12);
+  --hero-shadow-polaroid: 0 18px 40px rgba(14, 26, 24, 0.16), 0 2px 6px rgba(14, 26, 24, 0.08);
 
   /* legacy aliases — body + Tailwind color-* tokens */
   --background: var(--brand-bg);
@@ -161,13 +172,17 @@
      (#0F1A18), so controls read as controls without a heavy outline. Left at
      the nav-border value on purpose — the blending problem is light-only. */
   --brand-control-border: #33433F;
-  /* The hero photo frame — visible ONLY here. On the dark ground the panel
-     needs an edge; on linen it read as an unnecessary outline. See :root. */
-  --brand-hero-frame: var(--brand-green);
   --brand-hint: #F2EFEA;   /* brand white (linen) — deliberately the linen, not
                               --brand-text's #ECEAE4; Gautham asked for the brand
                               white shade specifically. */
   --brand-muted: #8B938F;  /* placeholders + muted fills ONLY */
+
+  /* Home hero — only the values that differ from light (see the :root block). */
+  --hero-card: var(--brand-surface);
+  --hero-polaroid: #F3EEE4;  /* linen frame, like the dark mockup */
+  --hero-search: #F2EFEA;    /* brand white (linen), like the polaroids */
+  --hero-shadow-card: 0 30px 70px rgba(0, 0, 0, 0.4);
+  --hero-shadow-polaroid: 0 20px 44px rgba(0, 0, 0, 0.45);
   /* --brand-logo inherits `var(--brand-green)` from :root, which resolves to the
      dark-mode green (#2F8A80) here — a readable green on the dark ground. */
 
@@ -194,6 +209,68 @@
 
   /* The `band:` breakpoint is declared in the plain @theme block below — see the
      note there. It cannot live in this `inline` block. */
+
+  /* The type scale as Tailwind classes — `text-meta`, `text-body`, … — each
+     backed by a responsive --fs-* value defined in the block below. */
+  --text-meta: var(--fs-meta);
+  --text-small: var(--fs-small);
+  --text-body: var(--fs-body);
+  --text-control: var(--fs-control);
+  --text-title: var(--fs-title);
+  --text-subhead: var(--fs-subhead);
+  --text-heading: var(--fs-heading);
+  --text-figure: var(--fs-figure);
+  --text-display: var(--fs-display);
+}
+
+/* ── Type scale — ONE place, every width ──────────────────────────────────────
+   Every font size in the app comes from these roles, used as the Tailwind
+   classes above (`text-body`, `text-title`, …). Do NOT write `text-[18px]` —
+   pick the role. To make the whole site bigger or smaller, edit the numbers
+   here; nothing else needs touching.
+
+   Set 2026-11-18 to the common web scale (body 15–16px, controls 15–16px,
+   card titles 17–18px) after the site read as oversized: it previously ran
+   body 18px, controls 18–20px bold, titles 20px, a 15px floor.
+
+     meta      labels, counts, sub-lines, captions — also the site-wide floor
+     small     secondary copy, helper lines, console cells
+     body      body text, card meta rows (date, venue)
+     control   buttons, CTAs, filter tabs, nav links
+     title     card / row / panel titles
+     subhead   sub-headings, modal titles
+     heading   small page headings
+     figure    StatTile figures
+     display   the largest non-hero type
+
+   Phone first; 640px (sm) and 1024px (lg) step up. Section headings and hero
+   titles use their own fluid clamp()s at the call sites. */
+:root {
+  --fs-meta: 14px;
+  --fs-small: 15px;
+  --fs-body: 15px;
+  --fs-control: 15px;
+  --fs-title: 17px;
+  --fs-subhead: 18px;
+  --fs-heading: 22px;
+  --fs-figure: 24px;
+  --fs-display: 28px;
+}
+@media (min-width: 640px) {
+  :root {
+    --fs-body: 16px;
+    --fs-title: 18px;
+    --fs-subhead: 20px;
+    --fs-heading: 24px;
+    --fs-figure: 28px;
+    --fs-display: 32px;
+  }
+}
+@media (min-width: 1024px) {
+  :root {
+    --fs-control: 16px;
+    --fs-display: 34px;
+  }
 }
 
 /* ── Extra breakpoint: `band:` = 1400px ───────────────────────────────────────
@@ -264,16 +341,16 @@ optgroup {
 }
 
 /* ── Font-size floor ──────────────────────────────────────────────────────────
-   No text on the site renders below 15px. Any Tailwind class that would be
-   smaller — `text-xs` (12px), `text-sm` (14px), and arbitrary `text-[9px]`…
-   `text-[14px]` — is raised to the floor. Sizes already ≥15px are untouched.
+   No text on the site renders below --fs-meta (14px). Any Tailwind class that
+   would be smaller — `text-xs` (12px), and arbitrary `text-[9px]`…`text-[13px]`
+   — is raised to the floor. `text-sm` is 14px already and stays in the list so
+   the floor still holds if --fs-meta is raised.
 
    Opt-out: elements marked `data-keep-type` (and their descendants) are exempt,
    so components with deliberately small, hand-tuned type keep it. Currently used
-   by the event card (EventCard.tsx). The community/event carousels use no
-   sub-15px type, so they need no marker.
+   by the event card (EventCard.tsx).
 
-   To change the minimum site-wide, edit the single value below. */
+   To change the minimum site-wide, edit --fs-meta in the type scale above. */
 :is(
   .text-xs,
   .text-sm,
@@ -284,16 +361,17 @@ optgroup {
   .text-\[13px\],
   .text-\[14px\]
 ):not([data-keep-type], [data-keep-type] *) {
-  font-size: 15px !important;
+  font-size: var(--fs-meta) !important;
 }
 
 /* ── Form-control floor on TOUCH: 16px ────────────────────────────────────────
    iOS Safari zooms the whole page when a focused <input>/<select>/<textarea>
-   is under 16px, and the 15px floor above is one pixel short of that. Every
+   is under 16px, and the 14px floor above is short of that. Every
    form in the app goes through `text-sm` (FormControls' inputCls, /explore's
    search + selects, the chat composers, checkout), so rather than touch 30
-   call sites this lifts the same class list one more pixel — on a coarse
-   pointer only, so a desktop form renders exactly as before.
+   call sites this lifts the same class list to 16px — on a coarse pointer
+   only, so a desktop form keeps the floor. Inputs sized with the type-scale
+   classes (`text-small`/`text-body`) are covered too.
 
    Specificity note: the floor rule above is (0,2,0) with !important; this one
    repeats its `:not()` so it lands at (0,2,1) and wins the tie. Keep the
@@ -307,7 +385,11 @@ optgroup {
     .text-\[11px\],
     .text-\[12px\],
     .text-\[13px\],
-    .text-\[14px\]
+    .text-\[14px\],
+    .text-meta,
+    .text-small,
+    .text-body,
+    .text-control
   ):not([data-keep-type], [data-keep-type] *) {
     font-size: 16px !important;
   }
@@ -323,7 +405,7 @@ optgroup {
    for the desktop case. */
 @media (max-width: 1023.98px) {
   .hero-title {
-    font-size: clamp(26px, 6.5vw, 40px) !important;
+    font-size: clamp(24px, 6vw, 34px) !important;
     white-space: normal !important;
     display: -webkit-box;
     -webkit-line-clamp: 3;

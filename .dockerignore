@@ -7,3 +7,5 @@
 frontend_react
 Eventmind_files
 *.db
+# Frontend testing tooling: dev only, never in an image
+frontend_testing

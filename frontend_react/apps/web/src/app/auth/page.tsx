@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { authApi } from "@eventmind/api";
@@ -7,6 +8,7 @@ import { useAuthStore } from "@eventmind/store";
 import type { AuthTokens } from "@eventmind/types";
 import { isAxiosError } from "@eventmind/api";
 import { BrandLogo } from "@/components/brand";
+import { SocialSignIn } from "@/components/SocialSignIn";
 
 export default function AuthPage() {
   const router = useRouter();
@@ -23,14 +25,14 @@ export default function AuthPage() {
   // sign-up form (keeping the entered email/password) and drop the cursor into
   // the Full Name field — the only thing left for the user to fill in.
   const nameRef = useRef<HTMLInputElement>(null);
-  const [focusNameOnSignup, setFocusNameOnSignup] = useState(false);
+  const focusNameOnSignup = useRef(false);
 
   useEffect(() => {
-    if (!isLogin && focusNameOnSignup) {
+    if (!isLogin && focusNameOnSignup.current) {
       nameRef.current?.focus();
-      setFocusNameOnSignup(false);
+      focusNameOnSignup.current = false;
     }
-  }, [isLogin, focusNameOnSignup]);
+  }, [isLogin]);
 
   async function handleSubmit(e: { preventDefault(): void }) {
     e.preventDefault();
@@ -50,18 +52,18 @@ export default function AuthPage() {
         router.push("/");
       }
     } catch (err) {
-      console.error("[Auth error]", err);
+      console.error("[Auth error]", isAxiosError(err) ? err.response?.status ?? "network" : "unexpected");
       if (isAxiosError(err)) {
         if (!err.response) {
-          setError("Cannot reach the server. Is the backend running on port 8000?");
+          setError("Unable to connect. Please try again.");
         } else if (isLogin && err.response.data?.detail === "email_not_registered") {
           // No account for this email — carry the entered credentials into the
           // sign-up form so the user only needs to add their name.
           setIsLogin(false);
-          setFocusNameOnSignup(true);
+          focusNameOnSignup.current = true;
           setError("This email isn't registered with us. Please sign up to continue.");
         } else {
-          setError(err.response.data?.detail ?? `Error ${err.response.status}`);
+          setError(typeof err.response.data?.detail === "string" ? err.response.data.detail : "Please check the form and try again.");
         }
       } else {
         setError(String(err));
@@ -72,18 +74,23 @@ export default function AuthPage() {
   }
 
   return (
-    <div className="flex min-h-screen" style={{ backgroundColor: "var(--brand-bg)" }}>
-      {/* Left panel — hidden on small screens. A fixed green fill in BOTH themes
-          (like the footer), so everything on it takes --brand-on-green rather
-          than the themed text tokens. */}
-      <div className="hidden lg:flex lg:flex-1 items-center justify-center p-16"
+    <div className="relative flex min-h-[100dvh] flex-col" style={{ backgroundColor: "var(--brand-bg)" }}>
+      {/* Top bar and panel photo removed 2026-11-17 (Gautham): a page used for ~10 s should be simple
+          and reliable. "Back to home" floats top-right; the logo stays the way home. */}
+      <Link href="/" className="absolute right-4 top-4 z-20 inline-flex min-h-11 items-center rounded-lg px-2 text-body font-bold text-[var(--brand-text)] hover:underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--brand-green)] sm:right-6 lg:right-20">
+        Back to home
+      </Link>
+      <div className="flex flex-1">
+      <div className="relative hidden overflow-hidden lg:flex lg:flex-1 items-center justify-center p-16"
         style={{ backgroundColor: "var(--brand-green)", color: "var(--brand-on-green)" }}>
-        <div className="max-w-md">
-          <BrandLogo markSize={70} gap={14} className="mb-10" />
-          <h1 className="text-[42px] font-extrabold leading-tight mb-6">
+        <div className="relative z-10 max-w-md">
+          <Link href="/" aria-label="NewFind — home" className="inline-block rounded-lg focus-visible:outline-2 focus-visible:outline-offset-4">
+            <BrandLogo markSize={70} gap={14} className="mb-10" />
+          </Link>
+          <h1 className="text-display font-extrabold leading-tight mb-6">
             Unlock Your Next<br />Great Experience.
           </h1>
-          <p className="text-xl leading-relaxed">
+          <p className="text-title leading-relaxed">
             Discover AI summits, tech workshops, and networking events near you.
           </p>
         </div>
@@ -92,7 +99,10 @@ export default function AuthPage() {
       {/* Right panel — auth form */}
       <div className="flex flex-1 items-center justify-center px-4 sm:px-6 py-12 lg:px-20" style={{ backgroundColor: "var(--brand-bg)" }}>
         <div className="w-full max-w-md">
-          <h2 className="text-3xl font-bold text-[var(--brand-text)] mb-3">
+          <Link href="/" aria-label="NewFind — home" className="mb-8 inline-flex rounded-lg focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--brand-green)] lg:hidden">
+            <BrandLogo markSize={44} gap={12} style={{ color: "var(--brand-logo)" }} />
+          </Link>
+          <h2 className="text-heading font-bold text-[var(--brand-text)] mb-3">
             {isLogin ? "Welcome Back" : "Create Account"}
           </h2>
           <p className="text-[var(--brand-hint)] mb-10">
@@ -102,13 +112,16 @@ export default function AuthPage() {
                 name. */}
             {isLogin
               ? "Sign in to access your dashboard and event tickets."
-              : "Sign in to start joining events."}
+              : "Create an account to start joining events."}
           </p>
 
           <form onSubmit={handleSubmit} className="space-y-6">
             {!isLogin && (
-              <Field label="Full Name">
+              <Field label="Full Name" htmlFor="auth-name">
                 <input
+                  id="auth-name"
+                  name="name"
+                  autoComplete="name"
                   ref={nameRef}
                   type="text"
                   required
@@ -120,8 +133,13 @@ export default function AuthPage() {
               </Field>
             )}
 
-            <Field label="Email Address">
+            <Field label="Email Address" htmlFor="auth-email">
               <input
+                id="auth-email"
+                name="email"
+                autoComplete="email"
+                autoCapitalize="none"
+                spellCheck={false}
                 type="email"
                 required
                 value={email}
@@ -131,11 +149,15 @@ export default function AuthPage() {
               />
             </Field>
 
-            <Field label="Password">
+            <Field label="Password" htmlFor="auth-password">
               <input
+                id="auth-password"
+                name="password"
+                autoComplete={isLogin ? "current-password" : "new-password"}
                 type="password"
                 required
-                minLength={8}
+                minLength={isLogin ? 8 : 10}
+                maxLength={72}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
@@ -144,18 +166,19 @@ export default function AuthPage() {
             </Field>
 
             {error && (
-              <p className="text-red-500 text-sm">{error}</p>
+              <p role="alert" className="text-red-500 text-meta">{error}</p>
             )}
 
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full py-4 rounded-lg bg-[var(--brand-green)] text-[var(--brand-on-green)] text-lg font-bold
+              className="w-full py-3 rounded-lg bg-[var(--brand-green)] text-[var(--brand-on-green)] text-control font-bold
                          hover:bg-[var(--brand-green-hover)] transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
             >
               {isLoading ? "Please wait…" : isLogin ? "Sign In" : "Sign Up"}
             </button>
           </form>
+          {isLogin&&<Link href="/forgot-password" className="block mt-5 text-meta underline">Forgot your password?</Link>}
 
           <div className="mt-8 text-center">
             <button
@@ -170,49 +193,28 @@ export default function AuthPage() {
 
           <div className="my-8 flex items-center gap-4">
             <div className="flex-1 h-px bg-[var(--brand-border)]" />
-            <span className="text-[var(--brand-hint)] font-semibold text-sm">OR</span>
+            <span className="text-[var(--brand-hint)] font-semibold text-meta">OR</span>
             <div className="flex-1 h-px bg-[var(--brand-border)]" />
           </div>
 
-          <div className="space-y-4">
-            <SocialButton label="Continue with Google" color="#DB4437" initial="G" />
-            <SocialButton label="Continue with Facebook" color="#1877F2" initial="f" />
-          </div>
+          <SocialSignIn disabled={isLoading} />
         </div>
+      </div>
       </div>
     </div>
   );
 }
 
 const inputCls =
-  "w-full px-4 py-3 rounded-lg border border-[var(--brand-border)] bg-[var(--brand-bg)] text-[var(--brand-text)] " +
+  "w-full text-control px-4 py-3 rounded-lg border border-[var(--brand-border)] bg-[var(--brand-bg)] text-[var(--brand-text)] " +
   "placeholder:text-[var(--brand-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--brand-green)]/30 " +
   "focus:border-[var(--brand-green)] transition-colors";
 
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
+function Field({ label, htmlFor, children }: { label: string; htmlFor: string; children: React.ReactNode }) {
   return (
     <div className="space-y-2">
-      <label className="text-sm font-bold text-[var(--brand-text)]">{label}</label>
+      <label htmlFor={htmlFor} className="text-meta font-bold text-[var(--brand-text)]">{label}</label>
       {children}
     </div>
-  );
-}
-
-function SocialButton({ label, color, initial }: { label: string; color: string; initial: string }) {
-  return (
-    <button
-      type="button"
-      disabled
-      title="Coming soon"
-      className="w-full flex items-center justify-center gap-3 py-4 rounded-lg border-2 border-[var(--brand-control-border)]
-                 bg-[var(--brand-bg)] text-[var(--brand-text)] font-semibold hover:bg-[var(--brand-surface)] transition-colors
-                 disabled:opacity-50 disabled:cursor-not-allowed"
-    >
-      <span className="w-6 h-6 rounded-full flex items-center justify-center text-[var(--brand-on-green)] text-sm font-bold"
-        style={{ backgroundColor: color }}>
-        {initial}
-      </span>
-      {label}
-    </button>
   );
 }

@@ -75,7 +75,7 @@ function Section({
       {/* The control sits on the heading's line and wraps beneath it on a phone
           rather than squeezing a 22px heading. */}
       <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
-        <h2 className="text-[22px] font-bold text-[var(--brand-text)]">{title}</h2>
+        <h2 className="text-subhead font-bold text-[var(--brand-text)]">{title}</h2>
         {canEdit && (
           <ConsoleButton
             tone="outline"
@@ -89,7 +89,7 @@ function Section({
       </div>
 
       {count === 0 ? (
-        <p className="text-[18px] leading-relaxed text-[var(--brand-hint)]">{emptyPrompt}</p>
+        <p className="text-body leading-relaxed text-[var(--brand-hint)]">{emptyPrompt}</p>
       ) : (
         children
       )}
@@ -136,11 +136,11 @@ export function AnnouncementsSection({
                 this". `PostedAt` degrades to nothing rather than to "Invalid Date". */}
             <PostedAt iso={a.posted_at} />
             {a.title && (
-              <h3 className="text-[18px] font-bold text-[var(--brand-text)] mt-1.5">{a.title}</h3>
+              <h3 className="text-body font-bold text-[var(--brand-text)] mt-1.5">{a.title}</h3>
             )}
             {/* whitespace-pre-line so an organiser's own line breaks survive —
                 they typed them into a textarea and meant them. */}
-            <p className="text-[18px] leading-relaxed text-[var(--brand-hint)] mt-1.5 whitespace-pre-line">
+            <p className="text-body leading-relaxed text-[var(--brand-hint)] mt-1.5 whitespace-pre-line">
               {a.body}
             </p>
           </article>
@@ -154,7 +154,7 @@ function PostedAt({ iso }: { iso: string }) {
   const d = new Date(iso ?? "");
   if (Number.isNaN(d.getTime())) return null;
   return (
-    <p className="text-[15px] font-semibold" style={{ color: "var(--brand-green)" }}>
+    <p className="text-meta font-semibold" style={{ color: "var(--brand-green)" }}>
       {d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
     </p>
   );
@@ -191,13 +191,13 @@ export function AgendaSection({ items, ...rest }: SectionProps & { items: Agenda
               i > 0 ? "border-t border-[var(--brand-border)]" : "pt-0"
             }`}
           >
-            <span className="text-[18px] font-bold" style={{ color: "var(--brand-green)" }}>
+            <span className="text-body font-bold" style={{ color: "var(--brand-green)" }}>
               {row.time}
             </span>
             <div>
-              <h3 className="text-[18px] font-bold text-[var(--brand-text)]">{row.title}</h3>
+              <h3 className="text-body font-bold text-[var(--brand-text)]">{row.title}</h3>
               {row.detail && (
-                <p className="text-[18px] leading-relaxed text-[var(--brand-hint)] mt-1 whitespace-pre-line">
+                <p className="text-body leading-relaxed text-[var(--brand-hint)] mt-1 whitespace-pre-line">
                   {row.detail}
                 </p>
               )}
@@ -233,8 +233,8 @@ export function FaqSection({ items, ...rest }: SectionProps & { items: FaqItem[]
             key={row.id}
             className={`py-4 ${i > 0 ? "border-t border-[var(--brand-border)]" : "pt-0"}`}
           >
-            <dt className="text-[18px] font-bold text-[var(--brand-text)]">{row.question}</dt>
-            <dd className="text-[18px] leading-relaxed text-[var(--brand-hint)] mt-1.5 whitespace-pre-line">
+            <dt className="text-body font-bold text-[var(--brand-text)]">{row.question}</dt>
+            <dd className="text-body leading-relaxed text-[var(--brand-hint)] mt-1.5 whitespace-pre-line">
               {row.answer}
             </dd>
           </div>

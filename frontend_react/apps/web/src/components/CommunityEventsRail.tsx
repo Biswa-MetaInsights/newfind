@@ -64,7 +64,7 @@ export function CommunityEventsRail({
       ) : events.length === 0 ? (
         // The other tab has cards, so the section stays — say why this one is
         // empty rather than collapsing the rail out from under the toggle.
-        <p className="text-[16px] py-8 text-[var(--brand-hint)]">
+        <p className="text-small py-8 text-[var(--brand-hint)]">
           {tab === "upcoming"
             ? "No upcoming events scheduled yet."
             : "This community hasn't run any events yet."}

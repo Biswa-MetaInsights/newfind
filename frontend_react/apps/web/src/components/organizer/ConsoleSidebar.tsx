@@ -28,11 +28,11 @@
 //  two were showing the same rows off the same `toConsoleRows`. `/organizer` is
 //  now a redirect to `/organizer/events`. Do not add a fifth item back.
 //
-//  The rail sits UNDER the app's 72px navbar rather than replacing it — search,
+//  The rail sits UNDER the app's navbar rather than replacing it — search,
 //  theme toggle, chat and the avatar menu stay reachable, and the way back out
-//  of the console is where it is everywhere else. That is why its height is
-//  `calc(100vh - 72px)` and its `top` is 72px: change the navbar's height and
-//  both numbers move.
+//  of the console is where it is everywhere else. That is why its `top` and
+//  height hang off the navbar's height, which is 56px below lg and 64px from lg
+//  (`h-14 lg:h-16` in Navbar.tsx): change the navbar and both constants move.
 // ─────────────────────────────────────────────────────────────────────────────
 
 "use client";
@@ -42,8 +42,10 @@ import { usePathname } from "next/navigation";
 import type { IconProps } from "@/components/EventIcons";
 import { EventsIcon, AttendeesIcon, EarningsIcon } from "./ConsoleIcons";
 
-/** The navbar's height. The rail hangs off it — see the header note. */
-export const NAVBAR_H = 72;
+/** The navbar's height from lg (the rail). See the header note. */
+export const NAVBAR_H = 64;
+/** The navbar's height below lg (the strip). */
+const NAVBAR_H_SM = 56;
 
 export interface ConsoleSection {
   href: string;
@@ -100,7 +102,7 @@ export function ConsoleSidebar({ badges = {} }: { badges?: NavBadges }) {
       <div
         className="lg:hidden sticky z-30"
         style={{
-          top: NAVBAR_H,
+          top: NAVBAR_H_SM,
           backgroundColor: "var(--brand-surface)",
           borderBottom: "1px solid var(--brand-nav-border)",
         }}
@@ -135,7 +137,7 @@ export function ConsoleSidebar({ badges = {} }: { badges?: NavBadges }) {
 function Badge({ children, active }: { children: number; active: boolean }) {
   return (
     <span
-      className="text-[15px] font-bold shrink-0"
+      className="text-meta font-bold shrink-0"
       style={{ color: active ? "var(--brand-on-green)" : "var(--brand-terracotta)" }}
     >
       {children}
@@ -149,7 +151,7 @@ function RailItem({ section, active, badge }: { section: ConsoleSection; active:
     <Link
       href={href}
       aria-current={active ? "page" : undefined}
-      className="flex items-center justify-between gap-2.5 rounded-lg px-3 py-2.5 text-[17px] transition-colors"
+      className="flex items-center justify-between gap-2.5 rounded-lg px-3 py-2.5 text-small transition-colors"
       style={{
         backgroundColor: active ? "var(--brand-green)" : "transparent",
         color: active ? "var(--brand-on-green)" : "var(--brand-hint)",
@@ -171,7 +173,7 @@ function StripItem({ section, active, badge }: { section: ConsoleSection; active
     <Link
       href={href}
       aria-current={active ? "page" : undefined}
-      className="flex items-center gap-2 rounded-lg px-3 py-2 text-[17px] whitespace-nowrap shrink-0"
+      className="flex items-center gap-2 rounded-lg px-3 py-2 text-small whitespace-nowrap shrink-0"
       style={{
         backgroundColor: active ? "var(--brand-green)" : "transparent",
         color: active ? "var(--brand-on-green)" : "var(--brand-hint)",

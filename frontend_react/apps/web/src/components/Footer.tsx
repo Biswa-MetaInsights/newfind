@@ -23,8 +23,8 @@ const COLUMNS: { title: string; links: { label: string; href: string }[] }[] = [
   {
     title: "Company",
     links: [
-      { label: "About", href: "#" },
-      { label: "Help", href: "#" },
+      { label: "About", href: "/about" },
+      { label: "Help", href: "/help" },
     ],
   },
 ];
@@ -33,7 +33,7 @@ function FooterLink({ href, label }: { href: string; label: string }) {
   return (
     <Link
       href={href}
-      className="text-[15px] no-underline transition-opacity hover:opacity-70"
+      className="text-meta no-underline transition-opacity hover:opacity-70"
       style={{ color: LINEN }}
     >
       {label}
@@ -49,9 +49,12 @@ export function Footer() {
           {/* Brand — footer is a fixed deep-green block, so the logo stays linen. */}
           <div className="max-w-sm">
             <BrandLogo markSize={55} gap={16} style={{ color: LINEN }} />
-            <p className="mt-3 text-[15px] leading-relaxed" style={{ color: "rgba(242,239,234,0.75)" }}>
+            <p className="mt-3 text-meta leading-relaxed" style={{ color: "rgba(242,239,234,0.75)" }}>
               {/* PARKED 2026-08-14 (MVP) — was "…find events, communities, and experiences near you." */}
-              AI-powered event discovery — find events and experiences near you.
+              Find events and experiences near you.
+            </p>
+            <p className="mt-3 text-meta leading-relaxed" style={{ color: "rgba(242,239,234,0.75)" }}>
+              Developed and powered by MetaInsights BV.
             </p>
           </div>
 
@@ -61,7 +64,7 @@ export function Footer() {
           <div className="grid grid-cols-1 min-[420px]:grid-cols-2 sm:grid-cols-3 gap-8 sm:gap-14">
             {COLUMNS.map((col) => (
               <div key={col.title} className="flex flex-col gap-3">
-                <p className="text-xs font-bold uppercase tracking-wide" style={{ color: "rgba(242,239,234,0.6)" }}>
+                <p className="text-meta font-bold uppercase tracking-wide" style={{ color: "rgba(242,239,234,0.6)" }}>
                   {col.title}
                 </p>
                 {col.links.map((l) => (
@@ -77,11 +80,13 @@ export function Footer() {
           className="mt-10 pt-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3"
           style={{ borderTop: "1px solid rgba(242,239,234,0.18)" }}
         >
-          <p className="text-sm" style={{ color: "rgba(242,239,234,0.7)" }}>
-            © {new Date().getFullYear()} EventMind. All rights reserved.
+          <p className="text-meta" style={{ color: "rgba(242,239,234,0.7)" }}>
+            © {new Date().getFullYear()} MetaInsights BV. All rights reserved.
           </p>
           <div className="flex items-center gap-4">
             {/* Social icons */}
+            {/* PARKED 2026-11-17 (Gautham): footer social icons — the links were placeholders (href="#").
+                Paste back below with real URLs to re-enable. See PARKED_README.md.
             <Link href="#" aria-label="Twitter / X" className="transition-opacity hover:opacity-70" style={{ color: LINEN }}>
               <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" /></svg>
             </Link>
@@ -91,6 +96,8 @@ export function Footer() {
             <Link href="#" aria-label="LinkedIn" className="transition-opacity hover:opacity-70" style={{ color: LINEN }}>
               <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" /></svg>
             </Link>
+            */}
+
           </div>
         </div>
       </div>

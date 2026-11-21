@@ -1,6 +1,8 @@
 /**
- * Developer escape hatches. One flag today; keep them all here so there is a
- * single place to look before a release.
+ * DEV ONLY. NEVER DELETE. NEVER SHIP. — see repo-root `frontend_testing/README.md`.
+ *
+ * Developer escape hatches. Keep them all here so there is a single place to
+ * look before a release.
  *
  * ⚠️ EVERY flag in this file must be `NODE_ENV === "development" && <env var>`.
  * The NODE_ENV half is what makes these structurally impossible to turn on in a
@@ -8,20 +10,24 @@
  * nothing. **Do not "simplify" a flag to the env var alone**, and do not key one
  * to a list of developers' emails: an allowlist ships inside the client bundle,
  * publishing those addresses, and would still be live in production.
+ * `scripts/check-frontend-testing.mjs` (run by `type-check`) fails if a flag here
+ * loses its NODE_ENV half.
  *
  * Both halves are statically replaced at build time, so a `false` flag is dead
  * code the bundler drops — the dev-only UI behind one never reaches users.
  */
 
 /**
- * Opens `/organizer/create` without a verified organiser profile, and turns the
+ * Opens `/organizer/create` without an organiser profile, and turns the
  * create ⇄ onboarding pair into a round trip you can walk in both directions:
  *
  * - `/organizer/create` skips its `organizerApi.get()` gate, and its back button
  *   goes to `/organizer/onboarding` instead of into browser history.
- * - `/organizer/onboarding` stops bouncing an already-verified organiser
- *   straight back to `/organizer/create` (that redirect is what would otherwise
- *   make the back button ping-pong), and grows a forward control.
+ * - `/organizer/onboarding` stops bouncing an organiser who already has a
+ *   profile straight back to `/organizer/create` (that redirect is what would
+ *   otherwise make the back button ping-pong).
+ * - Both pages show `BypassStrip` above their header, the visible door between
+ *   the two.
  *
  * ⚠️ It skips the CHECK, not the requirement. With no organiser profile a
  * real-mode submit can still be refused by the backend; dummy mode writes to
@@ -32,3 +38,15 @@
 export const SKIP_ORGANIZER_VERIFICATION =
   process.env.NODE_ENV === "development" &&
   process.env.NEXT_PUBLIC_SKIP_ORGANIZER_VERIFICATION === "true";
+
+/**
+ * Shows the AI event assistant (`EventChatWidget`) on `/event/[id]` in REAL
+ * data mode. Product behaviour shows it in dummy mode only; this lets you test
+ * it against the live backend's assistant endpoint, which needs
+ * `OPENAI_API_KEY` in the backend `.env`.
+ *
+ * Set `NEXT_PUBLIC_DEV_SHOW_EVENT_ASSISTANT=true` in `apps/web/.env.local`.
+ */
+export const SHOW_EVENT_ASSISTANT =
+  process.env.NODE_ENV === "development" &&
+  process.env.NEXT_PUBLIC_DEV_SHOW_EVENT_ASSISTANT === "true";

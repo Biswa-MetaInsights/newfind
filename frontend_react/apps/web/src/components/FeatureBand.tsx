@@ -66,6 +66,7 @@
 // ─────────────────────────────────────────────────────────────────────────────
 
 import Link from 'next/link'
+import { isDummyMode } from '@/lib/data-source'
 import { BRAND } from '@/lib/theme'
 import { GUTTERS } from '@/lib/layout'
 import { Wordmark } from './brand'
@@ -181,7 +182,7 @@ function BodyLink({
  *  numeric drop here — that is what sat it low the first time.
  *
  *  The `-translate-y` on top of it is the nudge from the x-height centre up to
- *  the CAP-height centre — Roboto's x-height is ~0.53em and its cap height
+ *  the CAP-height centre — the previous font's x-height is ~0.53em and its cap height
  *  ~0.71em, so their midpoints differ by ~0.09em, and that is the whole constant.
  *  A disc this much taller than the text reads low when centred on lowercase.
  *  It is a transform, NOT a vertical-align offset, so it stays independent of
@@ -217,8 +218,8 @@ const FEATURES: Record<Audience, Feature[]> = {
       // Spec: TODO.md §16. (The assistant card below is a DIFFERENT feature and
       // stays.)
       id: 'chat',
-      title: 'Talk to the organiser before you go',
-      body: 'Every event has its own room. Ask the organiser, meet the people going, even before it starts. Say goodbye to endless emails.',
+      title: isDummyMode ? 'Talk to the organiser before you go' : 'Find your next event',
+      body: isDummyMode ? 'Every event has its own room. Ask the organiser, meet the people going, even before it starts. Say goodbye to endless emails.' : 'Explore upcoming events, read the details, and find something you want to join.',
     },
     // ⚠️ PARKED, NOT DELETED (Gautham, 2026-08-19) — "Everything in one feed" is
     // commented out so Participants runs two cards + the CTA tile. Uncomment to
@@ -233,7 +234,7 @@ const FEATURES: Record<Audience, Feature[]> = {
     // },
     {
       id: 'assistant',
-      title: 'An AI assistant that knows the event inside out',
+      title: isDummyMode ? 'An AI assistant that knows the event inside out' : 'Your tickets, saved',
       // ⚠️ THE GLYPH IS THE NOUN — it is not decoration beside a description of
       // the button, it IS the word (Gautham, 2026-08-20: "the emoji/symbol alone
       // is enough"). An earlier draft read "just tap the terracotta button" and
@@ -243,8 +244,7 @@ const FEATURES: Record<Audience, Feature[]> = {
       // its place. **Do not delete it without putting words back.**
       body: (
         <>
-          Ask it what to bring, where to go, what to expect, and more — just tap the{' '}
-          <AssistantLauncherGlyph /> on any event to start chatting.
+          {isDummyMode ? <>Ask it what to bring, where to go, what to expect, and more — just tap the{' '}<AssistantLauncherGlyph /> on any event to start chatting.</> : 'Book a free event and find your confirmed ticket in My Dashboard whenever you sign in.'}
         </>
       ),
     },
@@ -257,14 +257,14 @@ const FEATURES: Record<Audience, Feature[]> = {
   organisers: [
     {
       id: 'stats',
-      title: 'Everything an organiser wants, in one place',
+      title: 'Your events in one place',
       body: (
         <>
-          See all your event info and stats in the{' '}
+          Find your events in the{' '}
           <BodyLink href="/organizer/events" audience="organisers">
             organiser console
           </BodyLink>{' '}
-          — one at a time, or all together.
+          — open an event to view or update its details.
         </>
       ),
     },
@@ -280,8 +280,8 @@ const FEATURES: Record<Audience, Feature[]> = {
       // total as an itemised line. TODO.md §13 carries the spec — keep the two
       // in step, because this card is the promise and §13 is the work.
       id: 'pricing',
-      title: 'Free to list. Small fee for paid events.',
-      body: 'Free events cost nothing to participants and organisers. Participants pay a mere 2% convenience fee on paid events.',
+      title: 'Free events. Free tickets.',
+      body: 'Publish a free event and let participants reserve their places. Paid checkout is not available yet.',
     },
   ],
 }
@@ -331,19 +331,19 @@ const TILE =
   'bg-[var(--brand-surface)] border-[var(--brand-control-border)]'
 
 /** ⚠️ THE TYPE SCALE IS THE EVENT CARD'S, not this band's own (Gautham,
- *  2026-08-19): a tile title is `text-[20px] font-bold` and its body
- *  `text-[18px]`, the same pair `EventCardItem` uses for an event title and its
+ *  2026-08-19): a tile title is `text-title font-bold` and its body
+ *  `text-body`, the same pair `EventCardItem` uses for an event title and its
  *  date/venue line — the two sit on the same page and were visibly out of step
  *  at 18/16. **If `EventsCarousel`'s card sizes move, move these with them**;
  *  they are a deliberate match, not a coincidence. The `SeeAllTile` in that file
  *  carries the same note for the same reason. */
 const TILE_TITLE =
-  'text-[20px] font-bold leading-snug transition-colors duration-200 text-[var(--brand-text)]'
+  'text-title font-bold leading-snug transition-colors duration-200 text-[var(--brand-text)]'
 
 /** `--brand-hint` is the secondary-text token and is NOT gray — do not "restore"
  *  it to --brand-muted, which is placeholders and fills. */
 const TILE_BODY =
-  'text-[18px] leading-relaxed transition-colors duration-200 text-[var(--brand-hint)]'
+  'text-body leading-relaxed transition-colors duration-200 text-[var(--brand-hint)]'
 
 /** ⚠️ ONE ACCENT PER HALF, and it drives everything (Gautham, 2026-08-19):
  *  **participants are GREEN, organisers are TERRACOTTA.** The accent is the
@@ -366,8 +366,9 @@ const TILE_BODY =
  *
  *  ⚠️ CONTRAST, stated so it is a known trade and not a surprise: linen on
  *  `--brand-green` is ~8.3:1, but white on `--brand-terracotta` is ~4.2:1 —
- *  fine for the 18px bold title (AA large needs 3:1) and **just under AA for the
- *  16px body** (4.5:1). It is a transient hover state on copy that is fully
+ *  just under AA for both the `text-title` bold title and the `text-body` copy
+ *  (both need 4.5:1; the title stopped counting as "large" text when it went
+ *  20→18px on 2026-11-18). It is a transient hover state on copy that is fully
  *  legible at rest, and the terracotta is Gautham's; do not darken the token to
  *  "fix" it, because `--brand-terracotta` is shared with the chat launcher and
  *  the category chip. */
@@ -399,7 +400,7 @@ const SKIN: Record<Audience, { tile: string; fg: string; badge: string; link: st
  *  ⚠️ IT IS STYLED AS A STATUS TAG (Gautham, 2026-08-19): "use the Selling Fast
  *  / This Week tags on the event card as the reference". Silhouette from
  *  `EventBadges`' exported `TAG_SHAPE`, then `gap-1.5 font-bold leading-5` +
- *  `px-2.5 py-1.5 text-[16px]` — the exact chrome `EventBadge` renders. Those
+ *  `px-2.5 py-1.5 text-small` — the exact chrome `EventBadge` renders. Those
  *  utilities are RESTATED rather than imported because `TAG` is private to that
  *  file, which exports only the shape on purpose; **if `EventBadge`'s padding or
  *  size changes, change these to match.** The one thing not copied is the glyph
@@ -429,7 +430,7 @@ function AudienceBadge({ audience }: { audience: Audience }) {
   return (
     <span
       className={
-        `${TAG_SHAPE} gap-1.5 font-bold leading-5 px-2.5 py-1.5 text-[16px] ` +
+        `${TAG_SHAPE} gap-1.5 font-bold leading-5 px-2.5 py-1.5 text-small ` +
         `transition-colors duration-200 ${SKIN[audience].badge}`
       }
     >
@@ -496,7 +497,7 @@ function CTATile({ audience, cta }: { audience: Audience; cta: AudienceCTA }) {
           rest colour cannot simply be reused there. */}
       <span
         className={
-          'text-[18px] font-bold transition-colors duration-200 ' +
+          'text-body font-bold transition-colors duration-200 ' +
           `${SKIN[audience].link} ${SKIN[audience].fg}`
         }
       >
@@ -547,7 +548,7 @@ export function FeatureBand() {
             stretch the whole box (swashes included). See the constants above. */}
         <h2
           className="font-extrabold tracking-[-0.5px]"
-          style={{ fontSize: 'clamp(22px, 4vw, 30px)', color: TEXT }}
+          style={{ fontSize: 'clamp(20px, 3vw, 26px)', color: TEXT }}
         >
           Why
           <Wordmark

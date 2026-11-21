@@ -1,4 +1,5 @@
 "use client";
+import { eventTimeUtc, localEventTime } from "@/lib/event-time";
 
 // ─────────────────────────────────────────────────────────────────────────────
 //  "Edit details" — the organiser's edit dialog on their own event page.
@@ -79,12 +80,6 @@ const REAL_CITIES = CITIES.filter((c) => !isOnlineCity(c));
  * converts to UTC first, so an organiser in IST opens the dialog to find their
  * 7pm event showing as 1:30pm. Read the local parts instead.
  */
-function toLocalInput(iso: string): string {
-  const d = new Date(iso);
-  if (Number.isNaN(d.getTime())) return "";
-  const pad = (n: number) => String(n).padStart(2, "0");
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
-}
 
 const str = (v: unknown): string => (typeof v === "string" ? v : "");
 const num = (v: unknown): number | null => (typeof v === "number" ? v : null);
@@ -96,7 +91,7 @@ function Group({ title, children }: { title: string; children: React.ReactNode }
   return (
     <section className="space-y-4">
       <h3
-        className="text-[15px] font-bold pb-2"
+        className="text-meta font-bold pb-2"
         style={{ color: "var(--brand-text)", borderBottom: "1px solid var(--brand-border)" }}
       >
         {title}
@@ -119,7 +114,7 @@ function ReadOnly({ label, value, why }: { label: string; value: string; why: st
   return (
     <FormField label={label} hint="cannot be changed">
       <div
-        className="w-full px-4 py-3 rounded-lg text-sm font-medium"
+        className="w-full px-4 py-3 rounded-lg text-meta font-medium"
         style={{
           border: "1px solid var(--brand-border)",
           backgroundColor: "color-mix(in srgb, var(--brand-hint) 6%, transparent)",
@@ -128,7 +123,7 @@ function ReadOnly({ label, value, why }: { label: string; value: string; why: st
       >
         {value}
       </div>
-      <p className="text-[15px] leading-relaxed" style={{ color: "var(--brand-hint)" }}>{why}</p>
+      <p className="text-meta leading-relaxed" style={{ color: "var(--brand-hint)" }}>{why}</p>
     </FormField>
   );
 }
@@ -236,8 +231,8 @@ export function EditEventModal({
     el.scrollIntoView({ block: "center" });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-  const [startDate, setStartDate] = useState(toLocalInput(event.start_date));
-  const [endDate, setEndDate] = useState(toLocalInput(event.end_date));
+  const [startDate, setStartDate] = useState(localEventTime(event.start_date,event.timezone||"UTC"));
+  const [endDate, setEndDate] = useState(localEventTime(event.end_date,event.timezone||"UTC"));
   const [city, setCity] = useState<City>(initialCity);
   // Fixtures and organiser-created events name the venue differently
   // (`name` vs `address`); prefill from whichever exists and always SAVE to
@@ -265,8 +260,8 @@ export function EditEventModal({
    *  warning below — shown when it is true rather than always, so it reads as a
    *  consequence of what you just did instead of boilerplate. */
   const postponing =
-    startDate !== toLocalInput(event.start_date) ||
-    endDate !== toLocalInput(event.end_date) ||
+    startDate !== localEventTime(event.start_date,event.timezone||"UTC") ||
+    endDate !== localEventTime(event.end_date,event.timezone||"UTC") ||
     city.name !== initialCity.name ||
     address !== initialVenue ||
     onlineUrl !== initialLink ||
@@ -321,8 +316,8 @@ export function EditEventModal({
           target_audience: targetAudience.join(", "),
           tags: tags.split(",").map((t) => t.trim()).filter(Boolean),
           event_website: eventWebsite.trim(),
-          start_date: new Date(startDate).toISOString(),
-          end_date: new Date(endDate).toISOString(),
+          start_date: eventTimeUtc(startDate,event.timezone||"UTC").toISOString(),
+          end_date: eventTimeUtc(endDate,event.timezone||"UTC").toISOString(),
           location,
           capacity: capacityNum,
           // ⚠️ NO `price` AND NO `currency` (Gautham, 2026-09-01). Both are
@@ -399,7 +394,7 @@ export function EditEventModal({
           <button
             type="button"
             onClick={onClose}
-            className="flex-1 py-3.5 rounded-lg text-[16px] font-bold transition-colors"
+            className="flex-1 py-3 rounded-lg text-small font-bold transition-colors"
             style={{ border: "2px solid var(--brand-control-border)", color: "var(--brand-text)" }}
           >
             Discard
@@ -408,7 +403,7 @@ export function EditEventModal({
             type="button"
             onClick={submit}
             disabled={save.isPending}
-            className="flex-[2] py-3.5 rounded-lg text-[16px] font-bold text-[var(--brand-on-green)] transition-colors disabled:opacity-60"
+            className="flex-[2] py-3 rounded-lg text-small font-bold text-[var(--brand-on-green)] transition-colors disabled:opacity-60"
             style={{ backgroundColor: "var(--brand-green)" }}
           >
             {save.isPending ? "Saving…" : "Save changes"}
@@ -577,7 +572,7 @@ export function EditEventModal({
         {postponing && (
           <Notice>
             <b>This counts as postponing the event.</b> Ticket holders booked the old details and
-            are not told — contact them yourself.
+            will receive an in-app notification. Email delivery depends on the configured email service.
           </Notice>
         )}
 
@@ -668,7 +663,7 @@ export function EditEventModal({
         </Group>
 
         {error && (
-          <p className="text-sm px-4 py-3 rounded-lg bg-red-50 text-red-600 border border-red-200">{error}</p>
+          <p className="text-meta px-4 py-3 rounded-lg bg-red-50 text-red-600 border border-red-200">{error}</p>
         )}
       </div>
     </ModalShell>
@@ -687,7 +682,7 @@ export function EditEventModal({
 function Notice({ children }: { children: React.ReactNode }) {
   return (
     <p
-      className="text-[15px] leading-relaxed rounded-lg px-4 py-3"
+      className="text-meta leading-relaxed rounded-lg px-4 py-3"
       style={{ border: "1px solid var(--brand-border)", color: "var(--brand-text)" }}
     >
       {children}

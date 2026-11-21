@@ -76,7 +76,7 @@ export function DetailCardHeader({
 }) {
   return (
     <div className={`${PAD_X} pt-7 pb-8`} style={{ backgroundColor: GREEN }}>
-      <p className="text-[13px] font-bold tracking-[0.08em] mb-3" style={{ color: ON_GREEN_MUTED }}>
+      <p className="text-meta font-bold tracking-[0.08em] mb-3" style={{ color: ON_GREEN_MUTED }}>
         {eyebrow}
       </p>
       <div className="flex items-center gap-4">
@@ -87,13 +87,13 @@ export function DetailCardHeader({
             border: "1px solid color-mix(in srgb, var(--brand-on-green) 22%, transparent)",
           }}
         >
-          <span className="text-[24px] font-extrabold" style={{ color: "var(--brand-on-green)" }}>
+          <span className="text-subhead font-extrabold" style={{ color: "var(--brand-on-green)" }}>
             {name.trim().charAt(0).toUpperCase() || "?"}
           </span>
         </div>
         <div className="min-w-0">
           <p
-            className="text-[24px] font-extrabold leading-tight truncate"
+            className="text-subhead font-extrabold leading-tight truncate"
             style={{ color: "var(--brand-on-green)" }}
           >
             {name}
@@ -103,7 +103,7 @@ export function DetailCardHeader({
               {verified && (
                 <ShieldCheckIcon color={ON_GREEN_MUTED} className="w-[15px] h-[15px] shrink-0" />
               )}
-              <span className="text-[15px] truncate" style={{ color: ON_GREEN_MUTED }}>
+              <span className="text-meta truncate" style={{ color: ON_GREEN_MUTED }}>
                 {subline}
               </span>
             </div>
@@ -117,11 +117,13 @@ export function DetailCardHeader({
 // ── Body pieces ──────────────────────────────────────────────────────────────
 
 /** One icon + label row (date, time, location). */
-export function DetailLine({ icon, text }: { icon: React.ReactNode; text: string }) {
+export function DetailLine({ icon, text, suffix }: { icon: React.ReactNode; text: string; suffix?: string }) {
   return (
     <div className="flex items-center gap-3 min-w-0">
       <span className="shrink-0">{icon}</span>
-      <span className="text-[16px] font-semibold text-[var(--brand-text)] truncate">{text}</span>
+      <span className="text-small font-semibold text-[var(--brand-text)] truncate">{text}</span>
+      {/* Optional small muted tail — the event page puts the time zone here, beside the time. */}
+      {suffix && <span className="shrink-0 text-meta text-[var(--brand-muted)]">{suffix}</span>}
     </div>
   );
 }
@@ -151,7 +153,7 @@ export function DetailPeopleChip({ count, label }: { count: number | string; lab
           />
         ))}
       </div>
-      <span className="text-[15px] whitespace-nowrap text-[var(--brand-hint)]">
+      <span className="text-meta whitespace-nowrap text-[var(--brand-hint)]">
         <b className="text-[var(--brand-text)]">{count}</b> {label}
       </span>
     </div>
@@ -162,7 +164,7 @@ export function DetailPeopleChip({ count, label }: { count: number | string; lab
 export function DetailAccentChip({ text }: { text: string }) {
   return (
     <span
-      className={`${TAG_SHAPE} px-3.5 py-2 text-[15px] font-bold`}
+      className={`${TAG_SHAPE} px-3.5 py-2 text-meta font-bold`}
       style={{ backgroundColor: "color-mix(in srgb, #C1603F 12%, transparent)", color: "#B4542F" }}
     >
       {text}
@@ -190,12 +192,12 @@ export function DetailPriceRow({
 }) {
   return (
     <div className="flex items-baseline justify-between gap-3">
-      <p className="text-[13px] font-bold tracking-[0.08em] text-[var(--brand-hint)]">{label}</p>
+      <p className="text-meta font-bold tracking-[0.08em] text-[var(--brand-hint)]">{label}</p>
       <div className="flex items-baseline gap-1.5 min-w-0">
-        <span className="text-[38px] leading-none font-extrabold" style={{ color: GREEN }}>
+        <span className="text-display leading-none font-extrabold" style={{ color: GREEN }}>
           {amount}
         </span>
-        {suffix && <span className="text-[16px] font-medium text-[var(--brand-hint)]">{suffix}</span>}
+        {suffix && <span className="text-small font-medium text-[var(--brand-hint)]">{suffix}</span>}
       </div>
     </div>
   );
@@ -240,13 +242,12 @@ export function DetailCTA({
   variant?: "solid" | "outline";
 }) {
   const solid = variant === "solid";
-  // ⚠️ `py-[14px]` on the outline, not `py-4`. Its 2px border is inside the box,
-  // so 14 + 2 lands on exactly the solid button's 16px — the two are the same
-  // height when stacked, and the solid one is byte-identical to what "Book Now"
-  // has always rendered. Change one of these numbers and change the other.
+  // ⚠️ `py-[10px]` on the outline, not `py-3`. Its 2px border is inside the box,
+  // so 10 + 2 lands on exactly the solid button's 12px — the two are the same
+  // height when stacked. Change one of these numbers and change the other.
   const cls = `block w-full mt-5 ${
-    solid ? "py-4" : "py-[14px]"
-  } rounded-lg text-[18px] font-bold text-center transition-colors disabled:opacity-60 disabled:cursor-not-allowed`;
+    solid ? "py-3" : "py-[10px]"
+  } rounded-lg text-control font-bold text-center transition-colors disabled:opacity-60 disabled:cursor-not-allowed`;
   // Inline, and hovered from JS, because that is what this file already does for
   // the sticky bar below — one pattern per file beats a correct second one.
   const rest = solid
@@ -389,10 +390,10 @@ export function DetailStickyShell({
  * a bar dropped into one can never submit it by accident.
  *
  * ⚠️ `compact` PINS THE HEIGHT AT 48px (`h-12`) instead of deriving it from
- * `py-4` — 59px at rest, which Gautham asked to come down on `/organizer/create`
- * (2026-09-11). It is a HEIGHT, not a type step: the label stays 18px bold,
- * because the house type scale puts every button there and a 48px slab has room
- * for it (18/27 leaves 10.5px a side). **Pass it with the shell's own `compact`
+ * `py-4` — 59px at rest (now `py-3`, matching `DetailCTA`), which Gautham asked to come down on `/organizer/create`
+ * (2026-09-11). It is a HEIGHT, not a type step: the label stays `text-control`
+ * bold, because the house type scale puts every button there and a 48px slab has
+ * plenty of room for it. **Pass it with the shell's own `compact`
  * or the buttons rattle in a bar still sized for 59px ones.** Nothing public
  * uses it — see the note on `DetailStickyShell`.
  */
@@ -415,10 +416,10 @@ export function DetailStickyCTA({
   compact?: boolean;
 }) {
   const cls =
-    "inline-flex items-center justify-center rounded-lg text-[16px] sm:text-[18px] " +
+    "inline-flex items-center justify-center rounded-lg text-control " +
     "font-bold text-[var(--brand-on-green)] transition-colors whitespace-nowrap " +
     "disabled:opacity-60 disabled:cursor-not-allowed " +
-    (compact ? "h-12 " : "py-4 ") +
+    (compact ? "h-12 " : "py-3 ") +
     (share ? "basis-0 grow sm:grow-0 px-2 sm:px-10 lg:px-16" : "px-4 sm:px-10 lg:px-16");
 
   if (href && !disabled) {
@@ -478,8 +479,8 @@ export function DetailStickyBar({
       {/* shrink-0 on the amount, so on a narrow bar the button loses its generous
           padding rather than the figure being squeezed out. */}
       <div className="shrink-0" style={{ textAlign: "left" }}>
-        <p className="text-sm text-[var(--brand-hint)]">{caption}</p>
-        <p className="text-[22px] sm:text-[28px] font-bold text-[var(--brand-text)]">{amount}</p>
+        <p className="text-meta text-[var(--brand-hint)]">{caption}</p>
+        <p className="text-subhead sm:text-heading font-bold text-[var(--brand-text)]">{amount}</p>
       </div>
       <DetailStickyCTA label={cta} onClick={onClick} href={href} disabled={disabled} />
     </DetailStickyShell>

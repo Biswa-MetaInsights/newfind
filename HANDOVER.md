@@ -56,7 +56,7 @@ scratch/
         │   ├── gateway/        ← API gateway (port 8000)
         │   ├── services/       ← auth, user, event, ticketing, payment, notification,
         │   │                     chat, recommendation, review, agents, community
-        │   └── scripts/        ← shadow_runner, postgres_runner, seed_events, sync_ticketmaster, migrations
+        │   └── scripts/        ← shadow_runner, postgres_runner, seed_events (replaced by frontend_testing/seed), sync_ticketmaster, migrations
         ├── start.bat / stop.bat  ← Windows launchers (start.bat holds real keys — git-ignored)
         └── docker-compose.yml
 ```
@@ -135,16 +135,17 @@ python backend\scripts\install_all.py
 > If PowerShell blocks activation with an execution-policy error, run once:
 > `Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser`
 
-Then seed the database — it starts empty, and without this the discovery page shows "No events
-found":
+Then seed the database (with the backend running) — it starts empty, and without this the
+discovery page shows "No events found":
 
 ```powershell
-python backend\scripts\seed_events.py
+node frontend_testing/seed/seed.mjs --db="backend\platform_dev.db"   # reset.mjs undoes it
 ```
 
-This seeds **dummy** events for NYC, London, SF, Berlin, Amsterdam, Brussels, Thiruvananthapuram and
-online, plus communities for Thiruvananthapuram. Data persists across restarts; re-run only if you
-delete `platform_dev.db`.
+This registers throwaway accounts (one per signed-in state) and creates one demo event per UI state,
+all through the real API; details and options in `frontend_testing/README.md`. Data persists across
+restarts. **`backend/scripts/seed_events.py` is replaced and no longer works** (it posts as a
+placeholder organiser the gateway rejects); it is left in place, unused.
 
 ### Backend — everyday use
 
@@ -161,6 +162,12 @@ Stopping the backend does **not** stop the frontend dev server — that's a sepa
 Both start every service on SQLite with mocked Kafka and Redis — no Docker needed. Ports are
 declared in `shadow_runner.py` / `start.bat`; the gateway is **8000** and is the only one the
 frontend talks to.
+
+> **⚠️ Registration creates the participant profile only when the auth service sees
+> `KAFKA_ENABLED=false`** (`auth_endpoints.py`), which `docker-compose.yml` sets and
+> `shadow_runner.py` does not. Without it every new account has no profile: `/user/<id>`, the
+> dashboard Profile tab and every chat post 404 ("Record not found"). Set it in the backend env when
+> running outside Docker. `frontend_testing/seed/` works around it for the accounts it creates.
 
 > **⚠️ The community service must start BEFORE the user service.** Both declare a `communities`
 > table in SQLAlchemy — community's schema is the full one, user's is simpler, and `create_all` only
@@ -179,7 +186,7 @@ needed — SQLAlchemy handles both dialects.
 docker compose up -d postgres          # creates the 8 per-service DBs on first init
 python -m pip install psycopg2-binary
 python backend\scripts\postgres_runner.py
-$env:PYTHONUTF8=1; python backend\scripts\seed_events.py   # UTF8 so seed prints don't crash on cp1252
+node frontend_testing/seed/seed.mjs --db=none   # no SQLite: skips the deleted-event state; reset.mjs can't clean Postgres
 ```
 
 - Only services whose `config.py` declares `DATABASE_URL` get a database. `gateway`, `agents`, `recommendation` and `notification` are stateless.
@@ -254,8 +261,8 @@ NEXT_PUBLIC_DATA_MODE=real    # live backend via the gateway (default when unset
   - **`create()`** backs `/organizer/create`. Real mode POSTs; dummy mode pushes onto `dummyMyEvents`, same module-memory lifetime as an edit — which is what lets the create form's agenda and FAQ editors actually work in the one mode where they can.
   - ⚠️ **BOTH `create()` and `update()` STRIP the five extras in real mode** (`EXTRA_KEYS` — agenda, announcements, faq, offer_name, image_url). There is no column for any of them, so Pydantic would drop them anyway; stripping makes that visible in one place instead of silent in the network tab. It is the **second** lock — the first is that every authoring control is disabled off `EXTRAS_ARE_LOCAL`. **When the columns land, delete BOTH strips AND `EXTRA_KEYS`**, or they will quietly discard the fields they were added to protect.
   - **`eventsSource.duplicate()` is also a create** — `POST /event/` in real mode, a push onto `dummyMyEvents` in dummy. The copy is **always a draft at `tickets_sold: 0`** and drops the original's announcements; see `DuplicateEventModal`.
-- Fixtures in `lib/fixtures/` are API-shaped, with dates computed relative to now so badges stay live. In dummy mode geo/city/price/date filters are ignored so the UI is always populated; only online-vs-offline, a loose text query, and `limit` are honoured. The home page also skips Ticketmaster auto-ingest.
-- ⚠️ **There is ONE set of dummy events, seen from two sides.** `lib/fixtures/events.ts` exports three arrays: `dummyEvents` + `dummyOnlineEvents` (other organisers' — discoverable and nothing more) and **`dummyMyEvents`**, the eight events the signed-in developer *owns*. The organiser console draws that third array and nothing else, and **`lib/fixtures/organizer.ts` derives every console figure from it** — rooms, earnings, roll-ups, the hero. **Never hand-write a title or a total in `organizer.ts`**; that is exactly how the dashboard ended up describing five events the rest of the app had never heard of. Details in both files' headers.
+- Fixtures in `frontend_testing/fixtures/` are API-shaped, with dates computed relative to now so badges stay live. In dummy mode geo/city/price/date filters are ignored so the UI is always populated; only online-vs-offline, a loose text query, and `limit` are honoured. The home page also skips Ticketmaster auto-ingest.
+- ⚠️ **There is ONE set of dummy events, seen from two sides.** `frontend_testing/fixtures/events.ts` exports three arrays: `dummyEvents` + `dummyOnlineEvents` (other organisers' — discoverable and nothing more) and **`dummyMyEvents`**, the eight events the signed-in developer *owns*. The organiser console draws that third array and nothing else, and **`frontend_testing/fixtures/organizer.ts` derives every console figure from it** — rooms, earnings, roll-ups, the hero. **Never hand-write a title or a total in `organizer.ts`**; that is exactly how the dashboard ended up describing five events the rest of the app had never heard of. Details in both files' headers.
 - ⚠️ **`dummyEventSearch` returns only published, not-yet-finished events**, matching the real endpoint's `status: "published"` default. `dummyMyEvents` deliberately contains a draft and three finished events so the console's Drafts and Past tabs are populated — they must never reach discovery. `eventsSource.get()` still resolves them by id, so the console's "Manage" link opens a real event page for every row.
 - **`NEXT_PUBLIC_*` vars are inlined at dev-server start — restart the server after changing the mode.**
 
@@ -335,7 +342,7 @@ Communities are active in the professional-QA candidate, with persisted membersh
 | `app/dashboard/page.tsx` | My Tickets / My Wishlist / My Events / Profile — the three lists are `EventCardItem`s on `CARD_GRID`; the Profile tab's camera badge opens `ProfilePictureModal` |
 | `components/CategoryGrid.tsx` | "Browse by category" rail above the footer |
 | `components/FeatureBand.tsx` | "Why NewFind" — participant tiles left, organiser tiles right |
-| `components/HeroCarousel.tsx` | Split hero on home — copy left, image right |
+| `components/HeroChatCollage.tsx` | Home hero — polaroids either side of a fake chat, search and quick picks underneath |
 | `components/SimilarEvents.tsx` | "Similar events" rail on `/event/[id]` |
 | `components/CommunityCarousel.tsx` | Community cards on home — ⚠️ **parked, no call sites** |
 | `components/CommunityEventsRail.tsx` | "Events in this community" rail — ⚠️ **parked** |
@@ -349,13 +356,16 @@ Communities are active in the professional-QA candidate, with persisted membersh
 
 | File | What it is |
 |---|---|
-| `components/navbar/Navbar.tsx` | Sticky top nav, 72px — split by audience (Participants / Organisers) |
+| `components/navbar/Navbar.tsx` | Sticky top nav, 56px (64px from `lg`) — split by audience (Participants / Organisers) |
 | `components/ChatPresence.tsx` | Invisible app-wide listener that lights the navbar chat glow |
 | `components/EventChatWidget.tsx` | AI chat widget on `/event/[id]` |
 | `components/CityPicker.tsx` | City selector — `CITIES[0]` is the Online pseudo-city |
 | `components/ShareModal.tsx` | Desktop fallback when the native share sheet is unavailable |
 | `components/Footer.tsx` | Site footer — **intentionally not themed** |
 | `components/brand/*` | Official logo, wordmark, lockup, loader |
+| `frontend_testing/dev-flags.ts` | Dev-only flags (organiser-setup bypass, assistant in real mode) — **dev only, never delete** |
+| `frontend_testing/BypassStrip.tsx` | Terracotta strip linking onboarding ⇄ create while the bypass is on |
+| `frontend_testing/DevBanner.tsx` | (parked, not mounted) one line above every page in `next dev`: data mode + dev flags |
 
 ### The organiser console (`/organizer/events`)
 
@@ -376,7 +386,7 @@ rows off the same `toConsoleRows`, so its overview band moved to the top of Even
 | `components/organizer/ConsoleIcons.tsx` | Console chrome glyphs — nav, actions, pagination |
 | `components/organizer/useOrganiser.ts` | Who is running the console and whether they may be here |
 | `lib/organizer-rows.ts` | `Event` → the console row, plus the Events page's filter and sort |
-| `lib/fixtures/organizer.ts` | Dummy console data — **derived from `dummyMyEvents`, never hand-written** |
+| `frontend_testing/fixtures/organizer.ts` | Dummy console data — **derived from `dummyMyEvents`, never hand-written** |
 | `lib/use-today.ts` | Time-of-day greeting for the console header |
 | `components/organizer/OrganiserViewToggle.tsx` | Organiser view ⇄ participant preview, in the hero's control row |
 | `components/organizer/OrganiserEventCard.tsx` | The right-column card an organiser gets **instead of** `BookingCard` |
@@ -420,7 +430,13 @@ rules apply, and costs nothing on a backend or docs task. The *reasoning* behind
 
 ### Production access
 
-Organizer development bypasses have been removed. Run type-check and backend integration tests before release. Set NEXT_PUBLIC_DATA_MODE=real and an HTTPS NEXT_PUBLIC_API_URL only after backend health checks pass.
+Organiser onboarding is required in production. The dev tooling stays in the repo and is switched off by the build itself, not by deleting it:
+
+- **Never delete `frontend_testing/` or `apps/web/src/frontend_testing/`** (rules: `frontend_testing/README.md`). `pnpm --filter @eventmind/web type-check` runs `scripts/check-frontend-testing.mjs` first and fails if either folder is missing or a flag in `dev-flags.ts` lacks its `NODE_ENV === "development" &&` half. It must pass before a release.
+- **Production env must not set `NEXT_PUBLIC_SKIP_*` or `NEXT_PUBLIC_DEV_*`.** They would do nothing (the `NODE_ENV` half is `false` in a build), but a set one means someone expected it to.
+- **Once per release, confirm the flags are compiled to `false`:** after `next build` (stop the dev server first; the build shares `.next` with it), grep `.next/static/chunks` for `"SHOW_EVENT_ASSISTANT",0,!1,"SKIP_ORGANIZER_VERIFICATION",0,!1`; it must appear, and `NEXT_PUBLIC_SKIP_` / `NEXT_PUBLIC_DEV_` must not. ⚠️ **`Dev bypass on` itself DOES appear in two client chunks** (measured 2026-11-17, with both env vars forced to `true` during the build): `BypassStrip` is not tree-shaken, so its text ships as unreachable code behind the `!1`. Only the flags matter, but if the text must not ship, that is a code change (`frontend_to_test.md` §5 #4).
+- `frontend_testing/` is in `.dockerignore`; how the frontend itself is deployed is unconfirmed (`STATUS.md` says Vercel; Gautham half-remembers a manual Hetzner deploy; Biswajith knows, see `backend_to-do.md` §9). Whatever the method, never copy `frontend_testing/` or `.env.local` to the server.
+- Run backend integration tests too. Set `NEXT_PUBLIC_DATA_MODE=real` and an HTTPS `NEXT_PUBLIC_API_URL` only after backend health checks pass.
 
 ---
 

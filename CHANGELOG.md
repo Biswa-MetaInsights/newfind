@@ -9,6 +9,33 @@
 
 ---
 
+## 2026-11-18
+
+- Site-wide type scale brought down ~10–15% to common web sizes and moved onto nine role classes in `globals.css`; navbar 72→56/64px; card grids 3-up at `lg`; home, `/explore` and event rails capped at 1400px.
+
+## 2026-11-17
+
+- Review follow-ups (3): event chat page scrolls to the newest message, announces only the newest to screen readers, Send looks disabled when it is, no blank page while loading; deployment is recorded as a question for Biswajith (`backend_to-do.md` §9).
+- Review follow-ups (2): ticket cards, console "Booked"/next-up/earnings dates and the console events table show the event's own time zone; external listings open in a new tab; Tickets-tab, org-name-limit and earnings-picker notes in `backend_to-do.md`.
+- Review follow-ups: "Suggested for you" chip also in the Online row; Explore city picker outlined; dev banner parked; city picker has no hover change; dev flags default to off (real data); navbar city tooltip laptop/desktop only; event-page zone shows CET/CEST-style abbreviations.
+- Review round, Phase 5: close-out checks. Signed-in and signed-out sweeps clean, `type-check` guard fail/pass confirmed, production build compiles both dev flags to `false` (but the `BypassStrip` text still ships as dead code), stale `EditPencil` row fixed.
+- Review round, Phase 4: `frontend_testing/` seed + reset scripts (replace `seed_events.py`), live demo fixtures and checklist, CDP mocks (bell, social sign-in), scenario screenshots, chat demo, Mailpit notes.
+- Review round, Phase 3: dev-only `frontend_testing/` (root docs + in-app flags, `BypassStrip`, `DevBanner`), organiser-setup bypass restored on onboarding ⇄ create, assistant-in-real-mode flag, `type-check` guard; dummy fixtures moved to `src/frontend_testing/fixtures/`.
+- Review round, Phase 2: Communities and the Explore map parked (`PARKED_README.md`); Explore picks location with `CityPicker`; "Suggested for you" moved from its own carousel into a home tab.
+- Review round, Phase 1: Old-page bell glyph and city tooltip, no coordinates entry, auth page without photo/top bar, zone label beside the event time, no year on cards, "Tonight" pick, footer icons and Visibility field parked (`PARKED_README.md`).
+
+## 2026-11-16
+
+- Home hero restyled to the polaroid mockups (dark + light): tilted polaroids, coral/lilac chat, teal callout, centred search. Roboto only, 8px radius, `CityPicker` kept; new `--hero-*` tokens. Local only.
+
+## 2026-11-15
+
+- Home hero replaced: `HeroCarousel` deleted for the chat + search + photo-collage `HeroChatCollage`, rebuilt to house tokens/Roboto/8px radius; dropped the live event count and `--brand-hero-frame`. Local only.
+
+## 2026-11-12
+
+- Deployed core API integration behind Gautham’s restored frontend and fixed the location picker escaping narrow screens; persistent booking and responsive geometry checks passed.
+
 ## 2026-11-07
 - **Biswajith Gopinathan** — deploy auth/gateway social backend with protected backup/restore and rollback images; verify health, preserved Gmail configuration and unchanged TalktoFile starts; provider activation and frontend promotion remain pending.
 - **Biswajith Gopinathan** — prepare browser-bound Google/Facebook authorization-code sign-in, signed Google identity verification and explicit account linking with isolated security tests; Google provider activation and live OAuth QA remain pending.

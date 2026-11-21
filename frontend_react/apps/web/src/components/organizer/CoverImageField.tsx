@@ -33,13 +33,15 @@
 //  the same thing twice.
 // ─────────────────────────────────────────────────────────────────────────────
 
+import { uploadImage } from "@/lib/operations";
+import { isDummyMode } from "@/lib/data-source";
 import { useRef, useState } from "react";
 import { inputCls } from "@/components/FormControls";
 import { fileToAvatarDataUrl, fileToCoverDataUrl, isUploadedImage } from "@/lib/image-upload";
 import { OUTLINE_BUTTON, REMOVE_BUTTON } from "@/lib/controls";
 
 /** This control's geometry over the shared outline colours. */
-const BUTTON = `flex-1 py-3 px-4 rounded-lg text-[16px] font-bold ${OUTLINE_BUTTON}`;
+const BUTTON = `flex-1 py-3 px-4 rounded-lg text-control font-bold ${OUTLINE_BUTTON}`;
 
 export function CoverImageField({
   value,
@@ -87,10 +89,12 @@ export function CoverImageField({
     if (!file) return;
     setUploadError(null);
     setBusy(true);
-    const result = await (isAvatar ? fileToAvatarDataUrl(file) : fileToCoverDataUrl(file));
-    setBusy(false);
-    if (result.ok) onChange(result.dataUrl);
-    else setUploadError(result.message);
+    try {
+      const result = await (isAvatar ? fileToAvatarDataUrl(file) : fileToCoverDataUrl(file));
+      if (result.ok) onChange(!isDummyMode && !isAvatar ? await uploadImage(result.dataUrl, 'event') : result.dataUrl);
+      else setUploadError(result.message);
+    } catch { setUploadError('The image could not be uploaded. Please try again.'); }
+    finally { setBusy(false); }
   }
 
   function remove() {
@@ -101,7 +105,7 @@ export function CoverImageField({
 
   return (
     <div className="space-y-4">
-      <p className="text-[15px] leading-relaxed" style={{ color: "var(--brand-hint)" }}>
+      <p className="text-meta leading-relaxed" style={{ color: "var(--brand-hint)" }}>
         {note}
       </p>
 
@@ -132,7 +136,7 @@ export function CoverImageField({
             backgroundColor: "var(--brand-surface)",
           }}
         >
-          <span className="text-[15px]" style={{ color: "var(--brand-hint)" }}>
+          <span className="text-meta" style={{ color: "var(--brand-hint)" }}>
             No picture yet
           </span>
         </div>
@@ -151,7 +155,7 @@ export function CoverImageField({
             backgroundColor: "var(--brand-surface)",
           }}
         >
-          <span className="text-[15px]" style={{ color: "var(--brand-hint)" }}>
+          <span className="text-meta" style={{ color: "var(--brand-hint)" }}>
             No cover image yet
           </span>
         </div>
@@ -191,7 +195,7 @@ export function CoverImageField({
             type="button"
             disabled={disabled}
             onClick={remove}
-            className={`px-4 py-3 rounded-lg text-[16px] font-bold ${REMOVE_BUTTON}`}
+            className={`px-4 py-3 rounded-lg text-control font-bold ${REMOVE_BUTTON}`}
           >
             Remove
           </button>
@@ -212,14 +216,14 @@ export function CoverImageField({
       </div>
 
       {uploadError && (
-        <p className="text-xs" style={{ color: "#EF4444" }}>{uploadError}</p>
+        <p className="text-meta" style={{ color: "#EF4444" }}>{uploadError}</p>
       )}
 
       {/* An uploaded picture lives in the value as a few hundred KB of base64 —
           putting THAT in a text input is unreadable and one stray keystroke from
           a broken image, so the link box only exists while there is no upload. */}
       {uploaded ? (
-        <p className="text-[15px]" style={{ color: "var(--brand-hint)" }}>
+        <p className="text-meta" style={{ color: "var(--brand-hint)" }}>
           Uploaded from this device. Remove it to paste a link instead.
         </p>
       ) : showLinkInput ? (
@@ -233,7 +237,7 @@ export function CoverImageField({
             placeholder="https://…"
             className={`${inputCls(!!error)} ${disabled ? "opacity-60 cursor-not-allowed" : ""}`}
           />
-          {error && <p className="text-xs" style={{ color: "#EF4444" }}>{error}</p>}
+          {error && <p className="text-meta" style={{ color: "#EF4444" }}>{error}</p>}
         </div>
       ) : null}
     </div>

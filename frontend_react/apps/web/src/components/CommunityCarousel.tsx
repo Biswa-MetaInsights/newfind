@@ -27,6 +27,7 @@ import { EventShareButton, EventWishlistButton } from './EventActions'
 // ─── Types ─────────────────────────────────────────────────────────────────────
 
 export interface CommunityItem {
+  slug?: string;
   id: string
   title: string
   date: string
@@ -345,7 +346,7 @@ function EditLocationButton() {
       </button>
       {hovered && (
         <span
-          className="absolute left-full ml-2 whitespace-nowrap text-[16px] font-semibold px-3 py-1 rounded-lg z-10"
+          className="absolute left-full ml-2 whitespace-nowrap text-small font-semibold px-3 py-1 rounded-lg z-10"
           style={{ backgroundColor: LINEN, color: GREEN, boxShadow: '0 2px 8px rgba(0,0,0,0.12)' }}
         >
           Click here to edit location
@@ -368,7 +369,7 @@ export function CommunityCardItem({
 
   return (
     <Link
-      href={`/community/${community.id}`}
+      href={`/community/${community.slug ?? community.id}`}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       className="relative rounded-lg overflow-hidden flex flex-col"
@@ -413,20 +414,20 @@ export function CommunityCardItem({
             {community.logoUrl ? (
               <Image src={community.logoUrl} alt="" fill className="object-cover" sizes="48px" />
             ) : (
-              <span className="text-[20px] font-bold select-none" style={{ color: ON_GREEN }}>
+              <span className="text-title font-bold select-none" style={{ color: ON_GREEN }}>
                 {community.title.charAt(0).toUpperCase()}
               </span>
             )}
           </div>
 
           <div className="flex flex-col gap-1 min-w-0">
-            <h3 className="text-[20px] font-bold leading-snug line-clamp-2" style={{ color: TEXT }}>
+            <h3 className="text-title font-bold leading-snug line-clamp-2" style={{ color: TEXT }}>
               {community.title}
             </h3>
             {community.venue && (
               <div className="flex items-center gap-1.5 min-w-0">
                 <LocationPinIcon color={TEXT} />
-                <span className="text-[18px] line-clamp-1 min-w-0" style={{ color: TEXT }}>
+                <span className="text-body line-clamp-1 min-w-0" style={{ color: TEXT }}>
                   {community.venue}
                 </span>
               </div>
@@ -438,11 +439,11 @@ export function CommunityCardItem({
         <div className="flex items-center justify-between mt-auto pt-1.5 gap-2">
           <span>
             {community.isSoldOut ? (
-              <span className="text-[20px] font-bold" style={{ color: MUTED }}>Full</span>
+              <span className="text-title font-bold" style={{ color: MUTED }}>Full</span>
             ) : (
               <>
-                <span className="text-[20px] font-bold" style={{ color: GREEN }}>{community.memberCount}</span>
-                <span className="text-[18px] font-normal" style={{ color: TEXT }}> members</span>
+                <span className="text-title font-bold" style={{ color: GREEN }}>{community.memberCount}</span>
+                <span className="text-body font-normal" style={{ color: TEXT }}> members</span>
               </>
             )}
           </span>
@@ -450,7 +451,7 @@ export function CommunityCardItem({
             onClick={(e) => { if (onJoin) { e.preventDefault(); e.stopPropagation(); onJoin(community.id) } }}
             aria-label={`View details for ${community.title}`}
             disabled={community.isSoldOut}
-            className="shrink-0 px-4 py-1.5 rounded-lg text-[20px] font-bold transition-all duration-150 active:scale-[0.98]"
+            className="shrink-0 px-4 py-1.5 rounded-lg text-control font-bold transition-all duration-150 active:scale-[0.98]"
             style={{
               backgroundColor: community.isSoldOut ? MUTED_FILL : GREEN,
               color: ON_GREEN,
@@ -478,7 +479,7 @@ function OnlineCommunityCard({
 
   return (
     <Link
-      href={`/community/${community.id}`}
+      href={`/community/${community.slug ?? community.id}`}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       className="relative rounded-lg overflow-hidden flex flex-col"
@@ -524,20 +525,20 @@ function OnlineCommunityCard({
             {community.logoUrl ? (
               <Image src={community.logoUrl} alt="" fill className="object-cover" sizes="48px" />
             ) : (
-              <span className="text-[20px] font-bold select-none" style={{ color: ON_GREEN }}>
+              <span className="text-title font-bold select-none" style={{ color: ON_GREEN }}>
                 {community.title.charAt(0).toUpperCase()}
               </span>
             )}
           </div>
 
           <div className="flex flex-col gap-1 min-w-0">
-            <h3 className="text-[20px] font-bold leading-snug line-clamp-2" style={{ color: TEXT }}>
+            <h3 className="text-title font-bold leading-snug line-clamp-2" style={{ color: TEXT }}>
               {community.title}
             </h3>
             {community.venue && (
               <div className="flex items-center gap-1.5 min-w-0">
                 <VideoCallIcon color={TEXT} />
-                <span className="text-[18px] line-clamp-1 min-w-0" style={{ color: TEXT }}>
+                <span className="text-body line-clamp-1 min-w-0" style={{ color: TEXT }}>
                   {community.venue}
                 </span>
               </div>
@@ -549,11 +550,11 @@ function OnlineCommunityCard({
         <div className="flex items-center justify-between mt-auto pt-1.5 gap-2">
           <span>
             {community.isSoldOut ? (
-              <span className="text-[20px] font-bold" style={{ color: MUTED }}>Full</span>
+              <span className="text-title font-bold" style={{ color: MUTED }}>Full</span>
             ) : (
               <>
-                <span className="text-[20px] font-bold" style={{ color: GREEN }}>{community.memberCount}</span>
-                <span className="text-[18px] font-normal" style={{ color: TEXT }}> members</span>
+                <span className="text-title font-bold" style={{ color: GREEN }}>{community.memberCount}</span>
+                <span className="text-body font-normal" style={{ color: TEXT }}> members</span>
               </>
             )}
           </span>
@@ -561,7 +562,7 @@ function OnlineCommunityCard({
             onClick={(e) => { if (onJoin) { e.preventDefault(); e.stopPropagation(); onJoin(community.id) } }}
             aria-label={`View details for ${community.title}`}
             disabled={community.isSoldOut}
-            className="shrink-0 px-4 py-1.5 rounded-lg text-[20px] font-bold transition-all duration-150 active:scale-[0.98]"
+            className="shrink-0 px-4 py-1.5 rounded-lg text-control font-bold transition-all duration-150 active:scale-[0.98]"
             style={{
               backgroundColor: community.isSoldOut ? MUTED_FILL : GREEN,
               color: ON_GREEN,
@@ -612,13 +613,13 @@ function OnlineCommunitiesRow({
     <section aria-label="Online Communities" className="pb-10">
       {/* Header */}
       <div className="flex items-center justify-between px-4 sm:px-6 lg:px-12 mb-4">
-        <h2 className="font-extrabold tracking-[-0.5px]" style={{ fontSize: "clamp(18px, 4vw, 30px)", color: TEXT }}>
+        <h2 className="font-extrabold tracking-[-0.5px]" style={{ fontSize: "clamp(20px, 3vw, 26px)", color: TEXT }}>
           Online Communities
         </h2>
         <Link
           href={seeAllHref}
           aria-label="View all online communities"
-          className="hidden sm:flex items-center gap-1.5 text-lg font-semibold transition-opacity hover:opacity-70"
+          className="hidden sm:flex items-center gap-1.5 text-body font-semibold transition-opacity hover:opacity-70"
           style={{ color: GREEN }}
         >
           View all
@@ -638,7 +639,7 @@ function OnlineCommunitiesRow({
                 key={tab}
                 onClick={() => setActiveTab(tab)}
                 aria-pressed={active}
-                className="flex-none px-4 py-1.5 rounded-lg text-[20px] font-semibold whitespace-nowrap transition-all duration-150"
+                className="flex-none px-4 py-1.5 rounded-lg text-control font-semibold whitespace-nowrap transition-all duration-150"
                 style={
                   active
                     ? { backgroundColor: GREEN, color: ON_GREEN, border: `2px solid ${GREEN}` }
@@ -654,21 +655,21 @@ function OnlineCommunitiesRow({
 
       <div className="px-4 sm:px-6 lg:px-12 pb-3">
         {isLoading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
             {Array.from({ length: GRID_LIMIT }).map((_, i) => <SkeletonCard key={i} />)}
           </div>
         ) : onlineCommunities.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-20 gap-3" style={{ color: MUTED }}>
+          <div className="flex flex-col items-center justify-center py-14 gap-3" style={{ color: MUTED }}>
             <VideoCallIcon color={MUTED} />
-            <p className="text-lg">No online communities right now. Check back soon.</p>
+            <p className="text-body">No online communities right now. Check back soon.</p>
           </div>
         ) : filtered.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-20 gap-3" style={{ color: MUTED }}>
+          <div className="flex flex-col items-center justify-center py-14 gap-3" style={{ color: MUTED }}>
             <VideoCallIcon color={MUTED} />
-            <p className="text-lg">No online communities in this category yet.</p>
+            <p className="text-body">No online communities in this category yet.</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
             {visible.map((c) => (
               <OnlineCommunityCard key={c.id} community={c} onJoin={onJoin} />
             ))}
@@ -721,12 +722,12 @@ function SeeAllTile({ communities, href }: { communities: CommunityItem[]; href:
         ))}
       </div>
 
-      {/* Label — font sizes match community title (text-[20px] font-bold) and date/venue (text-[18px]) */}
+      {/* Label — font sizes match community title (text-title font-bold) and date/venue (text-body) */}
       <div className="flex flex-col items-center gap-1 text-center">
-        <span className="text-[20px] font-bold" style={{ color: labelFg, transition: 'color 0.15s ease' }}>
+        <span className="text-title font-bold" style={{ color: labelFg, transition: 'color 0.15s ease' }}>
           View all
         </span>
-        <span className="text-[18px] flex items-center gap-1"
+        <span className="text-body flex items-center gap-1"
           style={{ color: labelFg, transition: 'color 0.15s ease' }}>
           Browse all communities
           <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -785,7 +786,7 @@ export function CommunityCarousel({
 
       {/* ── Section header ── */}
       <div className="flex items-center justify-between px-4 sm:px-6 lg:px-12 mb-5">
-        <h2 className="font-extrabold tracking-[-0.5px] flex items-center gap-1" style={{ fontSize: "clamp(18px, 4vw, 30px)", color: TEXT }}>
+        <h2 className="font-extrabold tracking-[-0.5px] flex items-center gap-1" style={{ fontSize: "clamp(20px, 3vw, 26px)", color: TEXT }}>
           Communities in{' '}
           <span className="relative inline-flex items-center gap-2">
             <span style={{ color: GREEN }}>{location}</span>
@@ -795,7 +796,7 @@ export function CommunityCarousel({
         <Link
           href={seeAllHref}
           aria-label={`View all communities in ${location}`}
-          className="hidden sm:flex items-center gap-1.5 text-lg font-semibold transition-opacity hover:opacity-70"
+          className="hidden sm:flex items-center gap-1.5 text-body font-semibold transition-opacity hover:opacity-70"
           style={{ color: GREEN }}
         >
           View all
@@ -815,7 +816,7 @@ export function CommunityCarousel({
                 key={tab}
                 onClick={() => setActiveTab(tab)}
                 aria-pressed={active}
-                className="flex-none px-4 py-1.5 rounded-lg text-[20px] font-semibold whitespace-nowrap transition-all duration-150"
+                className="flex-none px-4 py-1.5 rounded-lg text-control font-semibold whitespace-nowrap transition-all duration-150"
                 style={
                   active
                     ? { backgroundColor: GREEN, color: ON_GREEN, border: `2px solid ${GREEN}` }
@@ -832,19 +833,19 @@ export function CommunityCarousel({
       {/* ── Community grid ── */}
       <div className="px-4 sm:px-6 lg:px-12 pb-8">
         {isLoading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
             {Array.from({ length: GRID_LIMIT }).map((_, i) => <SkeletonCard key={i} />)}
           </div>
         ) : filtered.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-20 gap-3" style={{ color: MUTED }}>
+          <div className="flex flex-col items-center justify-center py-14 gap-3" style={{ color: MUTED }}>
             <svg className="w-10 h-10" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
               <path strokeLinecap="round" strokeLinejoin="round"
                 d="M18 18.72a9.094 9.094 0 0 0 3.741-.479 3 3 0 0 0-4.682-2.72m.94 3.198.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0 1 12 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 0 1 6 18.719m12 0a5.971 5.971 0 0 0-.941-3.197m0 0A5.995 5.995 0 0 0 12 12.75a5.995 5.995 0 0 0-5.058 2.772m0 0a3 3 0 0 0-4.681 2.72 8.986 8.986 0 0 0 3.74.477m.94-3.197a5.971 5.971 0 0 0-.94 3.197M15 6.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm6 3a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Zm-13.5 0a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Z" />
             </svg>
-            <p className="text-lg">No communities in this category yet.</p>
+            <p className="text-body">No communities in this category yet.</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
             {visible.map((c) => (
               <CommunityCardItem key={c.id} community={c} onJoin={onJoin} />
             ))}
