@@ -1,3 +1,7 @@
+## Organiser registration update — 2026-11-26
+
+Bank name and account number are optional. Blank values preserve the existing API contract. Other organiser/contact and business identity fields remain required. Server error details are displayed when available. Deployment verification pending.
+
 # NewFind — Current State
 
 > **This file describes the present only.** Rewrite the relevant section in place — never append.

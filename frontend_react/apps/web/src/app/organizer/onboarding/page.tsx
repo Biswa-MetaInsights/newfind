@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { organizerApi } from "@eventmind/api";
+import { organizerApi, isAxiosError } from "@eventmind/api";
 import { useAuthStore } from "@eventmind/store";
 import { Navbar } from "@/components/navbar/Navbar";
 import {
@@ -122,11 +122,11 @@ export default function OrganizerOnboardingPage() {
       errors.companyWebsite = "Website must start with http:// or https://";
     if (!country) errors.country = "Please select a country.";
     if (registrationNumber.trim().length < 3) errors.registrationNumber = `${selectedCountry.regLabel} is required.`;
-    if (bankName.trim().length < 2) errors.bankName = "Bank name is required.";
+    if (bankName.trim() && bankName.trim().length < 2) errors.bankName = "Bank name is required.";
     /* 6–34 is the world's range: 34 is the IBAN maximum, and no domestic account
        number anywhere is shorter than six. Anything outside it is a typo rather
        than an unusual country. */
-    if (!/^[A-Za-z0-9]{6,34}$/.test(normaliseAccount(bankAccountNumber)))
+    if (bankAccountNumber.trim() && !/^[A-Za-z0-9]{6,34}$/.test(normaliseAccount(bankAccountNumber)))
       errors.bankAccountNumber = "Enter a valid account number or IBAN.";
     setFieldErrors(errors);
     return Object.keys(errors).length === 0;
@@ -153,8 +153,9 @@ export default function OrganizerOnboardingPage() {
       });
       setSuccess(true);
       setTimeout(() => router.push("/organizer/create"), 1500);
-    } catch {
-      setError("Failed to submit. Please check your details and try again.");
+    } catch (cause) {
+      const detail = isAxiosError(cause) ? cause.response?.data?.detail : undefined;
+      setError(typeof detail === "string" ? detail : "Unable to save your organiser details. Please try again. Bank details are optional.");
     } finally {
       setIsSubmitting(false);
     }
@@ -316,16 +317,8 @@ export default function OrganizerOnboardingPage() {
                 />
               </FormField>
 
-              {/* ── Payout details ──
-                  Where ticket revenue lands. Marked "(required)" because an
-                  organiser with no account on file cannot be paid for a paid
-                  event, and this form is the one time we ask.
-
-                  `sm` for both: a bank name's longest realistic form here is
-                  "State Bank of India" and an IBAN is 34 characters at its
-                  longest, which is ~230px in Roboto 15 — both inside the step
-                  that already holds the registration number beside them. */}
-              <FormField label="Bank Name" required inline width="sm" error={fieldErrors.bankName}>
+              {/* Payout details are optional during organiser registration. */}
+              <FormField label="Bank Name" inline width="sm" error={fieldErrors.bankName}>
                 <input
                   type="text"
                   value={bankName}
@@ -340,7 +333,7 @@ export default function OrganizerOnboardingPage() {
               {/* Not `inputMode="numeric"`: an IBAN opens with two letters, so a
                   numeric keypad would lock half the world out of its own
                   account number. */}
-              <FormField label="Account Number" required inline width="sm" error={fieldErrors.bankAccountNumber}>
+              <FormField label="Account Number" inline width="sm" error={fieldErrors.bankAccountNumber}>
                 <input
                   type="text"
                   value={bankAccountNumber}
