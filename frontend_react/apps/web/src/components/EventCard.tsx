@@ -4,15 +4,13 @@ import type { Event } from "@eventmind/types";
 import { BRAND } from "@/lib/theme";
 import { formatPrice } from "@/lib/currency";
 import { ShareButton } from "./ShareButton";
+import { eventImageUrl } from "@/lib/event-media";
 import { CalendarIcon as SharedCalendarIcon, LocationPinIcon as SharedLocationPinIcon } from "./EventIcons";
 
 const GREEN = BRAND.green;
 const SURFACE = BRAND.surface;
 const ON_GREEN = BRAND.onGreen;
 // Use event ID as seed so each card gets a unique but consistent placeholder image
-function cardImg(id: string) {
-  return `https://picsum.photos/seed/${id}/400/300`;
-}
 
 function formatDate(iso: string) {
   const d = new Date(iso);
@@ -49,7 +47,7 @@ export function EventCard({ event, onTap }: Props) {
       <div className="relative w-full" style={{ height: 180 }}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src={cardImg(event.id)}
+          src={eventImageUrl(event, 400, 300)}
           alt={event.title}
           className="w-full h-full object-cover"
         />

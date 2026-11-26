@@ -1,9 +1,9 @@
-from fastapi import APIRouter, Depends, HTTPException, status, Query, BackgroundTasks
+from fastapi import APIRouter, Depends, HTTPException, status, Query, BackgroundTasks, Header
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 from app.db.session import get_db
 from app.models.event import Event, EventStatus
-from app.schemas.event_schemas import EventCreate, EventOut, EventUpdate, EventSearch, EventIngest
+from app.schemas.event_schemas import EventCreate, EventOut, EventUpdate, EventSearch, EventIngest, ProviderDeleteBatch
 from typing import List, Optional
 from datetime import datetime
 from uuid import UUID
@@ -12,6 +12,7 @@ from backend.shared.kafka_utils import KafkaManager
 import logging
 import asyncio
 import math
+import hmac
 
 router = APIRouter(prefix="/events", tags=["Event Management"])
 
@@ -130,6 +131,45 @@ def ingest_event(event_in: EventIngest, db: Session = Depends(get_db)):
 
     _cache_invalidate()
     return new_event
+
+@router.post("/provider-deletes")
+def cancel_provider_events(
+    payload: ProviderDeleteBatch,
+    x_provider_sync_token: Optional[str] = Header(None, alias="X-Provider-Sync-Token"),
+    db: Session = Depends(get_db),
+):
+    """Soft-cancel provider events named by an authenticated sync tombstone.
+
+    This endpoint is deliberately disabled until PROVIDER_SYNC_TOKEN is
+    configured, and it never affects native events or other providers.
+    """
+    expected_token = settings.PROVIDER_SYNC_TOKEN
+    if not expected_token:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Provider deletion sync is not configured",
+        )
+    if not x_provider_sync_token or not hmac.compare_digest(x_provider_sync_token, expected_token):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Invalid provider sync token")
+
+    external_ids = list(set(payload.external_ids))
+    events = (
+        db.query(Event)
+        .filter(Event.source == payload.source, Event.external_id.in_(external_ids))
+        .all()
+    )
+    for event in events:
+        event.status = EventStatus.CANCELLED
+    db.commit()
+    if events:
+        _cache_invalidate()
+    return {
+        "source": payload.source,
+        "requested": len(external_ids),
+        "cancelled": len(events),
+        "not_found": max(0, len(external_ids) - len(events)),
+    }
+
 
 @router.get("/search", response_model=List[EventOut])
 def search_events(
