@@ -19,9 +19,10 @@ ROOT = Path(__file__).resolve().parents[2]
 
 
 @pytest.fixture(scope="module")
-def core(tmp_path_factory):
+def core(tmp_path_factory, request):
     state = tmp_path_factory.mktemp("newfind")
     names = ["user", "event", "ticketing", "auth", "gateway"]
+    database_urls = request.getfixturevalue("postgres_databases") if getattr(request, "param", None) == "postgres" else {}
     ports = {}
     for name in names:
         with socket.socket() as sock:
@@ -43,7 +44,7 @@ def core(tmp_path_factory):
         folder = ROOT / "backend" / ("gateway" if name == "gateway" else f"services/{name}")
         log = open(state / f"{name}.log", "a")
         logs[name] = log
-        child_env = dict(env, DATABASE_URL=f"sqlite:///{state / (name + '.db')}")
+        child_env = dict(env, DATABASE_URL=database_urls.get(name, f"sqlite:///{state / (name + '.db')}"))
         processes[name] = subprocess.Popen([sys.executable, "-m", "uvicorn", "main:app", "--host",
                                            "127.0.0.1", "--port", str(ports[name])],
                                           cwd=folder, env=child_env, stdout=log, stderr=log)
@@ -68,6 +69,7 @@ def core(tmp_path_factory):
         for name in names:
             start(name)
         with httpx.Client(base_url=urls["gateway"], timeout=10, trust_env=False) as client:
+            client.qa_gateway_env = env
             client.qa_database_root = state
             client.event_internal_url = urls["event"]
             client.internal_api_key = env["INTERNAL_API_KEY"]
