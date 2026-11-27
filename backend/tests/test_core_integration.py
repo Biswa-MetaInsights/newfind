@@ -65,11 +65,19 @@ def core(tmp_path_factory, request):
         logs[name].close()
         start(name)
 
+    def stop_services():
+        for process in processes.values():
+            process.kill()
+        for process in processes.values():
+            process.wait(timeout=10)
+
     try:
         for name in names:
             start(name)
         with httpx.Client(base_url=urls["gateway"], timeout=10, trust_env=False) as client:
             client.qa_gateway_env = env
+            client.qa_database_urls = database_urls
+            client.qa_stop_services = stop_services
             client.qa_database_root = state
             client.event_internal_url = urls["event"]
             client.internal_api_key = env["INTERNAL_API_KEY"]

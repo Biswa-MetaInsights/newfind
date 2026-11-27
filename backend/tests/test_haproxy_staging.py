@@ -1,4 +1,4 @@
-"""Exercise the actual gateway and services through HAProxy on loopback."""
+"""Exercise gateway and application-stack loss through HAProxy on loopback."""
 from collections import Counter
 from concurrent.futures import ThreadPoolExecutor
 import json
@@ -82,8 +82,9 @@ def test_chat_and_booking_survive_gateway_loss(core, redis_endpoint, tmp_path, r
     haproxy = os.getenv('NEWFIND_TEST_HAPROXY') or shutil.which('haproxy')
     if not haproxy:
         pytest.skip('HAProxy executable is required')
-    core_api, _ = core
+    core_api, restart_core = core
     env = dict(core_api.qa_gateway_env, NEWFIND_RATE_LIMIT_STORAGE_URI=redis_endpoint)
+    stack_failover = request.node.callspec.params['core'] == 'postgres'
     processes = []
 
     def launch(args, cwd, process_env, label):
@@ -105,9 +106,9 @@ def test_chat_and_booking_survive_gateway_loss(core, redis_endpoint, tmp_path, r
             time.sleep(.05)
         pytest.fail(f'{log.name} did not become ready')
 
-    def gateway(port, label):
+    def application(port, label, folder, application_env):
         process, log = launch([sys.executable, '-m', 'uvicorn', 'main:app', '--host', '127.0.0.1',
-                               '--port', str(port)], ROOT / 'backend/gateway', env, label)
+                               '--port', str(port)], ROOT / folder, application_env, label)
         await_ready(process, log, port)
         return process
 
@@ -143,8 +144,24 @@ backend gateways
     server b 127.0.0.1:{port_b} check inter 250ms fall 2 rise 2
 ''')
     try:
-        first = gateway(port_a, 'gateway-a')
-        gateway(port_b, 'gateway-b')
+        services = core_api.qa_database_urls
+        replica_env = env
+        if stack_failover:
+            replica_ports = {name: free_port() for name in services}
+            replica_urls = {env[f'{name.upper()}_SERVICE_URL']: f'http://127.0.0.1:{port}'
+                            for name, port in replica_ports.items()}
+            replica_env = {}
+            for key, value in env.items():
+                for original, replica in replica_urls.items():
+                    if value == original or value.startswith(original + '/'):
+                        value = replica + value[len(original):]
+                        break
+                replica_env[key] = value
+            for name, database_url in services.items():
+                application(replica_ports[name], f'{name}-b', f'backend/services/{name}',
+                            dict(replica_env, DATABASE_URL=database_url))
+        first = application(port_a, 'gateway-a', 'backend/gateway', env)
+        application(port_b, 'gateway-b', 'backend/gateway', replica_env)
         proxy, log = launch([haproxy, '-db', '-f', str(cfg)], tmp_path, os.environ, 'haproxy')
         await_ready(proxy, log, proxy_port)
         with httpx.Client(base_url=f'http://127.0.0.1:{proxy_port}', trust_env=False, timeout=5,
@@ -155,15 +172,16 @@ backend gateways
                        'company_email': 'qa@example.org', 'country': 'Belgium', 'registration_number': 'QA',
                        'bank_name': '', 'bank_account_number': ''}
             assert http.post(f'/user/{organiser}/organizer', headers=owner, json=profile).status_code == 201
-            event = http.post('/event', headers=owner, json={
+            event_payload = {
                 'organizer_id': organiser, 'title': 'Failover QA event', 'status': 'published', 'price': 0,
                 'currency': 'EUR', 'capacity': 1, 'start_date': '2031-09-01T09:00:00Z',
                 'end_date': '2031-09-01T11:00:00Z', 'timezone': 'UTC',
-            })
+            }
+            event = http.post('/event', headers=owner, json=event_payload)
             assert event.status_code == 201, event.text
             eid = event.json()['id']
             booking = {'event_id': eid, 'user_id': attendee, 'quantity': 1, 'request_id': str(uuid4())}
-            if request.node.callspec.params['core'] == 'postgres':
+            if stack_failover:
                 contender, contender_headers = account(http, 'second-attendee')
                 second_booking = {**booking, 'user_id': contender, 'request_id': str(uuid4())}
                 ready = threading.Barrier(2)
@@ -217,6 +235,8 @@ backend gateways
                     if kill:
                         time.sleep(max(0, stop_at - time.monotonic()))
                         first.kill()
+                        if stack_failover:
+                            core_api.qa_stop_services()
                         first.wait(timeout=5)
                     rows = [row for task in tasks for row in task.result()]
                 codes = Counter(row[0] for row in rows)
@@ -240,12 +260,33 @@ backend gateways
             assert len(http.get(room, headers=guest).json()) == 1
             assert http.post('/ticket/book', headers=guest, json=booking).json()[0]['id'] == ticket
             assert len(http.get(f'/ticket/user/{attendee}', headers=guest).json()) == 1
-            gateway(port_a, 'gateway-a-restarted')
+            if stack_failover:
+                new_attendee, new_guest = account(http, 'after-cutover')
+                created = http.post('/event', headers=owner,
+                                    json={**event_payload, 'title': 'Published on surviving stack'})
+                assert created.status_code == 201
+                new_event = created.json()['id']
+                new_booking = http.post('/ticket/book', headers=new_guest, json={
+                    'event_id': new_event, 'user_id': new_attendee, 'quantity': 1, 'request_id': str(uuid4()),
+                })
+                assert new_booking.status_code == 201
+                new_message = http.post(f'/event/{new_event}/messages', headers=new_guest,
+                                        json={'content': 'Sent on surviving stack', 'request_id': str(uuid4())})
+                assert new_message.status_code == 201
+                for name in services:
+                    restart_core(name)
+            application(port_a, 'gateway-a-restarted', 'backend/gateway', env)
             deadline = time.monotonic() + 5
             while time.monotonic() < deadline:
-                result = http.get(room, headers=guest)
+                result = http.get(f'/event/{new_event}/messages' if stack_failover else room,
+                                  headers=new_guest if stack_failover else guest)
                 assert result.status_code == 200
                 if result.headers['x-qa-backend'] == 'a':
+                    if stack_failover:
+                        [stored_message] = result.json()
+                        assert stored_message['id'] == new_message.json()['id']
+                        assert stored_message['sender_id'] == new_attendee
+                        assert stored_message['content'] == 'Sent on surviving stack'
                     break
                 time.sleep(.1)
             else:

@@ -24,7 +24,17 @@ The HAProxy test uses two gateway processes, shared Redis, and the real authenti
 | PostgreSQL 15 | 840/840 | 1,046/1,048 | 2 | 527/527 | 33.2 / 37.2 ms |
 | SQLite | 850/850 | 1,032/1,033 | 1 | 504/504 | 34.7 / 43.3 ms |
 
-Both runs used 16 concurrent workers and four read endpoints over a four-second baseline and five-second fault run. These measurements reflect loopback traffic and process failure. Multi-host network traffic, production data distribution, shared dependency failover and sustained capacity require separate tests.
+Both runs used 16 concurrent workers and four read endpoints over a four-second baseline and five-second fault run. These measurements reflect loopback traffic and process failure.
+
+### Application stack outage drill
+
+The PostgreSQL test now runs two copies of the gateway and the auth, user, event and ticketing services. Each gateway routes to its own application processes. During the load run, the drill stops all processes in the first stack together. HAProxy, PostgreSQL and Redis stay online. The surviving stack verifies existing tickets and messages, accepts a new registration and sign-in, publishes an event, books a ticket and accepts a chat message. The returning stack reads the new message from PostgreSQL after rejoining HAProxy.
+
+### Multi-host staging acceptance
+
+1. Use two staging application hosts on a private network with independent test ingress and separate staging PostgreSQL and Redis. Deploy the same candidate commit to both hosts. Use synthetic accounts and events.
+2. Verify load reaches both hosts, then shut down one staging application host. Exercise fresh sign-in, event publishing, last-seat booking, chat, and QR check-in while the host remains down. Verify existing sessions and measure failed requests, recovery time and latency during sustained single-host operation.
+3. Bring the host back, confirm both hosts receive traffic, and compare stored tickets and messages by ID. Run separate ingress, PostgreSQL and Redis failure drills and record the scope and recovery time for each. Complete an off-host PostgreSQL restore drill with the actual staging backup workflow.
 
 Run `python -m pytest backend/tests -q -s` with the backend test dependencies installed. Use local HAProxy and Redis executables on PATH or set `NEWFIND_TEST_HAPROXY` and `NEWFIND_TEST_REDIS_SERVER`. Set `NEWFIND_TEST_POSTGRES_BIN` to the directory containing `initdb` and `postgres` and `NEWFIND_TEST_RESTIC` to a verified restic executable to include both optional checks. The restic check verifies encryption and file restore with synthetic dumps, including rejection of an incorrect password. A database restore on a clean host is a separate acceptance check.
 
