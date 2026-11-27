@@ -64,7 +64,7 @@ const normaliseAccount = (v: string) => v.replace(/[\s-]/g, "");
 function subFromToken(token: string | null): string {
   if (!token) return "";
   try {
-    const payload = JSON.parse(atob(token.split(".")[1]));
+    const payload = JSON.parse(atob(token.split(".")[1].replace(/-/g, "+").replace(/_/g, "/")));
     return payload.sub ?? "";
   } catch {
     return "";
@@ -318,7 +318,7 @@ export default function OrganizerOnboardingPage() {
               </FormField>
 
               {/* Payout details are optional during organiser registration. */}
-              <FormField label="Bank Name" inline width="sm" error={fieldErrors.bankName}>
+              <FormField label="Bank Name" optional inline width="sm" error={fieldErrors.bankName}>
                 <input
                   type="text"
                   value={bankName}
@@ -333,7 +333,7 @@ export default function OrganizerOnboardingPage() {
               {/* Not `inputMode="numeric"`: an IBAN opens with two letters, so a
                   numeric keypad would lock half the world out of its own
                   account number. */}
-              <FormField label="Account Number" inline width="sm" error={fieldErrors.bankAccountNumber}>
+              <FormField label="Account Number" optional inline width="sm" error={fieldErrors.bankAccountNumber}>
                 <input
                   type="text"
                   value={bankAccountNumber}

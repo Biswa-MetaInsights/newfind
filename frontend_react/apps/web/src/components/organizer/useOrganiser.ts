@@ -32,7 +32,7 @@ import { isDummyMode, organizerSource, ownsEvent } from "@/lib/data-source";
 function subFromToken(token: string | null): string {
   if (!token) return "";
   try {
-    return JSON.parse(atob(token.split(".")[1])).sub ?? "";
+    return JSON.parse(atob(token.split(".")[1].replace(/-/g, "+").replace(/_/g, "/"))).sub ?? "";
   } catch {
     return "";
   }

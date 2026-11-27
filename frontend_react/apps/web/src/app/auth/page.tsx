@@ -13,6 +13,7 @@ import { SocialSignIn } from "@/components/SocialSignIn";
 export default function AuthPage() {
   const router = useRouter();
   const setAuth = useAuthStore((s) => s.setAuth);
+  const sessionExpired = useAuthStore((s) => s.sessionExpired);
 
   const [isLogin, setIsLogin] = useState(true);
   const [name, setName] = useState("");
@@ -197,6 +198,7 @@ export default function AuthPage() {
             <div className="flex-1 h-px bg-[var(--brand-border)]" />
           </div>
 
+          {sessionExpired && <p role="alert" className="mb-4 text-[var(--brand-text)]">Your session has expired. Please sign in again to continue.</p>}
           <SocialSignIn disabled={isLoading} />
         </div>
       </div>

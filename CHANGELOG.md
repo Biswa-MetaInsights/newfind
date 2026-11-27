@@ -1,3 +1,7 @@
+## 2026-11-27
+
+- Recover expired frontend sessions, handle protected API 401 responses, decode organiser JWT subjects as base64url, and label optional bank fields clearly.
+
 # Recovery — 2026-11-16
 
 - Restore tested frontend API/auth and mobile fixes on main while preserving privacy and terms pages; backend unchanged.

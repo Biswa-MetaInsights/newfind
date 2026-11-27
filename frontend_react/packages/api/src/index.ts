@@ -1,4 +1,4 @@
-export { apiClient, configureApiBaseUrl } from "./client";
+export { apiClient, configureApiBaseUrl, configureSessionExpired } from "./client";
 export { authApi } from "./auth";
 export { eventsApi } from "./events";
 export type { EventSearchParams, EventCreateData, EventUpdateData, ChatMessage, ChatResponse } from "./events";

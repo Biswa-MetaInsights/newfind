@@ -316,7 +316,7 @@ function Toast({ message }: { message: string }) {
 // ── Navbar ────────────────────────────────────────────────────────────────────
 function subFromToken(token: string | null): string {
   if (!token) return "";
-  try { return JSON.parse(atob(token.split(".")[1])).sub ?? ""; }
+  try { return JSON.parse(atob(token.split(".")[1].replace(/-/g, "+").replace(/_/g, "/"))).sub ?? ""; }
   catch { return ""; }
 }
 

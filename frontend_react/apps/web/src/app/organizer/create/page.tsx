@@ -321,7 +321,7 @@ function OpenDialogButton({
 function subFromToken(token: string | null): string {
   if (!token) return "00000000-0000-0000-0000-000000000001";
   try {
-    const payload = JSON.parse(atob(token.split(".")[1]));
+    const payload = JSON.parse(atob(token.split(".")[1].replace(/-/g, "+").replace(/_/g, "/")));
     return payload.sub ?? "00000000-0000-0000-0000-000000000001";
   } catch {
     return "00000000-0000-0000-0000-000000000001";
