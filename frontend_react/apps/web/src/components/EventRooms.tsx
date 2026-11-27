@@ -23,8 +23,17 @@ export function EventRooms({roomId}: {roomId?: string}) {
   const heightBeforeOlder = useRef(0);
   const userId = currentUserId();
   useEffect(()=>{if (ready && !authenticated) router.replace('/auth');},[ready, authenticated, router]);
-  const rooms = useQuery({queryKey:['event-rooms',userId],queryFn:()=>collaboration.rooms().then(r=>r.data),enabled:ready&&authenticated,refetchInterval:15000});
-  const messages = useInfiniteQuery({queryKey:['event-messages',roomId,userId],initialPageParam:undefined as string|undefined,queryFn:({pageParam})=>collaboration.messages(roomId!,pageParam).then(r=>r.data),getNextPageParam:last=>last.length===50?last[0].created_at:undefined,enabled:ready&&authenticated&&!!roomId,refetchInterval:5000});
+  const rooms = useQuery({queryKey:['event-rooms',userId],queryFn:()=>collaboration.rooms().then(r=>r.data),enabled:ready&&authenticated,refetchInterval:30_000,refetchIntervalInBackground:false});
+  const messages = useInfiniteQuery({queryKey:['event-messages',roomId,userId],initialPageParam:undefined as string|undefined,queryFn:({pageParam})=>collaboration.messages(roomId!,pageParam).then(r=>r.data),getNextPageParam:last=>last.length===50?last[0].created_at:undefined,enabled:ready&&authenticated&&!!roomId,refetchInterval: query => {
+    // React Query refreshes every loaded history page. Keep the periodic refresh
+    // on the recent page only while the user is reading older messages.
+    const pages = query.state.data?.pages;
+    if (pages && pages.length > 1) return false;
+    const lastMessage = pages?.[0]?.at(-1);
+    const created = lastMessage?.created_at;
+    const latest = created ? Date.parse(/(?:Z|[+-]\d{2}:\d{2})$/.test(created) ? created : `${created}Z`) : NaN;
+    return Date.now() - latest < 120_000 ? 5_000 : 15_000;
+  },refetchIntervalInBackground:false});
   const history=messages.data?.pages.slice().reverse().flat();
   const latest = messages.data?.pages[0]?.at(-1)?.id;
   const newest = history?.at(-1);
@@ -60,7 +69,8 @@ export function EventRooms({roomId}: {roomId?: string}) {
             {/* Only the NEWEST message is announced, so older ones added at the top are not read out. */}
             <p className="sr-only" role="status" aria-live="polite">{newest?`Latest message from ${newest.name}: ${newest.content.slice(0,200)}`:''}</p>
             <div ref={listRef} role="region" tabIndex={0} aria-label="Messages" onScroll={e=>{const el=e.currentTarget;stick.current=el.scrollHeight-el.scrollTop-el.clientHeight<80;}} className="space-y-4 max-h-[55dvh] overflow-y-auto py-4">
-              {messages.hasNextPage&&<button className="underline p-3" disabled={messages.isFetchingNextPage} onClick={()=>{heightBeforeOlder.current=listRef.current?.scrollHeight??0;void messages.fetchNextPage();}}>{messages.isFetchingNextPage?'Loading…':'Load older messages'}</button>}
+              {(pageCount ?? 0) > 1 && <button type="button" className="underline p-3" disabled={messages.isFetching} onClick={() => void messages.refetch()}>Refresh messages</button>}
+            {messages.hasNextPage&&<button className="underline p-3" disabled={messages.isFetchingNextPage} onClick={()=>{heightBeforeOlder.current=listRef.current?.scrollHeight??0;void messages.fetchNextPage();}}>{messages.isFetchingNextPage?'Loading…':'Load older messages'}</button>}
               {!history?.length&&<p>No messages yet. Start the conversation.</p>}
               {history?.map(message=><article key={message.id} className="rounded-lg border border-[var(--brand-border)] p-4 break-words">
                 <p className="font-bold">{message.name}{message.is_organizer?' · Organiser':''}</p>
