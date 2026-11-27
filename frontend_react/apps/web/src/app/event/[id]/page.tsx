@@ -96,6 +96,8 @@ export default function EventDetailPage({
   const { data: event, isLoading } = useQuery({
     queryKey: ["event", id],
     queryFn: () => eventsSource.get(id).then((r) => r.data),
+    staleTime: 0,
+    refetchOnWindowFocus: true,
   });
 
   const registration = useRegistrationState(event);
@@ -170,6 +172,17 @@ export default function EventDetailPage({
     );
   }
 
+  const lifecycle = lifecycleOf(event);
+  const cancelled = lifecycle === "cancelled";
+  if (cancelled && !organiserView) {
+    return (
+      <div className="min-h-screen bg-[var(--brand-bg)]">
+        <Navbar />
+        <CancelledBanner />
+      </div>
+    );
+  }
+
   const isFree = event.price === 0;
   const category = event.category ?? "General";
   const eventId = String(event.id);
@@ -195,16 +208,6 @@ export default function EventDetailPage({
   // handler; the dialog only receives the finished row.
   const openList = (kind: ListKind, count: number) =>
     setEditingList({ kind, extraRow: count === 0 ? blankRow(kind) : null });
-  // A cancelled event keeps its page — a link already shared has to explain
-  // itself rather than 404 — but everything that would sell a ticket is off,
-  // and the page wears the same greyed-out treatment as a sold-out card
-  // (EventsCarousel: `grayscale opacity-60`). One visual language for "this is
-  // not available", so a visitor reads it without being told twice.
-  // Through `lifecycleOf`, not a bare `===`: `status` is a plain string that
-  // arrives in whatever case the row was written with, and that helper is the
-  // one place that decides what each value means.
-  const lifecycle = lifecycleOf(event);
-  const cancelled = lifecycle === "cancelled";
   // ⚠️ "Registration closed" is NOT dimmed and gets NO banner. The event is
   // still happening and its page is still the reference for everyone holding a
   // ticket — only the join is off. The grey-out and the band are reserved for

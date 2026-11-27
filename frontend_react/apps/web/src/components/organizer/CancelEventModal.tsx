@@ -40,7 +40,9 @@ export function CancelEventModal({
       eventsSource.update(String(event.id), { status: "cancelled" }).then((r) => r.data),
     onSuccess: (updated) => {
       queryClient.setQueryData(["event", String(event.id)], updated);
-      queryClient.invalidateQueries({ queryKey: ["organizer-events"] });
+      void queryClient.invalidateQueries({ predicate: ({ queryKey }) =>
+        ["organizer-events", "organizer-overview", "events", "explore-events", "similar-events", "recommendations"].includes(String(queryKey[0])),
+      });
       onClose();
     },
     onError: () => setError("Could not cancel the event. Please try again."),
@@ -75,7 +77,7 @@ export function CancelEventModal({
     >
       <div className="space-y-4">
         <p className="text-[16px] leading-relaxed text-[var(--brand-text)]">
-          <b>{event.title}</b> drops out of search and the home page, and nobody can book it.
+          <b>{event.title}</b> will move to Archived in your organiser console and disappear from public listings. Booking will close.
         </p>
 
         {/* Stated plainly BECAUSE it is not built. See the file header. */}

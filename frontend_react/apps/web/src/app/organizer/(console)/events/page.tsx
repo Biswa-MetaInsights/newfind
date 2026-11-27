@@ -89,7 +89,7 @@ export default function ConsoleEventsPage() {
   // where the filter's effect is stated.
   const counts = useMemo(() => bucketCounts(rows), [rows]);
   const inTab = useMemo(
-    () => (tab === "all" ? rows : rows.filter((r) => r.bucket === tab)),
+    () => (rows.filter((r) => tab === "all" ? r.bucket !== "archived" : r.bucket === tab)),
     [rows, tab],
   );
   const visible = useMemo(() => filterAndSortRows(inTab, price, sort), [inTab, price, sort]);
@@ -243,11 +243,11 @@ export default function ConsoleEventsPage() {
                 ? `No ${price === "free" ? "free" : "paid"} events in this tab.`
                 : tab === "drafts" && !isDummyMode
                   ? "No drafts yet. Save an event as a draft to see it here."
-                  : "Nothing in this tab."}
+                  : tab === "archived" ? "Cancelled events will appear here." : "Nothing in this tab."}
             </p>
           )}
 
-          <TableFooter note={`${visible.length} of ${rows.length} events`} />
+          <TableFooter note={`${visible.length} of ${inTab.length} events`} />
         </Card>
 
         <p className="text-[17px]" style={{ color: "var(--brand-hint)", textWrap: "pretty" }}>

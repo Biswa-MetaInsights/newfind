@@ -29,7 +29,7 @@ import { formatPrice } from "./currency";
 /** How far ahead an event still counts as actively selling rather than scheduled. */
 export const LIVE_WINDOW_DAYS = 30;
 
-export type EventBucket = "live" | "upcoming" | "drafts" | "past";
+export type EventBucket = "live" | "upcoming" | "drafts" | "past" | "archived";
 
 /** ⚠️ "Live" is FIRST and is the Events page's default tab (Gautham,
  *  2026-09-09), with "All" immediately to its right. The console opens on the
@@ -42,12 +42,15 @@ export const CONSOLE_TABS: { key: EventBucket | "all"; label: string }[] = [
   { key: "upcoming", label: "Upcoming" },
   { key: "drafts", label: "Drafts" },
   { key: "past", label: "Past" },
+  { key: "archived", label: "Archived" },
 ];
 
 const DAY = 24 * 60 * 60 * 1000;
 
 export function bucketOf(event: Event, now = Date.now()): EventBucket {
-  if ((event.status ?? "").toLowerCase() !== "published") return "drafts";
+  const status = (event.status ?? "").toLowerCase();
+  if (status === "cancelled") return "archived";
+  if (status !== "published") return "drafts";
   const ends = new Date(event.end_date || event.start_date).getTime();
   if (ends < now) return "past";
   const starts = new Date(event.start_date).getTime();
@@ -90,6 +93,7 @@ const STATUS_LABEL: Record<EventBucket, string> = {
   upcoming: "Scheduled",
   drafts: "Draft",
   past: "Completed",
+  archived: "Cancelled",
 };
 
 function placeOf(event: Event): string {
@@ -149,7 +153,7 @@ export function toConsoleRow(event: Event, now = Date.now()): ConsoleRow {
     revenue: isDraft ? "—" : free ? "Free" : formatPrice(sold * event.price, event.currency, { freeLabel: null }),
     // No check-in records exist yet — an em dash, never a 0. See TODO.md §19.
     checkins: "—",
-    finished: bucket === "past",
+    finished: bucket === "past" || bucket === "archived",
   };
 }
 
@@ -218,7 +222,10 @@ export function filterAndSortRows(
 
 /** Row counts per tab, for the tab badges. */
 export function bucketCounts(rows: ConsoleRow[]): Record<string, number> {
-  const counts: Record<string, number> = { live: 0, upcoming: 0, drafts: 0, past: 0, all: rows.length };
-  for (const r of rows) counts[r.bucket] += 1;
+  const counts: Record<string, number> = { live: 0, upcoming: 0, drafts: 0, past: 0, archived: 0, all: 0 };
+  for (const row of rows) {
+    counts[row.bucket] += 1;
+    if (row.bucket !== "archived") counts.all += 1;
+  }
   return counts;
 }

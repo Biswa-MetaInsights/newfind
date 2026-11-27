@@ -174,11 +174,18 @@ const discoverableEvents = () =>
       new Date(e.end_date || e.start_date).getTime() >= Date.now(),
   );
 
+export function isUncancelledEvent(event: Event): boolean {
+  return (event.status ?? "").toLowerCase() !== "cancelled";
+}
+
 const allCommunities = () => [...dummyCommunities, ...dummyOnlineCommunities];
 
 export const eventsSource = {
-  search: (params?: EventSearchParams) =>
-    isDummyMode ? ok(dummyEventSearch(params)) : eventsApi.search(params),
+  search: async (params?: EventSearchParams) => {
+    if (isDummyMode) return ok(dummyEventSearch(params));
+    const response = await eventsApi.search(params);
+    return { ...response, data: response.data.filter(isUncancelledEvent) };
+  },
   get: (id: string) => {
     if (!isDummyMode) return eventsApi.get(id);
     const found = allEvents().find((e) => String(e.id) === String(id));

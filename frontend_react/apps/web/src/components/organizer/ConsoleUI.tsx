@@ -304,13 +304,14 @@ const PILL_FILL: Record<PillType, { bg: string; text: string }> = {
   live: { bg: "#7E8B3A", text: TAG_LABEL },      // Olive
   upcoming: { bg: "#3E6FA0", text: TAG_LABEL },  // Denim
   drafts: { bg: "#4B5158", text: "#E5E7EB" },    // the 'sold-out' neutral
+  archived: { bg: "#5F7080", text: TAG_LABEL },
   past: { bg: "#5F7080", text: TAG_LABEL },      // Slate
   free: { bg: "#A05FA0", text: TAG_LABEL },      // Plum — BADGE_CONFIG's own Free
   paid: { bg: "#A8543A", text: TAG_LABEL },      // Rust
 };
 
 /**
- * What an event-row pill is describing. The four buckets are `EventBucket`
+ * What an event-row pill is describing. The event buckets are `EventBucket`
  * itself, so a row passes `r.bucket` straight through and the map is exhaustive
  * by construction — a new bucket cannot ship without a colour.
  */

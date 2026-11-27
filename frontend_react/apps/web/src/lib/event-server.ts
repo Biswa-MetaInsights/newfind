@@ -8,7 +8,7 @@ import type { Event } from "@eventmind/types";
 export async function getEventForShare(id: string): Promise<Event | null> {
   try {
     const { data } = await eventsSource.get(id);
-    return (data as Event) ?? null;
+    return data && (data.status ?? "").toLowerCase() !== "cancelled" ? data : null;
   } catch {
     return null;
   }

@@ -4,7 +4,7 @@ import { Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 // PARKED 2026-08-14 (MVP) â€” `communitiesSource` dropped from this import.
-import { eventsSource } from "@/lib/data-source";
+import { eventsSource, isUncancelledEvent } from "@/lib/data-source";
 import { useLocationStore, DEFAULT_CITY } from "@eventmind/store";
 import { apiClient } from "@eventmind/api";
 import { useAuthStore } from "@eventmind/store";
@@ -129,7 +129,7 @@ function DiscoveryPage() {
         isLoading={eventsLoading || onlineLoading}
         onBookNow={(id) => router.push(`/event/${id}`)}
         locationSlot={<CityPicker />}
-        suggestedEvents={signedIn ? recommendations.data?.map(toCarouselEvent) : undefined}
+        suggestedEvents={signedIn ? recommendations.data?.filter(isUncancelledEvent).map(toCarouselEvent) : undefined}
       />
 
       {/* PARKED 2026-08-14 (MVP) â€” the community carousel ("Communities in {city}"

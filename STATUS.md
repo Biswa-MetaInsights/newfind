@@ -8,6 +8,8 @@ The current production baseline is 7cfe2fa974293ce3504903ea32c3983fed05444d, ass
 
 Session-recovery release 0c66a7af993adad6c4c2f6054847226043d903cd is live on www.newfind.events (Vercel DwSxoGsxYVP8HKQZifFdWLqaLLtH, Ready). A live browser confirmed that the previously failing dashboard redirects its expired session to sign-in and displays a clear explanation. Bank fields are labelled optional. Backend containers and database schemas are unchanged.
 
+Cancelling an event puts it in the organiser console’s Archived tab. Public discovery and share previews omit it. An attendee following an existing link sees a cancellation notice. Existing ticket and cancellation history is retained.
+
 ## Verification
 
 61 automated tests passed across the session client/store, event registration rules and isolated gateway/service journeys. One optional backup test was skipped. The TypeScript check, production build and focused lint passed; one existing Navbar warning remains. The shipping TypeScript booking client passed booking/retry/restart/account-isolation checks against isolated services. Live read-only checks passed for discovery and the public application pages.
