@@ -6,7 +6,7 @@ Last reviewed: 2026-11-27
 
 The current production baseline is 7cfe2fa974293ce3504903ea32c3983fed05444d, assigned to www.newfind.events. It retains Gautham's design, same-origin backend routing and the privacy and terms pages. Bank name and account number are optional at organiser registration.
 
-The next frontend correction improves expired-session recovery, adds a clear sign-in explanation and labels the bank fields as optional. Backend containers and database schemas are unchanged. Production verification of this correction is pending.
+Session-recovery release 0c66a7af993adad6c4c2f6054847226043d903cd is live on www.newfind.events (Vercel DwSxoGsxYVP8HKQZifFdWLqaLLtH, Ready). A live browser confirmed that the previously failing dashboard redirects its expired session to sign-in and displays a clear explanation. Bank fields are labelled optional. Backend containers and database schemas are unchanged.
 
 ## Verification
 

@@ -2,7 +2,7 @@
 
 ## Release decision
 
-Session recovery correction is ready for deployment after automated checks. Live organiser submission, full live event creation/booking and real-device mobile journeys remain unverified. Paid checkout is unavailable.
+Session recovery correction is deployed and its live expired-session recovery is verified. Live organiser submission, full live event creation/booking and real-device mobile journeys remain unverified. Paid checkout is unavailable.
 
 ## Confirmed defects
 
@@ -54,4 +54,4 @@ python -m pytest backend/tests/test_core_integration.py backend/tests/test_opera
 
 ## Deployment
 
-Candidate production assignment and live expiry recovery confirmation pending.
+Application commit 0c66a7af993adad6c4c2f6054847226043d903cd is Ready in production: Vercel DwSxoGsxYVP8HKQZifFdWLqaLLtH, assigned to www.newfind.events, newfind.events and the existing Vercel aliases. Live verification: reloading the previously failing /dashboard redirected to /auth and showed “Your session has expired. Please sign in again to continue.” Google start button was enabled, Facebook disabled. Public API and page checks passed after rollout. Screenshot: [session recovery](newfind-session-recovery-20261127.jpg).
