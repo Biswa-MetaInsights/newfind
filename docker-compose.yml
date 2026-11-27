@@ -69,6 +69,8 @@ services:
     ports:
     - 127.0.0.1:${NEWFIND_API_PORT:-18000}:8000
     depends_on:
+      redis:
+        condition: service_healthy
       auth:
         condition: service_healthy
       user:
@@ -79,6 +81,7 @@ services:
         condition: service_healthy
     environment:
       APP_PORT: '8000'
+      NEWFIND_RATE_LIMIT_STORAGE_URI: ${NEWFIND_RATE_LIMIT_STORAGE_URI:-redis://redis:6379/0}
       CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:?Set CORS_ALLOWED_ORIGINS}
       JWT_SECRET: ${JWT_SECRET:?Set JWT_SECRET}
     mem_limit: 192m

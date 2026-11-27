@@ -5,7 +5,7 @@ from uuid import UUID, uuid4, uuid5, NAMESPACE_URL
 import httpx
 from fastapi import APIRouter, Depends, HTTPException, Query, Header
 from pydantic import BaseModel, Field
-from sqlalchemy import Column, String, Text, DateTime, JSON, UniqueConstraint
+from sqlalchemy import Column, String, Text, DateTime, JSON, UniqueConstraint, and_, func, or_
 from sqlalchemy.types import Uuid
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
@@ -159,16 +159,16 @@ def rooms(authorization: str = Header(''), claims=Depends(identity), db: Session
     tickets = service_get('TICKETING', '/tickets/user/' + claims['sub'], {'Authorization': authorization})
     ids = {UUID(row['event_id']) for row in tickets}
     events = db.query(Event).filter((Event.organizer_id == UUID(claims['sub'])) | Event.id.in_(ids)).order_by(Event.start_date.desc()).limit(200).all()
-    result = []
-    for event in events:
-        last = db.query(RoomRead).filter_by(event_id=event.id, user_id=UUID(claims['sub'])).first()
-        unread = db.query(EventMessage).filter(EventMessage.event_id == event.id,
-                                              EventMessage.user_id != UUID(claims['sub']))
-        if last:
-            unread = unread.filter(EventMessage.created_at > last.read_at)
-        result.append({'id': str(event.id), 'name': event.title, 'unread_count': unread.count(),
-                       'organizer': str(event.organizer_id) == claims['sub']})
-    return result
+    if not events:
+        return []
+    viewer = UUID(claims['sub'])
+    unread_counts = dict(db.query(EventMessage.event_id, func.count(EventMessage.id))
+        .outerjoin(RoomRead, and_(RoomRead.event_id == EventMessage.event_id, RoomRead.user_id == viewer))
+        .filter(EventMessage.event_id.in_([event.id for event in events]), EventMessage.user_id != viewer,
+                or_(RoomRead.read_at.is_(None), EventMessage.created_at > RoomRead.read_at))
+        .group_by(EventMessage.event_id).all())
+    return [{'id': str(event.id), 'name': event.title, 'unread_count': unread_counts.get(event.id, 0),
+             'organizer': event.organizer_id == viewer} for event in events]
 
 
 class MessageInput(BaseModel):

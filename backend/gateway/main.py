@@ -21,7 +21,11 @@ def rate_key(request: Request):
     except HTTPException:
         return 'ip:' + get_remote_address(request)
 
-limiter = Limiter(key_func=rate_key)
+limiter = Limiter(
+    key_func=rate_key,
+    storage_uri=os.getenv("NEWFIND_RATE_LIMIT_STORAGE_URI", "memory://"),
+    key_prefix="newfind-gateway",
+)
 app = FastAPI(title="NewFind API Gateway", version="1.0.0")
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
