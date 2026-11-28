@@ -378,8 +378,17 @@ function TicketsTab({ tickets }: { tickets: StoredTicket[] }) {
 function TicketCard({ ticket }: { ticket: StoredTicket }) {
   const router = useRouter();
   const isFree = ticket.price_paid === 0;
-  const qr = useQuery({queryKey: ['ticket-qr', ticket.id], queryFn: async () => privateImage('/api/ticket/qr/' + ticket.id), enabled: !isDummyMode});
+  const qr = useQuery({queryKey: ['ticket-qr', ticket.id], queryFn: async () => privateImage('/api/ticket/qr/' + ticket.id), enabled: !isDummyMode && !ticket.eventUnavailable});
   const number = ticket.id.substring(ticket.id.length - 8).toUpperCase();
+  if (ticket.eventUnavailable) {
+    return (
+      <article className="rounded-xl border border-[var(--brand-border)] p-5">
+        <h3 className="font-semibold">Event unavailable</h3>
+        <p className="mt-2">Ticket #{number}</p>
+        <p className="mt-2">Your ticket is still on record. Event details are currently unavailable.</p>
+      </article>
+    );
+  }
   const card: CarouselEvent = {
     id: ticket.event_id,
     title: ticket.event_title,
