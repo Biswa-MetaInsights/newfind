@@ -7,6 +7,7 @@ import os
 from pathlib import Path
 import secrets
 import socket
+import sqlite3
 import subprocess
 import sys
 import time
@@ -131,6 +132,18 @@ def test_core_user_journeys_and_security(core):
     assert r.status_code == 201, r.text
     event_id = r.json()["id"]
     assert client.get("/event/search", params={"q":"Integration QA"}).json()[0]["id"] == event_id
+    online = client.post("/event", json={**event, "title": "Online date boundary", "event_type": "Online"},
+                         headers=organizer_headers)
+    assert online.status_code == 201, online.text
+    online_id = online.json()["id"]
+    search = {"q": "Online date boundary", "event_type": "Online", "date_from": "2030-12-01",
+              "lat": 50.85, "lng": 4.35, "radius": 10}
+    results = client.get("/event/search", params={**search, "date_to": "2030-12-01"})
+    assert results.status_code == 200 and [row["id"] for row in results.json()] == [online_id]
+    assert results.json()[0]["distance_km"] is None
+    assert client.get("/event/search", params={**search, "date_to": "2030-12-01T00:00:00Z"}).json() == []
+    assert client.get("/event/search", params={**search, "date_to": "2030-12-01T13:00:00+02:00"}).json() == []
+    assert client.get("/event/search", params={**search, "date_to": "invalid"}).status_code == 422
     assert client.get(f"/event/{event_id}").status_code == 200
     assert client.patch(f"/event/{event_id}", json={"title":"Hijack"}, headers=attendee_headers).status_code == 403
     assert client.patch(f"/event/{event_id}", json={"title":"Integration QA Updated"}, headers=organizer_headers).status_code == 200
@@ -159,6 +172,18 @@ def test_core_user_journeys_and_security(core):
     restart("ticketing")
     r = client.get(f"/ticket/user/{attendee}", headers=attendee_headers)
     assert r.status_code == 200 and {t["id"] for t in r.json()} == set(ticket_ids)
+    assert all(t["event"]["title"] == "Integration QA Updated" for t in r.json())
+    assert client.post("/event/internal/ticket-events", json=[event_id]).status_code == 403
+    extra = client.post("/ticket/book", headers=attendee_headers,
+                        json={**booking, "event_id": draft_id, "quantity": 1, "request_id": str(uuid4())})
+    assert extra.status_code == 201, extra.text
+    with sqlite3.connect(client.qa_database_root / 'event.db') as event_db:
+        event_db.execute("DELETE FROM events WHERE id = ?", (draft_id.replace('-', ''),))
+    r = client.get(f"/ticket/user/{attendee}", headers=attendee_headers)
+    assert r.status_code == 200
+    summaries = {ticket["id"]: ticket["event"] for ticket in r.json()}
+    assert summaries[extra.json()[0]["id"]] is None
+    assert all(summaries[ticket_id]["title"] == "Integration QA Updated" for ticket_id in ticket_ids)
     assert client.get("/event/" + str(uuid4())).status_code == 404
     assert client.post("/event/", headers=organizer_headers, content="broken").status_code == 400
     assert client.post("/ticket/book", headers=attendee_headers, json={**booking,"quantity":-1}).status_code == 422

@@ -24,6 +24,10 @@ class TicketOut(BaseModel):
     class Config:
         from_attributes = True
 
+class TicketListItem(TicketOut):
+    event: dict[str, Any] | None = None
+
+
 class WaitlistJoin(BaseModel):
     event_id: UUID
     user_id: UUID
