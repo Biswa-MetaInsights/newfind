@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.orm import Session
 from app.db.session import get_db
 from app.models.ticket import Ticket, TicketStatus, Waitlist
-from app.schemas.ticket_schemas import TicketCreate, TicketOut, WaitlistJoin, WaitlistOut
+from app.schemas.ticket_schemas import TicketCreate, TicketListItem, TicketOut, WaitlistJoin, WaitlistOut
 from app.services.ticket_service import TicketService
 from uuid import UUID
 from typing import List, Optional
@@ -125,11 +125,31 @@ def join_waitlist(join_in: WaitlistJoin, db: Session = Depends(get_db)):
     
     return WaitlistOut(event_id=join_in.event_id, user_id=join_in.user_id, position=position)
 
-@router.get("/user/{user_id}", response_model=List[TicketOut])
+@router.get("/user/{user_id}", response_model=List[TicketListItem])
 def get_user_tickets(user_id: UUID, claims=Depends(identity), db: Session = Depends(get_db)):
     if str(user_id) != claims['sub']:
         raise HTTPException(403, 'Booking identity mismatch')
     """
     Fetch all valid tickets for a specific user.
     """
-    return db.query(Ticket).filter(Ticket.user_id == user_id, Ticket.status.in_([TicketStatus.VALID, TicketStatus.USED])).all()
+    tickets = db.query(Ticket).filter(
+        Ticket.user_id == user_id, Ticket.status.in_([TicketStatus.VALID, TicketStatus.USED])
+    ).all()
+    event_ids = list(dict.fromkeys(str(ticket.event_id) for ticket in tickets))
+    events = {}
+    if event_ids:
+        with httpx.Client(timeout=2.0) as client:
+            for offset in range(0, len(event_ids), 200):
+                try:
+                    response = client.post(
+                        os.environ['EVENT_SERVICE_URL'] + '/events/internal/ticket-events',
+                        headers={'X-Internal-Key': os.environ['INTERNAL_API_KEY']},
+                        json=event_ids[offset:offset + 200],
+                    )
+                    response.raise_for_status()
+                    events.update(response.json())
+                except (httpx.HTTPError, KeyError, ValueError):
+                    logger.warning('Ticket event summaries unavailable')
+                    break
+    return [TicketListItem.model_validate(ticket).model_copy(update={'event': events.get(str(ticket.event_id))})
+            for ticket in tickets]

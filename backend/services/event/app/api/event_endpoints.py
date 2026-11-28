@@ -4,8 +4,9 @@ from sqlalchemy.orm import Session
 from app.db.session import get_db
 from app.models.event import Event, EventStatus
 from app.schemas.event_schemas import EventCreate, EventOut, EventUpdate, EventSearch, EventIngest
-from typing import List, Optional
-from datetime import datetime, timedelta, timezone
+from typing import Annotated, List, Optional
+from datetime import date, datetime, timedelta, timezone
+from pydantic import Field, TypeAdapter, ValidationError
 from uuid import UUID
 from app.core.config import settings
 from backend.shared.kafka_utils import KafkaManager
@@ -22,6 +23,11 @@ from zoneinfo import ZoneInfo
 router = APIRouter(prefix="/events", tags=["Event Management"])
 
 logger = logging.getLogger(__name__)
+_search_datetime = TypeAdapter(datetime)
+
+
+def utc_naive(value: datetime) -> datetime:
+    return value.astimezone(timezone.utc).replace(tzinfo=None) if value.tzinfo else value
 
 # ── In-memory search cache ────────────────────────────────────────────────────
 # Keyed by search params, TTL = 5 minutes. Invalidated on new event creation.
@@ -188,7 +194,7 @@ def ingest_event(event_in: EventIngest, x_internal_key: str = Header(""), db: Se
 def search_events(
     q: Optional[str] = Query(None, max_length=200), category: Optional[str] = None,
     event_type: Optional[str] = None, date_from: Optional[datetime] = None,
-    date_to: Optional[datetime] = None, price_min: Optional[float] = Query(None, ge=0),
+    date_to: Optional[str] = None, price_min: Optional[float] = Query(None, ge=0),
     price_max: Optional[float] = Query(None, ge=0), currency: Optional[str] = Query(None, pattern=r'^[A-Z]{3}$'),
     community_id: Optional[UUID] = None, status: Optional[EventStatus] = None,
     lat: Optional[float] = Query(None, ge=-90, le=90), lng: Optional[float] = Query(None, ge=-180, le=180),
@@ -222,8 +228,18 @@ def search_events(
     if event_type:
         formats = [event_type, 'Hybrid'] if event_type in ('Online', 'In-Person') else [event_type]
         query = query.filter(Event.event_type.in_(formats))
-    if date_from: query = query.filter(Event.start_date >= date_from)
-    if date_to: query = query.filter(Event.start_date <= date_to)
+    if date_from:
+        query = query.filter(Event.start_date >= utc_naive(date_from))
+    if date_to is not None:
+        try:
+            end = utc_naive(_search_datetime.validate_python(date_to))
+        except ValidationError as exc:
+            raise HTTPException(422, 'Provide a valid end date or timestamp') from exc
+        if date_to == end.date().isoformat():
+            if end.date() != date.max:
+                query = query.filter(Event.start_date < end + timedelta(days=1))
+        else:
+            query = query.filter(Event.start_date <= end)
     if currency: query = query.filter(Event.currency == currency)
     if price_min is not None: query = query.filter(Event.price >= price_min)
     if price_max is not None:
@@ -237,8 +253,9 @@ def search_events(
     candidates = []
     for event in query.order_by(Event.start_date, Event.id).yield_per(200):
         distance = None
-        if lat is not None:
-            if event.event_type == 'Online': continue
+        if lat is not None and event.event_type == 'Online' and event_type != 'Online':
+            continue
+        if lat is not None and event.event_type != 'Online':
             loc = event.location or {}
             try:
                 ev_lat, ev_lng = float(loc['latitude']), float(loc['longitude'])
@@ -291,6 +308,16 @@ def count_events(
 @router.get('/internal/organizer/{organizer_id}', dependencies=[Depends(internal)])
 def internal_organizer_events(organizer_id: UUID, db: Session = Depends(get_db)):
     return [EventOut.model_validate(e).model_dump(mode='json') for e in db.query(Event).filter(Event.organizer_id == organizer_id).order_by(Event.start_date).all()]
+
+@router.post('/internal/ticket-events', dependencies=[Depends(internal)])
+def ticket_events(event_ids: Annotated[list[UUID], Field(max_length=200)], db: Session = Depends(get_db)):
+    events = db.query(Event).filter(
+        Event.id.in_(event_ids), Event.visibility == 'public', Event.status != EventStatus.DRAFT,
+    ).all()
+    fields = {'title', 'start_date', 'timezone', 'currency', 'location', 'image_url', 'status'}
+    return {str(event.id): EventOut.model_validate(event).model_dump(mode='json', include=fields)
+            for event in events}
+
 
 @router.get("/internal/{event_id}", response_model=EventOut)
 def get_event_for_booking(event_id: UUID, x_internal_key: str = Header(""), db: Session = Depends(get_db)):
