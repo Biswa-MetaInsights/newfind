@@ -159,7 +159,7 @@ export function HeroChatCollage() {
   const quickPicks = [
     { label: "This weekend", href: `/explore?view=events&date_from=${weekendFrom}&date_to=${weekendTo}` },
     { label: "Free", href: "/explore?view=events&free=true" },
-    { label: "Online", href: eventType(EVENT_FORMATS.online) },
+    { label: "Online", href: `${eventType(EVENT_FORMATS.online)}&city=Online` },
   ];
 
   function onSearch(e: React.FormEvent) {

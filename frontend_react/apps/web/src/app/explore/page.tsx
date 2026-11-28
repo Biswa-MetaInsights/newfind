@@ -285,12 +285,14 @@ function ExploreContent() {
   const [q, setQ] = useState(searchParams.get("q") ?? "");
   const [category, setCategory] = useState(searchParams.get("category") ?? "All");
   const [eventType, setEventType] = useState(searchParams.get("event_type") ?? "All");
-  const [city, setCity] = useState<City>(() => {
+  const [localCity, setCity] = useState<City | null>(() => {
     const lat=Number(searchParams.get('lat')), lng=Number(searchParams.get('lng'));
     if(searchParams.has('lat')&&searchParams.has('lng')&&Number.isFinite(lat)&&Number.isFinite(lng)&&Math.abs(lat)<=90&&Math.abs(lng)<=180)
       return {name:searchParams.get('city')||'Chosen location',country:'',lat,lng};
-    return CITIES.find(c=>c.name===searchParams.get('city'))??selectedCity;
+    return CITIES.find(c=>c.name===searchParams.get('city'))??null;
   });
+  const city = localCity ?? selectedCity;
+  const locationReady = localCity !== null || hasHydrated;
   // Either end may be null, which means "unbounded that way" — not 0, and not
   // PRICE_SLIDER_MAX. Both are read from the URL so a filtered search is
   // shareable, exactly like ?category= above.
@@ -312,19 +314,22 @@ function ExploreContent() {
   // Lazy initialiser so presetRange() runs once, not on every render. A URL that
   // carries either date wins outright — including a deliberately empty one, so a
   // shared "All events" link doesn't silently snap back to this week.
+  const upcomingQuickPick = searchParams.get("free") === "true" ||
+    searchParams.get("event_type") === EVENT_FORMATS.online;
   const [dateFrom, setDateFrom] = useState(
-    () => searchParams.get("date_from") ?? (searchParams.has("date_to") ? "" : presetRange(DEFAULT_PRESET)[0])
+    () => searchParams.get("date_from") ?? (searchParams.has("date_to") ? "" : upcomingQuickPick ? isoDate(new Date()) : presetRange(DEFAULT_PRESET)[0])
   );
   const [dateTo, setDateTo] = useState(
-    () => searchParams.get("date_to") ?? (searchParams.has("date_from") ? "" : presetRange(DEFAULT_PRESET)[1])
+    () => searchParams.get("date_to") ?? (searchParams.has("date_from") || upcomingQuickPick ? "" : presetRange(DEFAULT_PRESET)[1])
   );
 
   useEffect(()=>{
+    if (!locationReady) return;
     const params=new URLSearchParams({city:city.name,lat:String(city.lat),lng:String(city.lng),radius:String(radius),sort,q,category,event_type:eventType,currency:priceCurrency,date_from:dateFrom,date_to:dateTo,selling_fast:String(sellingFast)});
     if(priceMin!=null)params.set('price_min',String(priceMin));if(priceMax!=null)params.set('price_max',String(priceMax));
     window.history.replaceState(null,'',`/explore?${params}`);
-  },[city,radius,sort,q,category,eventType,priceCurrency,dateFrom,dateTo,sellingFast,priceMin,priceMax]);
-  const online = isOnlineCity(city);
+  },[locationReady,city,radius,sort,q,category,eventType,priceCurrency,dateFrom,dateTo,sellingFast,priceMin,priceMax]);
+  const online = isOnlineCity(city) || eventType === EVENT_FORMATS.online;
   const showEvents = view !== "communities";
   // PARKED 2026-08-14 (MVP) — its only reader was the community query's `enabled`.
   // const showCommunities = view !== "events";
@@ -363,6 +368,7 @@ function ExploreContent() {
   // applies here: picking Online + Music now gives online music events, where the
   // old category="online" query silently threw the category selection away.
   const buildEventParams = useCallback(() => {
+    const end = /^\d{4}-\d{2}-\d{2}$/.test(dateTo) ? `${dateTo}T23:59:59.999999Z` : dateTo || undefined;
     if (online) {
       return {
         q: q || undefined,
@@ -375,7 +381,7 @@ function ExploreContent() {
         price_min: priceMin ?? undefined,
         price_max: priceMax ?? undefined,
         date_from: dateFrom || undefined,
-        date_to: dateTo || undefined,
+        date_to: end,
       };
     }
     return {
@@ -393,7 +399,7 @@ function ExploreContent() {
         price_min: priceMin ?? undefined,
       price_max: priceMax ?? undefined,
       date_from: dateFrom || undefined,
-      date_to: dateTo || undefined,
+      date_to: end,
     };
   }, [online, q, category, eventType, city, priceMin, priceMax, dateFrom, dateTo, radius, priceCurrency, sellingFast, sort]);
 
@@ -417,7 +423,7 @@ function ExploreContent() {
     initialPageParam: 0,
     queryFn: ({pageParam}) => eventsSource.search({...buildEventParams(),offset:pageParam}).then((r) => r.data),
     getNextPageParam: (last, pages) => last.length===200?pages.length*200:undefined,
-    enabled: showEvents,
+    enabled: showEvents && (locationReady || online),
   });
 
   /* PARKED 2026-08-14 (MVP) — the community fetch. Not merely hidden at the

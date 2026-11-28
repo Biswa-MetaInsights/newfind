@@ -5,6 +5,7 @@ export interface StoredTicket {
   id: string;
   event_id: string;
   event_title: string;
+  eventUnavailable?: boolean;
   start_date: string;
   /** The event's IANA zone, so a ticket card shows the VENUE's clock time, not the browser's.
    *  Optional: tickets persisted before this field existed have none and fall back to browser time. */
